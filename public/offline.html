@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sin conexión - Tienda-fg</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: #0f172a;
+            color: #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            text-align: center;
+            max-width: 400px;
+            padding: 40px 30px;
+            background: #1e293b;
+            border-radius: 20px;
+            border: 1px solid #334155;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+        .icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            display: block;
+            color: #f59e0b;
+        }
+        h1 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: #f1f5f9;
+        }
+        p {
+            color: #94a3b8;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #4f46e5, #8b5cf6);
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: transform 0.2s;
+            border: none;
+            cursor: pointer;
+        }
+        .btn:hover { transform: translateY(-2px); }
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid #334155;
+            margin-top: 10px;
+            color: #94a3b8;
+        }
+        .btn-secondary:hover {
+            background: #334155;
+            color: #f1f5f9;
+        }
+        .status {
+            margin-top: 20px;
+            padding: 10px;
+            background: #0f172a;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            color: #64748b;
+        }
+        .status i {
+            color: #f59e0b;
+            margin-right: 6px;
+        }
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #4f46e5, #8b5cf6, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <span class="icon">📡</span>
+        <span class="logo">Tienda-fg</span>
+        <h1>Sin conexión a internet</h1>
+        <p>No pudimos conectar con el servidor. Verifica tu conexión y vuelve a intentarlo.</p>
+        <button class="btn" onclick="reloadPage()">
+            <i>🔄</i> Reintentar
+        </button>
+        <br>
+        <button class="btn btn-secondary" onclick="goHome()">
+            <i>🏠</i> Ir a la página principal
+        </button>
+        <div class="status">
+            <i>⚠️</i> Modo offline activado
+        </div>
+    </div>
+
+    <script>
+        function reloadPage() {
+            if (navigator.onLine) {
+                window.location.href = '/';
+            } else {
+                alert('No tienes conexión a internet. Conéctate y vuelve a intentarlo.');
+            }
+        }
+
+        function goHome() {
+            window.location.href = '/';
+        }
+
+        // Escuchar cambios en la conexión
+        window.addEventListener('online', () => {
+            window.location.href = '/';
+        });
+    </script>
+</body>
+</html>
