@@ -1,0 +1,164 @@
+/* ============================================
+   AJUSTES FINALES - NIVEL EMPRESARIAL
+   ============================================ */
+
+/* 1. Forzar el 100% del tamaño de pantalla */
+html {
+    font-size: 16px !important;
+    -webkit-text-size-adjust: 100%;
+}
+
+body {
+    font-size: 15px !important;
+}
+
+/* 2. Hacer los textos de los productos más grandes y legibles */
+.card-title, .card-title-grande {
+    font-size: 1.15rem !important; /* Letras más grandes */
+    line-height: 1.3 !important;
+    color: #2C3E50 !important;
+    font-weight: 600 !important;
+}
+
+.new-price, .new-price-grande {
+    font-size: 1.1rem !important; /* Precio más visible */
+    font-weight: 800 !important;
+}
+
+.old-price {
+    font-size: 0.8rem !important;
+}
+
+/* 3. Arreglar los botones de cerrar (X) que se perdieron */
+.modal-close, .close-cart, .close-panel-btn {
+    color: #2C3E50 !important; /* Color oscuro para que se vea */
+    background: #FFFFFF !important;
+    border: 1px solid #E8DFD3 !important;
+    width: 40px !important;
+    height: 40px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 1.2rem !important;
+    opacity: 1 !important;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1) !important;
+}
+
+.modal-close:hover, .close-cart:hover {
+    background: #F4EFE6 !important;
+}
+
+/* 4. Arreglar el botón de Menú (hamburguesa) */
+.menu-toggle {
+    color: #2C3E50 !important;
+    font-size: 1.5rem !important;
+    display: flex !important;
+}
+
+/* 5. Hacer los botones "Añadir" más grandes y profesionales */
+.btn-add, .btn-add-grande, .modal-btn-add {
+    padding: 10px 20px !important;
+    font-size: 0.85rem !important;
+    font-weight: 700 !important;
+    border-radius: 30px !important;
+    background: #2C3E50 !important;
+    color: white !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+}
+
+.btn-add i, .btn-add-grande i {
+    font-size: 0.9rem !important;
+}
+
+/* 6. Agrandar los botones de cantidad (+ y -) */
+.qty-btn, .cart-qty-btn, .modal-qty-btn {
+    width: 32px !important;
+    height: 32px !important;
+    font-size: 1rem !important;
+    font-weight: bold !important;
+    background: #F4EFE6 !important;
+    color: #2C3E50 !important;
+}
+
+.qty-val, .cart-qty-val, .modal-qty-val {
+    font-size: 1rem !important;
+    font-weight: 700 !important;
+    min-width: 30px !important;
+}
+
+/* 7. Arreglar el Hero (Texto de bienvenida) */
+.hero h1 {
+    font-size: 2.2rem !important;
+    margin-bottom: 12px !important;
+}
+
+.hero p {
+    font-size: 1.1rem !important;
+    line-height: 1.5 !important;
+}
+
+.btn-hero {
+    font-size: 1rem !important;
+    padding: 14px 30px !important;
+}
+
+/* 8. Mejorar la tarjeta GRANDE para que no se corte la imagen */
+.producto-card.producto-card-grande {
+    height: auto !important;
+    min-height: 200px !important;
+    display: flex !important;
+    flex-direction: row !important;
+    background: #FFFFFF !important;
+}
+
+.producto-card.producto-card-grande .card-img-wrapper {
+    width: 50% !important;
+    height: auto !important;
+    min-height: 200px !important;
+}
+
+.card-body-grande {
+    width: 50% !important;
+    padding: 16px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+}
+
+/* 9. Ajuste para que en móviles la tarjeta grande sea vertical y visible */
+@media (max-width: 480px) {
+    .producto-card.producto-card-grande {
+        flex-direction: column !important;
+        min-height: auto !important;
+    }
+    .producto-card.producto-card-grande .card-img-wrapper {
+        width: 100% !important;
+        height: 200px !important;
+    }
+    .card-body-grande {
+        width: 100% !important;
+    }
+}
+
+/* 10. Asegurar que el botón flotante del carrito se vea bien */
+.floating-cart {
+    width: 65px !important;
+    height: 65px !important;
+    font-size: 1.6rem !important;
+    bottom: 100px !important;
+    right: 20px !important;
+}
+
+/* 11. Ajustar las categorías (pills) */
+.cat-link {
+    font-size: 0.9rem !important;
+    padding: 10px 20px !important;
+}
+
+/* 12. Arreglar el texto del footer y estado */
+footer {
+    font-size: 0.9rem !important;
+    padding: 30px 20px !important;
+}
