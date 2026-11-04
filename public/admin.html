@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin / Multi tienda</title>
+    <link rel="manifest" href="/manifest-admin.json">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/global.css">
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+
+<button class="mobile-menu-btn" onclick="toggleSidebar()">
+    <i class="fas fa-bars"></i> Menú
+</button>
+
+<div id="loginScreen">
+    <div class="login-card">
+        <div class="login-icon"><i class="fas fa-crown"></i></div>
+        <h2>Tienda-fg</h2>
+        <p class="subtitle">Panel Administrativo</p>
+        <form id="loginForm">
+            <div class="mb-3">
+                <input type="password" id="passInput" class="form-control" placeholder="Ingresa la contraseña" required style="padding: 12px; border-radius: 12px;" autofocus>
+            </div>
+            <button class="btn btn-primary w-100" id="loginBtn" style="padding: 12px; font-size: 0.95rem;">
+                <i class="fas fa-arrow-right me-2"></i> Ingresar
+            </button>
+            <div class="login-error" id="loginError"></div>
+        </form>
+    </div>
+</div>
+
+<div class="sidebar" id="sidebar">
+    <a href="#" class="sidebar-brand">
+        <div class="brand-icon"><i class="fas fa-store"></i></div>
+        <span>Tienda-fg</span>
+    </a>
+    <div class="tienda-selector">
+        <label><i class="fas fa-store-alt me-1"></i> Tienda Activa</label>
+        <select id="tiendaSelect" class="form-select"></select>
+    </div>
+    <button class="nav-item active" data-section="products" onclick="showSection('products')">
+        <span class="icon"><i class="fas fa-box"></i></span> Productos
+    </button>
+    <button class="nav-item" data-section="orders" onclick="showSection('orders')">
+        <span class="icon"><i class="fas fa-shopping-cart"></i></span> Pedidos
+        <span class="new-order-indicator" id="newOrderIndicator"></span>
+    </button>
+    <button class="nav-item" data-section="stores" onclick="showSection('stores')">
+        <span class="icon"><i class="fas fa-store-alt"></i></span> Tiendas
+    </button>
+    <button class="nav-item" data-section="settings" onclick="showSection('settings')">
+        <span class="icon"><i class="fas fa-cog"></i></span> Configuración
+    </button>
+    <div class="sidebar-divider"></div>
+    <button class="nav-item logout" onclick="AdminAuth.logout()">
+        <span class="icon"><i class="fas fa-sign-out-alt"></i></span> Salir
+    </button>
+</div>
+
+<div class="main-content" id="app" style="display:none;">
+    <div id="view-products">
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+            <div>
+                <h3 class="fw-bold mb-1"><i class="fas fa-box me-2" style="color:var(--primary);"></i> Productos - <span id="currentStoreName" class="text-secondary">Electrodomésticos</span></h3>
+                <p class="text-muted small mb-0">Gestiona el catálogo de productos</p>
+            </div>
+            <div class="d-flex gap-2 flex-wrap">
+                <button id="notifBtn" class="btn btn-warning btn-sm" onclick="AdminNotifications.toggle()">
+                    <i class="fas fa-bell-slash"></i> Activar Notificaciones
+                </button>
+                <button class="btn btn-primary" onclick="AdminProducts.openProductModal()">
+                    <i class="fas fa-plus me-1"></i> Nuevo Producto
+                </button>
+            </div>
+        </div>
+        <div class="card p-0 overflow-hidden">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead><tr><th>Img</th><th>Nombre</th><th>Precio</th><th>Desc</th><th>Categoría</th><th>Tamaño</th><th>Estado</th><th style="text-align:right;">Acciones</th></tr></thead>
+                    <tbody id="productsList"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="view-orders" style="display:none;">
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+            <div>
+                <h3 class="fw-bold mb-1"><i class="fas fa-shopping-cart me-2" style="color:var(--primary);"></i> Pedidos - <span id="currentStoreNameOrders" class="text-secondary">Electrodomésticos</span></h3>
+                <p class="text-muted small mb-0">Gestión de pedidos en tiempo real</p>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+                <span class="badge bg-primary rounded-pill px-3 py-2" id="orderCount">0</span>
+                <button class="btn btn-outline-danger" onclick="AdminOrders.deleteAllOrders()"><i class="fas fa-trash-alt me-1"></i> Limpiar</button>
+            </div>
+        </div>
+        <div class="card mb-4" style="background: #f8fafc; border: 2px solid #e2e8f0;">
+            <div class="card-body">
+                <div class="row g-2 align-items-center">
+                    <div class="col-md-8">
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-search" style="color:var(--primary);"></i></span>
+                            <input type="text" id="searchOrderCode" class="form-control" placeholder="Buscar por código" style="font-family: monospace; text-transform: uppercase;">
+                            <button class="btn btn-primary" onclick="AdminOrders.buscarPedidoPorCodigo()"><i class="fas fa-search"></i> Buscar</button>
+                        </div>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <button class="btn btn-outline-secondary btn-sm" onclick="AdminOrders.limpiarBusquedaPedidos()"><i class="fas fa-times"></i> Limpiar búsqueda</button>
+                    </div>
+                </div>
+                <div id="searchResultContainer" style="display:none;" class="mt-3"></div>
+            </div>
+        </div>
+        <div class="stat-grid" id="orderStats" style="display:none;">
+            <div class="stat-card"><div class="stat-value" id="statTotal">0</div><div class="stat-label">Total Pedidos</div></div>
+            <div class="stat-card" style="border-color: var(--warning);"><div class="stat-value" id="statPendientes">0</div><div class="stat-label">Pendientes</div></div>
+            <div class="stat-card" style="border-color: var(--success);"><div class="stat-value" id="statCompletados">0</div><div class="stat-label">Completados</div></div>
+        </div>
+        <div id="ordersList"></div>
+    </div>
+
+    <div id="view-stores" style="display:none;">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h3 class="fw-bold mb-1"><i class="fas fa-store-alt me-2" style="color:var(--primary);"></i> Gestión de Tiendas</h3>
+                <p class="text-muted small mb-0">Crea y administra tus tiendas</p>
+            </div>
+        </div>
+        <div class="store-form-card">
+            <h5 class="mb-3 fw-bold"><i class="fas fa-plus-circle" style="color: var(--primary);"></i> <span id="storeFormTitle">Agregar Nueva Tienda</span></h5>
+            <form id="storeForm">
+                <input type="hidden" id="storeId">
+                <div class="row g-3">
+                    <div class="col-md-4"><label class="form-label">ID de Tienda (slug)</label><div class="input-group"><span class="input-group-text"><i class="fas fa-tag"></i></span><input type="text" id="storeSlug" class="form-control" placeholder="ej. electro" required></div></div>
+                    <div class="col-md-4"><label class="form-label">Nombre Comercial</label><div class="input-group"><span class="input-group-text"><i class="fas fa-store"></i></span><input type="text" id="storeDisplayName" class="form-control" placeholder="Ej: Electrodomésticos" required></div></div>
+                    <div class="col-md-4"><label class="form-label">Icono (Emoji)</label><div class="input-group"><span class="input-group-text"><i class="fas fa-icons"></i></span><input type="text" id="storeIcon" class="form-control" value="⚡" maxlength="4"></div></div>
+                    <div class="col-12"><label class="form-label">Descripción</label><textarea id="storeDescription" class="form-control" rows="2"></textarea></div>
+                    <div class="col-12"><label class="form-label">Categorías Iniciales</label><input type="text" id="storeCategories" class="form-control" value="otros"></div>
+                    <div class="col-md-4"><label class="form-label">Envío Disponible</label><select id="storeEnvioDisponible" class="form-select"><option value="true">✅ Sí</option><option value="false">❌ No</option></select></div>
+                    <div class="col-md-4"><label class="form-label">Costo de Envío</label><input type="number" id="storeEnvioCosto" class="form-control" value="0" min="0"></div>
+                    <div class="col-md-4"><label class="form-label">Tiempo Estimado</label><input type="text" id="storeEnvioTiempo" class="form-control" value="24-48 horas"></div>
+                    <div class="col-md-4"><label class="form-label">Garantía Disponible</label><select id="storeGarantiaDisponible" class="form-select"><option value="true">✅ Sí</option><option value="false">❌ No</option></select></div>
+                    <div class="col-md-4"><label class="form-label">Duración Garantía</label><input type="text" id="storeGarantiaDuracion" class="form-control" value="12 meses"></div>
+                    <div class="col-md-4"><label class="form-label">Descripción Garantía</label><input type="text" id="storeGarantiaDesc" class="form-control" value="Garantía contra defectos"></div>
+                    <div class="col-md-6"><label class="form-label">Métodos de Pago</label><div class="d-flex gap-4 mt-2"><label class="form-check"><input type="checkbox" id="pagoEfectivo" checked> Efectivo</label><label class="form-check"><input type="checkbox" id="pagoTransferencia" checked> Transferencia</label></div></div>
+                    <div class="col-md-3"><label class="form-label">Teléfono</label><input type="text" id="storeTelefono" class="form-control" value="+53 5XXXXXXX"></div>
+                    <div class="col-md-3"><label class="form-label">Email</label><input type="text" id="storeEmail" class="form-control" value="contacto@tienda.com"></div>
+                    <div class="col-md-6"><label class="form-label">Número de Tarjeta</label><input type="text" id="storeNumeroTarjeta" class="form-control" placeholder="1234 5678..."></div>
+                    <div class="col-md-6"><label class="form-label">WhatsApp Comprobante</label><input type="text" id="storeWhatsAppConfirmacion" class="form-control" placeholder="+53 5XXXXXXX"></div>
+                    <div class="col-12 mt-3"><button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> <span id="storeSubmitText">Crear Tienda</span></button><button type="button" class="btn btn-outline-secondary ms-2" onclick="resetStoreForm()"><i class="fas fa-times"></i> Cancelar</button></div>
+                </div>
+            </form>
+        </div>
+        <div class="card p-0 overflow-hidden">
+            <div class="card-header"><i class="fas fa-list-ul me-2" style="color:var(--primary);"></i> Tiendas Registradas</div>
+            <div class="table-responsive">
+                <table class="table table-hover"><thead><tr><th>ID</th><th>Icono</th><th>Nombre</th><th>Descripción</th><th>Categorías</th><th style="text-align:right;">Acciones</th></tr></thead><tbody id="storesList"></tbody></table>
+            </div>
+        </div>
+    </div>
+
+    <div id="view-settings" style="display:none;">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div><h3 class="fw-bold mb-1"><i class="fas fa-cog me-2" style="color:var(--primary);"></i> Configuración Global</h3><p class="text-muted small mb-0">Tasas de cambio</p></div>
+        </div>
+        <div class="card" style="max-width:500px;">
+            <div class="card-header fw-bold"><i class="fas fa-exchange-alt me-2" style="color:var(--primary);"></i> Tasas de Cambio</div>
+            <div class="card-body">
+                <form id="currencyForm" onsubmit="saveCurrencyConfig(event)">
+                    <div class="mb-4"><label class="form-label">1 USD = CUP</label><div class="input-group"><span class="input-group-text">$</span><input type="number" step="0.01" id="rateUSD" class="form-control" required><span class="input-group-text">CUP</span></div></div>
+                    <div class="mb-4"><label class="form-label">1 EUR = CUP</label><div class="input-group"><span class="input-group-text">€</span><input type="number" step="0.01" id="rateEUR" class="form-control" required><span class="input-group-text">CUP</span></div></div>
+                    <button class="btn btn-primary w-100" id="currencySaveBtn"><i class="fas fa-save me-1"></i> Guardar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="productModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content" style="border-radius: var(--radius); border: none;">
+            <div class="modal-header"><h5 class="fw-bold"><i class="fas fa-box me-2" style="color:var(--primary);"></i>Producto</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+            <div class="modal-body" style="padding: 24px;">
+                <form id="productFormData">
+                    <input type="hidden" id="productId">
+                    <div class="mb-3"><label class="form-label">Nombre</label><input type="text" id="prodName" class="form-control" required maxlength="100"></div>
+                    <div class="mb-3"><label class="form-label">Descripción</label><textarea id="prodDescription" class="form-control" rows="3"></textarea></div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3"><label class="form-label">Precio (CUP)</label><input type="number" id="prodPrice" class="form-control" required min="0.01" step="0.01"></div>
+                        <div class="col-md-6 mb-3"><label class="form-label">Descuento (%)</label><input type="number" id="prodDiscount" class="form-control" value="0" min="0" max="100"></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3"><label class="form-label">Categoría</label><select id="prodCategory" class="form-select"></select><button type="button" class="btn btn-sm btn-outline-primary mt-2" onclick="AdminProducts.quickAddCategory()"><i class="fas fa-plus"></i> Nueva</button></div>
+                        <div class="col-md-6 mb-3"><label class="form-label">Tamaño</label><select id="prodSize" class="form-select"><option value="pequeno">📐 Pequeño</option><option value="grande">📏 Grande</option></select></div>
+                    </div>
+                    <div class="row"><div class="col-md-6 mb-3"><label class="form-label">Estado</label><select id="prodStock" class="form-select"><option value="true">✅ Disponible</option><option value="false">❌ Agotado</option></select></div></div>
+                    <div class="mb-3"><label class="form-label">URL Imagen</label><input type="text" id="prodImage" class="form-control" placeholder="https://..."></div>
+                    <div class="mb-3"><label class="form-label">Subir archivo</label><input type="file" id="prodFile" class="form-control" accept="image/*"></div>
+                </form>
+            </div>
+            <div class="modal-footer"><button class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button><button class="btn btn-primary" id="productSaveBtn" onclick="AdminProducts.saveProduct()"><i class="fas fa-save me-1"></i> Guardar</button></div>
+        </div>
+    </div>
+</div>
+
+<div class="admin-toast" id="adminToast"><i class="fas fa-check-circle"></i><span id="adminToastMsg">Operación exitosa</span><button class="toast-close" onclick="this.closest('.admin-toast').classList.remove('show')">&times;</button></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/js/admin/api.js"></script>
+<script src="/js/admin/ui.js"></script>
+<script src="/js/admin/auth.js"></script>
+<script src="/js/admin/products.js"></script>
+<script src="/js/admin/orders.js"></script>
+<script src="/js/admin/stores.js"></script>
+<script src="/js/admin/notifications.js"></script>
+<script src="/js/admin/app.js"></script>
+</body>
+</html>
