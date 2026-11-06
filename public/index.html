@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>Tienda-fg — Calidad y Confianza</title>
+    <meta name="theme-color" content="#1E64FF">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/global.css">
+    <link rel="stylesheet" href="/css/store.css">
+</head>
+<body>
+    <div class="global-loader" id="globalLoader">
+        <div class="loader-logo"><div class="loader-spinner"></div></div>
+        <div class="loader-text">Tienda-fg</div>
+        <div class="loader-subtext">Cargando…</div>
+    </div>
+
+    <header class="site-header">
+        <div class="header-inner">
+            <a href="/" class="logo-container">
+                <img src="https://i.ibb.co/LDG7Gf2d/fotor-ai-2025020222510.jpg" alt="Logo" class="logo-img">
+                <span class="brand-name" id="headerStoreName">Tienda-fg</span>
+            </a>
+            <div class="header-right">
+                <div class="currency-dropdown" id="currencyDropdown">
+                    <button class="currency-btn" id="currencyBtn">
+                        <i class="fas fa-coins"></i><span id="selectedCurrencyText">CUP</span>
+                    </button>
+                    <div class="currency-menu" id="currencyMenu">
+                        <div class="currency-option active" data-currency="CUP">CUP</div>
+                        <div class="currency-option" data-currency="USD">USD</div>
+                        <div class="currency-option" data-currency="EUR">EUR</div>
+                    </div>
+                </div>
+                <button class="icon-action" id="cartBtnDesktop">
+                    <i class="fas fa-shopping-bag"></i><span class="cart-badge" id="cartCountDesktop">0</span>
+                </button>
+                <button class="menu-toggle" id="menuToggle"><i class="fas fa-bars"></i></button>
+            </div>
+        </div>
+    </header>
+
+    <nav class="sticky-nav" id="categoryNav">
+        <a class="cat-link active" data-cat="todos" onclick="event.preventDefault(); StoreApp.filterByCategory('todos');">Todos</a>
+    </nav>
+
+    <main id="main-content">
+        <section class="hero">
+            <div class="hero-glow hero-glow-1"></div>
+            <div class="hero-glow hero-glow-2"></div>
+            <div class="hero-content">
+                <h1 id="heroTitle">Bienvenido a <span class="hero-highlight">Tienda-fg</span></h1>
+                <p id="heroDescription">Encuentra los mejores productos.</p>
+            </div>
+        </section>
+
+        <section id="productosSection">
+            <div class="section-head">
+                <h2 class="section-title"><span class="section-icon"><i class="fas fa-leaf"></i></span><span id="categoryTitle">Todos los Productos</span></h2>
+            </div>
+            <div id="skeletonLoader" class="skeleton-grid">
+                <div class="skeleton-card"><div class="skeleton-image"></div></div>
+                <div class="skeleton-card"><div class="skeleton-image"></div></div>
+            </div>
+            <div id="dynamicContent" class="grid-productos"></div>
+        </section>
+    </main>
+
+    <nav class="bottom-nav">
+        <button class="bottom-nav-item active" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fas fa-home"></i><span>Inicio</span></button>
+        <button class="bottom-nav-item" id="cartBtn"><i class="fas fa-shopping-bag"></i><span>Carrito</span><span class="cart-badge" id="cartCount">0</span></button>
+        <button class="bottom-nav-item" id="menuToggleBottom"><i class="fas fa-bars"></i><span>Menú</span></button>
+    </nav>
+
+    <div class="overlay" id="overlay"></div>
+    <aside class="panel-desplegable" id="sideMenu">
+        <div class="panel-header">
+            <h3><i class="fas fa-bars-staggered"></i> Menú</h3>
+            <button class="close-panel-btn" id="closeMenu"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="panel-body">
+            <div class="tiendas-list">
+                <p><i class="fas fa-store"></i> Nuestras Tiendas</p>
+                <div id="tiendasList"></div>
+            </div>
+        </div>
+    </aside>
+
+    <aside class="cart-panel" id="cartPanel">
+        <div class="cart-header">
+            <h3><i class="fas fa-shopping-bag"></i> Tu Carrito</h3>
+            <button class="close-cart" id="closeCart"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="cart-items" id="cartItemsContainer"></div>
+        <div class="cart-footer">
+            <div class="cart-total final"><span>Total</span> <span id="cartTotal">0 CUP</span></div>
+            <button class="btn-block btn-checkout" onclick="StoreApp.showCheckoutForm()">
+                <i class="fas fa-arrow-right"></i> Continuar
+            </button>
+        </div>
+    </aside>
+
+    <div class="product-modal" id="productModal">
+        <div class="product-modal-content">
+            <button class="modal-close" onclick="StoreApp.closeProductModal()"><i class="fas fa-times"></i></button>
+            <div class="product-modal-body" id="modalBody"></div>
+        </div>
+    </div>
+
+    <div class="toast-notification" id="toast">
+        <i class="fas fa-check-circle"></i><span id="toastMsg">Notificación</span>
+    </div>
+
+    <script src="/js/store/utils.js"></script>
+    <script src="/js/store/api.js"></script>
+    <script src="/js/store/cart.js"></script>
+    <script src="/js/store/ui.js"></script>
+    <script src="/js/store/app.js"></script>
+</body>
+</html>
