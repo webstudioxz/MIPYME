@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title id="dynamicTitle">Tienda-fg — Calidad y Confianza</title>
+    <meta name="theme-color" content="#1E64FF">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <link rel="manifest" href="/manifest.json">
+    <link rel="stylesheet" href="/css/global.css">
+    <link rel="stylesheet" href="/css/store.css">
+</head>
+<body>
+    <a href="#main-content" class="skip-link">Saltar al contenido principal</a>
+
+    <!-- Loader -->
+    <div class="global-loader" id="globalLoader">
+        <div class="loader-logo"><div class="loader-spinner"></div></div>
+        <div class="loader-text">Tienda-fg</div>
+        <div class="loader-subtext">Cargando experiencia premium…</div>
+    </div>
+
+    <!-- Header -->
+    <header class="site-header">
+        <div class="header-inner">
+            <a href="/" class="logo-container">
+                <img src="https://i.ibb.co/LDG7Gf2d/fotor-ai-2025020222510.jpg" class="logo-img">
+                <span class="brand-name" id="headerStoreName">Tienda-fg</span>
+            </a>
+            <div class="header-right">
+                <button class="menu-toggle"><i class="fas fa-bars"></i></button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Nav Categorías -->
+    <nav class="sticky-nav" id="categoryNav"></nav>
+
+    <!-- Main -->
+    <main id="main-content">
+        <section class="hero">
+            <div class="hero-glow hero-glow-1"></div>
+            <div class="hero-glow hero-glow-2"></div>
+            <div class="hero-content">
+                <span class="hero-eyebrow"><i class="fas fa-bolt"></i> Nueva temporada</span>
+                <h1 id="heroTitle">Bienvenido a <span class="hero-highlight">Tienda-fg</span></h1>
+                <p id="heroDescription">Cargando productos...</p>
+            </div>
+        </section>
+
+        <section id="productosSection">
+            <div class="section-head">
+                <h2 class="section-title" id="categoryTitle">
+                    <span class="section-icon"><i class="fas fa-leaf"></i></span>
+                    <span>Todos los Productos</span>
+                </h2>
+            </div>
+            
+            <div id="skeletonLoader" class="skeleton-grid">
+                <div class="skeleton-card"><div class="skeleton-image"></div><div class="skeleton-body"><div class="skeleton-title"></div><div class="skeleton-price"></div><div class="skeleton-btn"></div></div></div>
+                <div class="skeleton-card"><div class="skeleton-image"></div><div class="skeleton-body"><div class="skeleton-title"></div><div class="skeleton-price"></div><div class="skeleton-btn"></div></div></div>
+                <div class="skeleton-card"><div class="skeleton-image"></div><div class="skeleton-body"><div class="skeleton-title"></div><div class="skeleton-price"></div><div class="skeleton-btn"></div></div></div>
+                <div class="skeleton-card"><div class="skeleton-image"></div><div class="skeleton-body"><div class="skeleton-title"></div><div class="skeleton-price"></div><div class="skeleton-btn"></div></div></div>
+            </div>
+
+            <div id="dynamicContent"></div>
+        </section>
+    </main>
+
+    <!-- Bottom Nav -->
+    <nav class="bottom-nav">
+        <button class="bottom-nav-item active"><i class="fas fa-home"></i><span>Inicio</span></button>
+        <button class="bottom-nav-item"><i class="fas fa-compass"></i><span>Explorar</span></button>
+        <button class="bottom-nav-item" id="cartBtn"><i class="fas fa-shopping-bag"></i><span>Carrito</span><span class="cart-badge" id="cartCount">0</span></button>
+        <button class="bottom-nav-item"><i class="fas fa-bars"></i><span>Menú</span></button>
+    </nav>
+
+    <!-- Toast -->
+    <div class="toast-notification" id="toast" role="status">
+        <i class="fas fa-check-circle"></i>
+        <span id="toastMsg">Producto añadido</span>
+    </div>
+
+    <!-- Lógica embebida -->
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const loader = document.getElementById('globalLoader');
+            const content = document.getElementById('dynamicContent');
+            
+            try {
+                // Detectar tienda
+                const urlParams = new URLSearchParams(window.location.search);
+                let currentStore = urlParams.get('tienda');
+
+                // Obtener tiendas
+                const resStores = await fetch('/api/tiendas/info');
+                const stores = await resStores.json();
+
+                if (!stores || stores.length === 0) {
+                    throw new Error("No hay tiendas creadas en la base de datos.");
+                }
+
+                if (!currentStore) currentStore = stores[0].id;
+
+                // Info de la tienda
+                const tiendaInfo = stores.find(s => s.id === currentStore) || stores[0];
+                document.getElementById('headerStoreName').innerText = tiendaInfo.nombre;
+                document.getElementById('heroTitle').innerText = tiendaInfo.nombre;
+                if (tiendaInfo.descripcion) {
+                    document.getElementById('heroDescription').innerText = tiendaInfo.descripcion;
+                }
+
+                // Obtener productos
+                const resProducts = await fetch(`/api/productos?tienda=${currentStore}`);
+                const products = await resProducts.json();
+                
+                const skeleton = document.getElementById('skeletonLoader');
+                if (skeleton) skeleton.style.display = 'none';
+
+                if (!products || products.length === 0) {
+                    content.innerHTML = '<p style="text-align:center; padding:40px;">Esta tienda no tiene productos aún.</p>';
+                } else {
+                    let html = '<div class="grid-productos">';
+                    products.forEach(p => {
+                        const disponible = p.disponible === true || p.disponible === 'true';
+                        const desc = p.descuento || 0;
+                        const precioFinal = p.precio * (1 - desc / 100);
+                        const img = p.imagen || 'https://via.placeholder.com/400x400?text=Sin+Foto';
+
+                        html += `
+                        <article class="producto-card">
+                            <div class="card-img-wrapper">
+                                ${desc > 0 ? `<span class="availability-badge badge-offer"><i class="fas fa-tag"></i> Oferta</span>` : ''}
+                                ${disponible && desc === 0 ? `<span class="availability-badge"><i class="fas fa-circle-check"></i> Disponible</span>` : ''}
+                                ${!disponible ? `<span class="availability-badge" style="background:#FEE2E2; color:#EF4444;"><i class="fas fa-ban"></i> Agotado</span>` : ''}
+                                <button class="card-wishlist"><i class="fas fa-heart"></i></button>
+                                <img src="${img}" alt="${p.nombre}" loading="lazy">
+                            </div>
+                            <div class="card-body">
+                                <span class="card-category">${p.categoria || 'General'}</span>
+                                <h3 class="card-title">${p.nombre}</h3>
+                                <div class="card-rating"><span class="stars">★★★★★</span><span>4.8</span></div>
+                                <div class="price-box">
+                                    ${desc > 0 ? `<span class="old-price">${p.precio} CUP</span>` : ''}
+                                    <span class="new-price">${precioFinal.toFixed(0)} CUP</span>
+                                </div>
+                                <div class="card-footer">
+                                    <div class="qty-control">
+                                        <button class="qty-btn">−</button>
+                                        <span class="qty-val">1</span>
+                                        <button class="qty-btn">+</button>
+                                    </div>
+                                    <button class="btn-add" ${!disponible ? 'disabled' : ''}><i class="fas fa-cart-plus"></i> Añadir</button>
+                                </div>
+                            </div>
+                        </article>
+                        `;
+                    });
+                    html += '</div>';
+                    content.innerHTML = html;
+                }
+
+                loader.classList.add('hidden');
+
+            } catch (error) {
+                console.error("Error:", error);
+                loader.classList.add('hidden');
+                content.innerHTML = `
+                    <div style="text-align:center; padding: 40px; color: #EF4444;">
+                        <h3>Error al cargar la tienda</h3>
+                        <p>${error.message}</p>
+                    </div>`;
+            }
+        });
+    </script>
+</body>
+</html>
