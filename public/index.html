@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title id="dynamicTitle">Tienda-fg — Calidad y Confianza</title>
+    <meta name="description" id="metaDescription" content="Compra los mejores productos con calma y consciencia. Envíos seguros, pago flexible y atención premium.">
+    <meta name="theme-color" content="#1E64FF">
+    <meta name="robots" content="index, follow">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <link rel="manifest" href="/manifest.json">
+    <link rel="stylesheet" href="/css/global.css">
+    <link rel="stylesheet" href="/css/store.css">
+</head>
+<body>
+    <a href="#main-content" class="skip-link">Saltar al contenido principal</a>
+
+    <!-- Script anti-caché -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                for(let registration of registrations) {
+                    registration.unregister();
+                }
+                if(registrations.length > 0) {
+                    window.location.reload(true);
+                }
+            });
+        }
+    </script>
+
+    <div class="global-loader" id="globalLoader">
+        <div class="loader-logo"><div class="loader-spinner"></div></div>
+        <div class="loader-text">Tienda-fg</div>
+        <div class="loader-subtext">Cargando experiencia premium…</div>
+    </div>
+
+    <div class="offline-screen" id="offlineScreen">
+        <div class="offline-card">
+            <div class="offline-icon"><i class="fas fa-wifi-slash"></i></div>
+            <h3>Sin conexión</h3>
+            <p>No pudimos conectar con el servidor.</p>
+            <button class="btn-primary" onclick="StoreApp.checkServerAndReload()">
+                <i class="fas fa-rotate-right"></i> Reintentar
+            </button>
+        </div>
+    </div>
+
+    <div class="product-modal" id="productModal" onclick="if(event.target===this)StoreApp.closeProductModal()">
+        <div class="product-modal-content">
+            <button class="modal-close" onclick="StoreApp.closeProductModal()" aria-label="Cerrar">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="product-modal-body" id="modalBody"></div>
+        </div>
+    </div>
+
+    <header class="site-header">
+        <div class="header-inner">
+            <a href="/" class="logo-container" aria-label="Inicio Tienda-fg">
+                <img src="https://i.ibb.co/LDG7Gf2d/fotor-ai-2025020222510.jpg" alt="Logo Tienda-fg" class="logo-img">
+                <span class="brand-name" id="headerStoreName">Tienda-fg</span>
+            </a>
+            <div class="header-search">
+                <i class="fas fa-search"></i>
+                <input type="search" id="headerSearchInput" placeholder="Buscar productos..." aria-label="Buscar">
+            </div>
+            <div class="header-right">
+                <div class="currency-dropdown">
+                    <button class="currency-btn" id="currencyBtn" aria-label="Cambiar moneda">
+                        <i class="fas fa-coins"></i>
+                        <span id="selectedCurrencyText">CUP</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="currency-menu" id="currencyMenu" role="menu">
+                        <div class="currency-option active" data-currency="CUP"><i class="fas fa-coins"></i> CUP <small>Peso cubano</small></div>
+                        <div class="currency-option" data-currency="USD"><i class="fas fa-dollar-sign"></i> USD <small>Dólar EE.UU.</small></div>
+                        <div class="currency-option" data-currency="EUR"><i class="fas fa-euro-sign"></i> EUR <small>Euro</small></div>
+                    </div>
+                </div>
+                <button class="icon-action" id="cartBtnDesktop" aria-label="Ver carrito">
+                    <i class="fas fa-shopping-bag"></i>
+                    <span class="cart-badge" id="cartCountDesktop">0</span>
+                </button>
+                <button class="menu-toggle" id="menuToggle" aria-label="Abrir menú"><i class="fas fa-bars"></i></button>
+            </div>
+        </div>
+    </header>
+
+    <nav class="sticky-nav" id="categoryNav" aria-label="Categorías"></nav>
+
+    <main id="main-content">
+        <section class="hero" id="heroSection">
+            <div class="hero-glow hero-glow-1"></div>
+            <div class="hero-glow hero-glow-2"></div>
+            <div class="hero-content">
+                <span class="hero-eyebrow"><i class="fas fa-bolt"></i> Nueva temporada</span>
+                <h1 id="heroTitle">Bienvenido a <span class="hero-highlight">Tienda-fg</span></h1>
+                <p id="heroDescription">Encuentra los mejores productos con calma y consciencia.</p>
+                <div class="hero-actions">
+                    <button class="btn-hero" onclick="document.getElementById('productosSection').scrollIntoView({behavior:'smooth'})">Ver Catálogo <i class="fas fa-arrow-right"></i></button>
+                </div>
+            </div>
+        </section>
+
+        <section id="productosSection">
+            <div class="section-head">
+                <h2 class="section-title" id="categoryTitle">
+                    <span class="section-icon"><i class="fas fa-leaf"></i></span>
+                    <span>Todos los Productos</span>
+                </h2>
+            </div>
+            
+            <div id="skeletonLoader" class="skeleton-grid">
+                <div class="skeleton-card"><div class="skeleton-image"></div><div class="skeleton-body"><div class="skeleton-title"></div><div class="skeleton-price"></div><div class="skeleton-btn"></div></div></div>
+                <div class="skeleton-card"><div class="skeleton-image"></div><div class="skeleton-body"><div class="skeleton-title"></div><div class="skeleton-price"></div><div class="skeleton-btn"></div></div></div>
+                <div class="skeleton-card"><div class="skeleton-image"></div><div class="skeleton-body"><div class="skeleton-title"></div><div class="skeleton-price"></div><div class="skeleton-btn"></div></div></div>
+                <div class="skeleton-card"><div class="skeleton-image"></div><div class="skeleton-body"><div class="skeleton-title"></div><div class="skeleton-price"></div><div class="skeleton-btn"></div></div></div>
+            </div>
+
+            <div id="dynamicContent"></div>
+        </section>
+    </main>
+
+    <nav class="bottom-nav" aria-label="Navegación inferior">
+        <button class="bottom-nav-item active" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fas fa-home"></i><span>Inicio</span></button>
+        <button class="bottom-nav-item" onclick="document.getElementById('productosSection').scrollIntoView({behavior:'smooth'})"><i class="fas fa-compass"></i><span>Explorar</span></button>
+        <button class="bottom-nav-item" id="cartBtn"><i class="fas fa-shopping-bag"></i><span>Carrito</span><span class="cart-badge" id="cartCount">0</span></button>
+        <button class="bottom-nav-item" id="menuToggleBottom"><i class="fas fa-bars"></i><span>Menú</span></button>
+    </nav>
+
+    <footer class="site-footer">
+        <div class="footer-grid">
+            <div class="footer-col footer-brand">
+                <div class="footer-logo"><img src="https://i.ibb.co/LDG7Gf2d/fotor-ai-2025020222510.jpg" alt="Logo Tienda-fg"> Tienda-fg</div>
+                <p class="footer-tagline">Calidad y confianza en cada pedido. Tu tienda de confianza, siempre cerca.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Tienda</h4>
+                <ul>
+                    <li><a href="#"><i class="fas fa-angle-right"></i> Catálogo completo</a></li>
+                    <li><a href="#"><i class="fas fa-angle-right"></i> Ofertas del día</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p class="footer-copy">© 2026 Tienda-fg · Todos los derechos reservados</p>
+        </div>
+    </footer>
+
+    <div class="overlay" id="overlay"></div>
+    <aside class="panel-desplegable" id="sideMenu" aria-label="Menú lateral">
+        <div class="panel-header">
+            <h3><i class="fas fa-bars-staggered"></i> Menú</h3>
+            <button class="close-panel-btn" id="closeMenu" aria-label="Cerrar menú"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="panel-body">
+            <div class="tiendas-list">
+                <p><i class="fas fa-store"></i> Nuestras Tiendas</p>
+                <div id="tiendasList"></div>
+            </div>
+        </div>
+    </aside>
+
+    <button class="floating-cart" id="floatingCartBtn" style="display:none;" aria-label="Carrito"><i class="fas fa-shopping-cart"></i></button>
+    <button class="floating-checkout-btn" id="floatingCheckoutBtn" onclick="StoreApp.showCheckoutForm()" style="display:none;">
+        <i class="fas fa-arrow-right"></i> Continuar Compra
+    </button>
+
+    <aside class="cart-panel" id="cartPanel" aria-label="Carrito de compras">
+        <div class="cart-header">
+            <h3><i class="fas fa-shopping-bag"></i> Tu Carrito</h3>
+            <button class="close-cart" id="closeCart" aria-label="Cerrar carrito"><i class="fas fa-times"></i></button>
+        </div>
+
+        <div id="cartItemsView" style="display:flex;flex-direction:column;height:100%;">
+            <div class="cart-items" id="cartItemsContainer">
+                <div class="cart-empty-state">
+                    <div class="empty-icon"><i class="fas fa-shopping-basket"></i></div>
+                    <h4>Tu carrito está vacío</h4>
+                    <p>Agrega productos para empezar tu compra.</p>
+                </div>
+            </div>
+            <div class="cart-footer" id="cartFooter">
+                <div class="cart-summary-row">
+                    <div class="cart-total"><span>Subtotal</span> <span id="cartSubtotal">0 CUP</span></div>
+                    <div class="cart-total"><span>Envío</span> <span class="text-success"><i class="fas fa-circle-check"></i> Gratis</span></div>
+                </div>
+                <div class="cart-total final"><span>Total</span> <span id="cartTotal">0 CUP</span></div>
+                <button class="btn-block btn-checkout" onclick="StoreApp.showCheckoutForm()">
+                    <i class="fas fa-arrow-right"></i> Continuar
+                </button>
+            </div>
+        </div>
+
+        <div id="checkoutFormView" style="display:none;height:100%;overflow-y:auto;">
+            <div class="checkout-form">
+                <h4><i class="fas fa-clipboard-list"></i> Datos de Envío</h4>
+
+                <div class="form-group">
+                    <label for="cliName">Nombre Completo <span class="text-danger">*</span></label>
+                    <div class="input-icon">
+                        <i class="fas fa-user"></i>
+                        <input type="text" class="form-control" id="cliName" placeholder="Ej: Juan Pérez" maxlength="60" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="cliPhone">Teléfono <span class="text-danger">*</span></label>
+                    <div class="input-icon">
+                        <i class="fas fa-phone"></i>
+                        <input type="tel" class="form-control" id="cliPhone" placeholder="5XXXXXXX" maxlength="12" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="cliAddress">Dirección de Envío <span class="text-danger">*</span></label>
+                    <div class="input-icon input-icon-top">
+                        <i class="fas fa-location-dot"></i>
+                        <textarea class="form-control" id="cliAddress" rows="2" placeholder="Ej: Calle 123 #456 entre A y B, La Habana" maxlength="200" required></textarea>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Método de Pago</label>
+                    <div class="payment-methods">
+                        <label class="payment-option">
+                            <input type="radio" name="paymentMethod" value="Efectivo" checked onchange="StoreUI.toggleBankInfo()">
+                            <i class="fas fa-money-bill-wave"></i> Efectivo
+                        </label>
+                        <label class="payment-option">
+                            <input type="radio" name="paymentMethod" value="Transferencia" onchange="StoreUI.toggleBankInfo()">
+                            <i class="fas fa-building-columns"></i> Transferencia
+                        </label>
+                    </div>
+                </div>
+
+                <div class="bank-info-box" id="bankInfoBox">
+                    <h5><i class="fas fa-university"></i> Datos para Transferencia</h5>
+                    <div class="bank-detail">
+                        <i class="fas fa-credit-card"></i>
+                        <div><small>Número de Tarjeta</small><strong id="bankCardNumber">----</strong></div>
+                        <button class="copy-btn" onclick="navigator.clipboard.writeText(document.getElementById('bankCardNumber').textContent)" aria-label="Copiar"><i class="fas fa-copy"></i></button>
+                    </div>
+                    <a href="#" class="whatsapp-link-btn" id="whatsappBankLink" target="_blank">
+                        <i class="fab fa-whatsapp"></i> Enviar Comprobante
+                    </a>
+                </div>
+
+                <div class="bank-info-box danger-box" id="noCardWarning" style="display:none;">
+                    <div class="transfer-warning"><i class="fas fa-exclamation-circle"></i> Transferencia no disponible.</div>
+                </div>
+
+                <div class="codigo-cliente-box" id="codigoClienteBox" style="display:none;">
+                    <h4><i class="fas fa-qrcode"></i> Su Código de Pedido</h4>
+                    <div class="codigo-cliente-display" id="codigoClienteDisplay"></div>
+                    <small>Guarde este código para dar seguimiento.</small>
+                </div>
+
+                <div class="checkout-summary-box">
+                    <div class="checkout-summary-row">
+                        <span>Total a pagar</span>
+                        <strong id="checkoutTotalAmount">0 CUP</strong>
+                    </div>
+                </div>
+
+                <button class="btn-block btn-checkout" id="btnConfirmarPedido" onclick="StoreApp.enviarPedido()">
+                    <i class="fas fa-check-circle"></i> Confirmar Pedido
+                </button>
+                <button class="btn-block btn-ghost" onclick="StoreApp.cancelarCheckout()">
+                    <i class="fas fa-arrow-left"></i> Volver
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <div class="toast-notification" id="toast" role="status" aria-live="polite">
+        <i class="fas fa-check-circle"></i>
+        <span id="toastMsg">Producto añadido</span>
+    </div>
+
+    <script src="/js/store/api.js"></script>
+    <script src="/js/store/cart.js"></script>
+    <script src="/js/store/utils.js"></script>
+    <script src="/js/store/ui.js"></script>
+    <script src="/js/store/app.js"></script>
+</body>
+</html>

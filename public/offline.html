@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sin conexión · Tienda-fg</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:linear-gradient(135deg,#0f172a 0%,#1e1b4b 50%,#0f172a 100%);color:#f1f5f9;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;overflow-x:hidden}
+body::before{content:'';position:fixed;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle,rgba(99,102,241,0.15) 0%,transparent 50%);animation:float 8s ease-in-out infinite;z-index:0}
+@keyframes float{0%,100%{transform:translate(0,0)}50%{transform:translate(50px,-50px)}}
+.card{position:relative;z-index:1;text-align:center;max-width:420px;width:100%;padding:48px 36px;background:rgba(30,41,59,0.7);backdrop-filter:blur(20px);border-radius:32px;border:1px solid rgba(99,102,241,0.2);box-shadow:0 24px 60px rgba(0,0,0,0.4)}
+.icon{width:96px;height:96px;margin:0 auto 24px;border-radius:50%;background:linear-gradient(135deg,#f59e0b,#ef4444);display:flex;align-items:center;justify-content:center;font-size:2.4rem;color:#fff;box-shadow:0 12px 32px rgba(245,158,11,0.4);animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+.logo{font-family:'Plus Jakarta Sans',sans-serif;font-size:1.8rem;font-weight:800;background:linear-gradient(135deg,#6366f1,#8b5cf6,#a855f7);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px;display:block}
+h1{font-family:'Plus Jakarta Sans',sans-serif;font-size:1.5rem;font-weight:700;margin-bottom:12px;color:#f1f5f9}
+p{color:#94a3b8;font-size:0.95rem;line-height:1.6;margin-bottom:28px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:14px 28px;border-radius:999px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:0.92rem;text-decoration:none;border:none;cursor:pointer;transition:all 0.3s cubic-bezier(0.4,0,0.2,1);width:100%;margin-bottom:10px}
+.btn-primary{background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;box-shadow:0 8px 24px rgba(99,102,241,0.4)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(99,102,241,0.5)}
+.btn-secondary{background:transparent;color:#94a3b8;border:1.5px solid rgba(148,163,184,0.2)}
+.btn-secondary:hover{background:rgba(148,163,184,0.1);color:#f1f5f9}
+.status{margin-top:24px;padding:12px 16px;background:rgba(15,23,42,0.6);border-radius:12px;font-size:0.8rem;color:#64748b;display:flex;align-items:center;justify-content:center;gap:8px}
+.status i{color:#f59e0b}
+</style>
+</head>
+<body>
+<div class="card">
+<div class="icon"><i class="fas fa-wifi-slash"></i></div>
+<span class="logo">Tienda-fg</span>
+<h1>Sin conexión a internet</h1>
+<p>No pudimos conectar con el servidor. Verifica tu conexión y vuelve a intentarlo.</p>
+<button class="btn btn-primary" onclick="reloadPage()"><i class="fas fa-rotate-right"></i> Reintentar</button>
+<button class="btn btn-secondary" onclick="goHome()"><i class="fas fa-house"></i> Ir a la página principal</button>
+<div class="status"><i class="fas fa-triangle-exclamation"></i> Modo offline activado</div>
+</div>
+<script>
+function reloadPage(){if(navigator.onLine)window.location.href='/';else alert('No tienes conexión. Conéctate y vuelve a intentarlo.')}
+function goHome(){window.location.href='/'}
+window.addEventListener('online',()=>window.location.href='/');
+</script>
+</body>
+</html>

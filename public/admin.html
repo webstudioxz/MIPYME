@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin · Tienda-fg</title>
+    <meta name="theme-color" content="#0f172a">
+    <meta name="robots" content="noindex, nofollow">
+
+    <link rel="manifest" href="/manifest-admin.json">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="/css/global.css">
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body class="admin-body">
+
+<button class="mobile-menu-btn" onclick="toggleSidebar()">
+    <i class="fas fa-bars"></i> <span>Menú</span>
+</button>
+
+<div id="loginScreen" class="login-screen">
+    <div class="login-glow login-glow-1"></div>
+    <div class="login-glow login-glow-2"></div>
+    <div class="login-card">
+        <div class="login-icon"><i class="fas fa-shield-halved"></i></div>
+        <h2>Tienda-fg</h2>
+        <p class="subtitle"><i class="fas fa-crown"></i> Panel Administrativo</p>
+        <form id="loginForm">
+            <div class="login-input-wrap">
+                <i class="fas fa-lock"></i>
+                <input type="password" id="passInput" class="login-input" placeholder="Ingresa la contraseña" required autofocus>
+            </div>
+            <button class="login-btn" id="loginBtn" type="submit">
+                <span class="login-btn-text"><i class="fas fa-arrow-right"></i> Ingresar</span>
+            </button>
+            <div class="login-error" id="loginError"></div>
+        </form>
+        <div class="login-footer">
+            <i class="fas fa-lock"></i> Acceso restringido · Solo administradores
+        </div>
+    </div>
+</div>
+
+<aside class="sidebar" id="sidebar">
+    <a href="/admin" class="sidebar-brand">
+        <div class="brand-icon"><i class="fas fa-store"></i></div>
+        <span>Tienda-fg</span>
+    </a>
+
+    <div class="tienda-selector">
+        <label><i class="fas fa-store-alt"></i> Tienda Activa</label>
+        <select id="tiendaSelect" class="form-select"></select>
+    </div>
+
+    <nav class="sidebar-nav">
+        <button class="nav-item active" data-section="products" onclick="showSection('products')">
+            <span class="icon"><i class="fas fa-box"></i></span>
+            <span class="label">Productos</span>
+        </button>
+        <button class="nav-item" data-section="orders" onclick="showSection('orders')">
+            <span class="icon"><i class="fas fa-shopping-cart"></i></span>
+            <span class="label">Pedidos</span>
+            <span class="new-order-indicator" id="newOrderIndicator"></span>
+        </button>
+        <button class="nav-item" data-section="stores" onclick="showSection('stores')">
+            <span class="icon"><i class="fas fa-store-alt"></i></span>
+            <span class="label">Tiendas</span>
+        </button>
+        <button class="nav-item" data-section="settings" onclick="showSection('settings')">
+            <span class="icon"><i class="fas fa-cog"></i></span>
+            <span class="label">Configuración</span>
+        </button>
+    </nav>
+
+    <div class="sidebar-divider"></div>
+
+    <div class="sidebar-footer">
+        <button class="nav-item" id="notifBtn" onclick="AdminNotifications.toggle()">
+            <span class="icon"><i class="fas fa-bell-slash"></i></span>
+            <span class="label">Activar Push</span>
+        </button>
+        <button class="nav-item logout" onclick="AdminAuth.logout()">
+            <span class="icon"><i class="fas fa-sign-out-alt"></i></span>
+            <span class="label">Salir</span>
+        </button>
+    </div>
+</aside>
+
+<div class="main-content" id="app" style="display:none;">
+
+    <div id="view-products">
+        <div class="page-header">
+            <div>
+                <h3 class="page-title"><i class="fas fa-box"></i> Productos</h3>
+                <p class="page-subtitle">Gestiona el catálogo · <span id="currentStoreName" class="text-secondary">—</span></p>
+            </div>
+            <div class="page-actions">
+                <button class="btn-add-product" onclick="AdminProducts.openProductModal()">
+                    <i class="fas fa-plus"></i> Nuevo Producto
+                </button>
+            </div>
+        </div>
+        <div class="card p-0 overflow-hidden">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Img</th><th>Nombre</th><th>Precio</th><th>Desc.</th>
+                            <th>Categoría</th><th>Tamaño</th><th>Estado</th>
+                            <th style="text-align:right;">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="productsList"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="view-orders" style="display:none;">
+        <div class="page-header">
+            <div>
+                <h3 class="page-title"><i class="fas fa-shopping-cart"></i> Pedidos</h3>
+                <p class="page-subtitle">Gestión en tiempo real · <span id="currentStoreNameOrders" class="text-secondary">—</span></p>
+            </div>
+            <div class="page-actions">
+                <span class="badge-count" id="orderCount">0</span>
+                <button class="btn-outline-danger-sm" onclick="AdminOrders.deleteAllOrders()">
+                    <i class="fas fa-trash-alt"></i> Limpiar
+                </button>
+            </div>
+        </div>
+
+        <div class="card search-card">
+            <div class="card-body">
+                <div class="search-row">
+                    <div class="search-input-wrap">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchOrderCode" class="search-input"
+                               placeholder="Buscar por código de pedido"
+                               onkeydown="if(event.key==='Enter')AdminOrders.buscarPedidoPorCodigo()">
+                    </div>
+                    <button class="btn-search" onclick="AdminOrders.buscarPedidoPorCodigo()">
+                        <i class="fas fa-search"></i> Buscar
+                    </button>
+                    <button class="btn-clear-search" onclick="AdminOrders.limpiarBusquedaPedidos()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div id="searchResultContainer" style="display:none;" class="mt-3"></div>
+            </div>
+        </div>
+
+        <div class="stat-grid" id="orderStats">
+            <div class="stat-card stat-blue">
+                <div class="stat-icon"><i class="fas fa-list"></i></div>
+                <div class="stat-info"><div class="stat-value" id="statTotal">0</div><div class="stat-label">Total</div></div>
+            </div>
+            <div class="stat-card stat-amber">
+                <div class="stat-icon"><i class="fas fa-clock"></i></div>
+                <div class="stat-info"><div class="stat-value" id="statPendientes">0</div><div class="stat-label">Pendientes</div></div>
+            </div>
+            <div class="stat-card stat-green">
+                <div class="stat-icon"><i class="fas fa-circle-check"></i></div>
+                <div class="stat-info"><div class="stat-value" id="statCompletados">0</div><div class="stat-label">Completados</div></div>
+            </div>
+        </div>
+
+        <div id="ordersList"></div>
+    </div>
+
+    <div id="view-stores" style="display:none;">
+        <div class="page-header">
+            <div>
+                <h3 class="page-title"><i class="fas fa-store-alt"></i> Gestión de Tiendas</h3>
+                <p class="page-subtitle">Crea y administra tus tiendas</p>
+            </div>
+        </div>
+        <div class="store-form-card">
+            <h5 class="form-card-title"><i class="fas fa-plus-circle"></i> <span id="storeFormTitle">Agregar Nueva Tienda</span></h5>
+            <form id="storeForm" onsubmit="event.preventDefault(); AdminStores.saveStore(event);">
+                <input type="hidden" id="storeId">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label">ID de Tienda (slug)</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-tag"></i></span>
+                            <input type="text" id="storeSlug" class="form-control" placeholder="ej. electro" required>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Nombre Comercial</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-store"></i></span>
+                            <input type="text" id="storeDisplayName" class="form-control" placeholder="Ej: Electrodomésticos" required>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Icono (Emoji)</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-icons"></i></span>
+                            <input type="text" id="storeIcon" class="form-control" value="⚡" maxlength="4">
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Descripción</label>
+                        <textarea id="storeDescription" class="form-control" rows="2"></textarea>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Categorías Iniciales (separadas por coma)</label>
+                        <input type="text" id="storeCategories" class="form-control" value="otros">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Envío Disponible</label>
+                        <select id="storeEnvioDisponible" class="form-select">
+                            <option value="true">✅ Sí</option><option value="false">❌ No</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Costo de Envío</label>
+                        <input type="number" id="storeEnvioCosto" class="form-control" value="0" min="0">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Tiempo Estimado</label>
+                        <input type="text" id="storeEnvioTiempo" class="form-control" value="24-48 horas">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Garantía Disponible</label>
+                        <select id="storeGarantiaDisponible" class="form-select">
+                            <option value="true">✅ Sí</option><option value="false">❌ No</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Duración Garantía</label>
+                        <input type="text" id="storeGarantiaDuracion" class="form-control" value="12 meses">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Descripción Garantía</label>
+                        <input type="text" id="storeGarantiaDesc" class="form-control" value="Garantía contra defectos">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Métodos de Pago</label>
+                        <div class="payment-checks">
+                            <label class="check-pill"><input type="checkbox" id="pagoEfectivo" checked> <i class="fas fa-money-bill-wave"></i> Efectivo</label>
+                            <label class="check-pill"><input type="checkbox" id="pagoTransferencia" checked> <i class="fas fa-building-columns"></i> Transferencia</label>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Teléfono</label>
+                        <input type="text" id="storeTelefono" class="form-control" value="+53 5XXXXXXX">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Email</label>
+                        <input type="text" id="storeEmail" class="form-control" value="contacto@tienda.com">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Número de Tarjeta</label>
+                        <input type="text" id="storeNumeroTarjeta" class="form-control" placeholder="1234 5678...">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">WhatsApp Comprobante</label>
+                        <input type="text" id="storeWhatsAppConfirmacion" class="form-control" placeholder="+53 5XXXXXXX">
+                    </div>
+                    <div class="col-12 mt-3">
+                        <button type="submit" class="btn-primary"><i class="fas fa-save"></i> <span id="storeSubmitText">Crear Tienda</span></button>
+                        <button type="button" class="btn-ghost ms-2" onclick="resetStoreForm()"><i class="fas fa-times"></i> Cancelar</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="card p-0 overflow-hidden">
+            <div class="card-header"><i class="fas fa-list-ul"></i> Tiendas Registradas</div>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead><tr><th>ID</th><th>Icono</th><th>Nombre</th><th>Descripción</th><th>Categorías</th><th style="text-align:right;">Acciones</th></tr></thead>
+                    <tbody id="storesList"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="view-settings" style="display:none;">
+        <div class="page-header">
+            <div>
+                <h3 class="page-title"><i class="fas fa-cog"></i> Configuración Global</h3>
+                <p class="page-subtitle">Tasas de cambio de moneda</p>
+            </div>
+        </div>
+        <div class="card" style="max-width:520px;">
+            <div class="card-header"><i class="fas fa-exchange-alt"></i> Tasas de Cambio</div>
+            <div class="card-body">
+                <form id="currencyForm" onsubmit="saveCurrencyConfig(event)">
+                    <div class="rate-row">
+                        <label class="form-label"><i class="fas fa-dollar-sign"></i> 1 USD =</label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input type="number" step="0.01" id="rateUSD" class="form-control" required>
+                            <span class="input-group-text">CUP</span>
+                        </div>
+                    </div>
+                    <div class="rate-row">
+                        <label class="form-label"><i class="fas fa-euro-sign"></i> 1 EUR =</label>
+                        <div class="input-group">
+                            <span class="input-group-text">€</span>
+                            <input type="number" step="0.01" id="rateEUR" class="form-control" required>
+                            <span class="input-group-text">CUP</span>
+                        </div>
+                    </div>
+                    <button class="btn-primary w-100" id="currencySaveBtn"><i class="fas fa-save"></i> Guardar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="productModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5><i class="fas fa-box"></i> <span id="productModalTitle">Nuevo Producto</span></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <form id="productFormData">
+                    <input type="hidden" id="productId">
+                    <div class="mb-3">
+                        <label class="form-label">Nombre</label>
+                        <input type="text" id="prodName" class="form-control" required maxlength="100">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Descripción</label>
+                        <textarea id="prodDescription" class="form-control" rows="3"></textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Precio (CUP)</label>
+                            <input type="number" id="prodPrice" class="form-control" required min="0.01" step="0.01">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Descuento (%)</label>
+                            <input type="number" id="prodDiscount" class="form-control" value="0" min="0" max="100">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Categoría</label>
+                            <select id="prodCategory" class="form-select"></select>
+                            <button type="button" class="btn-quick-cat" onclick="AdminProducts.quickAddCategory()">
+                                <i class="fas fa-plus"></i> Nueva categoría
+                            </button>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Tamaño</label>
+                            <select id="prodSize" class="form-select">
+                                <option value="pequeno">📐 Pequeño (tarjeta normal)</option>
+                                <option value="grande">📏 Grande (tarjeta destacada)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Estado</label>
+                            <select id="prodStock" class="form-select">
+                                <option value="true">✅ Disponible</option>
+                                <option value="false">❌ Agotado</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">URL de Imagen</label>
+                        <input type="text" id="prodImage" class="form-control" placeholder="https://...">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">O subir archivo</label>
+                        <input type="file" id="prodFile" class="form-control" accept="image/*">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-ghost" data-bs-dismiss="modal">Cancelar</button>
+                <button class="btn-primary" id="productSaveBtn" onclick="AdminProducts.saveProduct()">
+                    <i class="fas fa-save"></i> Guardar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="admin-toast" id="adminToast">
+    <i class="fas fa-check-circle"></i>
+    <span id="adminToastMsg">Operación exitosa</span>
+    <button class="toast-close" onclick="this.closest('.admin-toast').classList.remove('show')">&times;</button>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/js/admin/api.js"></script>
+<script src="/js/admin/ui.js"></script>
+<script src="/js/admin/auth.js"></script>
+<script src="/js/admin/products.js"></script>
+<script src="/js/admin/orders.js"></script>
+<script src="/js/admin/stores.js"></script>
+<script src="/js/admin/notifications.js"></script>
+<script src="/js/admin/app.js"></script>
+</body>
+</html>
