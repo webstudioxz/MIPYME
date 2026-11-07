@@ -1,0 +1,28 @@
+{
+    "name": "Tienda-fg",
+    "short_name": "Tienda-fg",
+    "description": "Tienda online Dulceria, electrodomesticos y muchos mas visitenos ahora",
+    "start_url": "/",
+    "display": "standalone",
+    "orientation": "portrait",
+    "background_color": "#f8fafc",
+    "theme_color": "#4f46e5",
+    "categories": ["shopping", "lifestyle", "electronics"],
+    "lang": "es",
+    "dir": "ltr",
+    "prefer_related_applications": false,
+    "icons": [
+        {
+            "src": "https://d.top4top.io/p_3525b1u9b0.jpg",
+            "sizes": "192x192",
+            "type": "image/jpeg",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "https://d.top4top.io/p_3525b1u9b0.jpg",
+            "sizes": "512x512",
+            "type": "image/jpeg",
+            "purpose": "any maskable"
+        }
+    ]
+}
