@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title id="dynamicTitle">Tienda-fg - Calidad y Confianza</title>
+    <meta name="description" id="metaDescription" content="Compra los mejores productos con calma y consciencia.">
+    <meta name="theme-color" content="#1E64FF">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="apple-touch-icon" href="https://i.ibb.co/LDG7Gf2d/fotor-ai-2025020222510.jpg">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="/css/global.css?v=13">
+    <link rel="stylesheet" href="/css/store.css?v=13">
+</head>
+<body>
+    <a href="#main-content" class="skip-link">Saltar al contenido principal</a>
+
+    <div class="global-loader" id="globalLoader">
+        <div class="loader-logo"><div class="loader-spinner"></div></div>
+        <div class="loader-text">Tienda-fg</div>
+        <div class="loader-subtext">Cargando experiencia premium…</div>
+    </div>
+
+    <div class="offline-screen" id="offlineScreen">
+        <div class="offline-footer">
+            <span><i class="fas fa-wifi-slash"></i> Sin conexión</span>
+            <button class="retry-btn" onclick="location.reload()"><i class="fas fa-sync-alt"></i> Reintentar</button>
+        </div>
+    </div>
+
+    <header class="site-header">
+        <div class="header-inner">
+            <a href="/" class="logo-container">
+                <img src="https://i.ibb.co/LDG7Gf2d/fotor-ai-2025020222510.jpg" alt="Logo" class="logo-img">
+                <span class="brand-name" id="headerStoreName">Tienda-fg</span>
+            </a>
+            <div class="header-search">
+                <i class="fas fa-search"></i>
+                <input type="search" id="headerSearch" placeholder="Buscar productos, marcas, categorías…">
+                <kbd>⌘K</kbd>
+            </div>
+            <div class="header-right">
+                <div class="currency-dropdown" id="currencyDropdown">
+                    <button class="currency-btn" id="currencyBtn">
+                        <i class="fas fa-coins"></i>
+                        <span id="selectedCurrencyText">CUP</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="currency-menu" id="currencyMenu">
+                        <div class="currency-option active" data-currency="CUP"><i class="fas fa-coins"></i> CUP <small>Peso cubano</small></div>
+                        <div class="currency-option" data-currency="USD"><i class="fas fa-dollar-sign"></i> USD <small>Dólar EE.UU.</small></div>
+                        <div class="currency-option" data-currency="EUR"><i class="fas fa-euro-sign"></i> EUR <small>Euro</small></div>
+                    </div>
+                </div>
+                <button class="icon-action" id="cartBtnDesktop" aria-label="Carrito">
+                    <i class="fas fa-shopping-bag"></i>
+                    <span class="cart-badge" id="cartCountDesktop">0</span>
+                </button>
+                <button class="menu-toggle" id="menuToggle" aria-label="Menú"><i class="fas fa-bars"></i></button>
+            </div>
+        </div>
+    </header>
+
+    <nav class="sticky-nav" id="categoryNav"></nav>
+
+    <main id="main-content">
+        <section class="hero">
+            <div class="hero-glow hero-glow-1"></div>
+            <div class="hero-glow hero-glow-2"></div>
+            <div class="hero-content">
+                <span class="hero-eyebrow"><i class="fas fa-bolt"></i> Nueva temporada · 2026</span>
+                <h1>Bienvenido a <span class="hero-highlight" id="heroTitle">Tienda-fg</span></h1>
+                <p id="heroDescription">Encuentra los mejores productos con calma y consciencia. Calidad premium, entrega confiable y pago flexible.</p>
+                <div class="hero-actions">
+                    <button class="btn-hero" onclick="document.getElementById('productosSection').scrollIntoView({behavior:'smooth'})">Ver Catálogo <i class="fas fa-arrow-right"></i></button>
+                    <button class="btn-hero-ghost" onclick="document.getElementById('trustBadges').scrollIntoView({behavior:'smooth'})"><i class="fas fa-shield-halved"></i> Por qué elegirnos</button>
+                </div>
+                <div class="hero-stats">
+                    <div class="hero-stat"><strong>4.9<i class="fas fa-star"></i></strong><span>Valoración media</span></div>
+                    <div class="hero-stat"><strong>+12k</strong><span>Pedidos entregados</span></div>
+                    <div class="hero-stat"><strong>24/7</strong><span>Soporte premium</span></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="trust-badges" id="trustBadges">
+            <div class="trust-badge"><div class="trust-icon"><i class="fas fa-truck-fast"></i></div><div><strong>Envío Rápido</strong><span>Entrega en 24–48h</span></div></div>
+            <div class="trust-badge"><div class="trust-icon"><i class="fas fa-shield-halved"></i></div><div><strong>Pago Seguro</strong><span>100% protegido</span></div></div>
+            <div class="trust-badge"><div class="trust-icon"><i class="fas fa-rotate-left"></i></div><div><strong>Devoluciones</strong><span>Garantía de 7 días</span></div></div>
+            <div class="trust-badge"><div class="trust-icon"><i class="fas fa-headset"></i></div><div><strong>Soporte 24/7</strong><span>Atención premium</span></div></div>
+        </section>
+
+        <section id="productosSection">
+            <div class="section-head">
+                <h2 class="section-title">
+                    <span class="section-icon"><i class="fas fa-leaf"></i></span>
+                    <span id="categoryTitle">Todos los Productos</span>
+                </h2>
+                <div class="section-tools">
+                    <button class="chip-toggle active" id="viewGridBtn"><i class="fas fa-th"></i></button>
+                    <button class="chip-toggle" id="viewListBtn"><i class="fas fa-list"></i></button>
+                </div>
+            </div>
+            <div id="skeletonLoader" class="skeleton-grid"></div>
+            <div id="dynamicContent"></div>
+        </section>
+
+        <section class="newsletter" style="background: linear-gradient(135deg, #0F172A, #1E64FF); color: white; padding: 40px 24px; border-radius: 28px; margin: 40px 0; box-shadow: 0 10px 30px rgba(30,100,255,0.25); text-align: center; position: relative; overflow: hidden;">
+            <div style="position: relative; z-index: 2;">
+                <div style="width: 64px; height: 64px; background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 1.8rem;">
+                    <i class="fas fa-store"></i>
+                </div>
+                <h3 style="font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; font-size: 1.4rem; margin-bottom: 12px; color: white;">¿Tienes un negocio?</h3>
+                <p style="color: rgba(255,255,255,0.85); font-size: 0.95rem; max-width: 400px; margin: 0 auto 24px; line-height: 1.5;">
+                    Crea tu propia tienda o sistema de reservas <strong>GRATIS por 1 mes</strong>.<br>
+                    Vende, gestiona pedidos y recibe notificaciones.
+                </p>
+                <div style="display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; margin-bottom: 28px; font-size: 0.8rem; color: #E8F0FE;">
+                    <span><i class="fas fa-check-circle" style="color: #60A5FA;"></i> 10 productos gratis</span>
+                    <span><i class="fas fa-check-circle" style="color: #60A5FA;"></i> Tu propia URL</span>
+                    <span><i class="fas fa-check-circle" style="color: #60A5FA;"></i> Notificaciones</span>
+                </div>
+                <button onclick="abrirRegistroModal()" style="display: inline-flex; align-items: center; justify-content: center; gap: 10px; background: white; color: #1E64FF; padding: 16px 32px; border-radius: 30px; font-weight: 800; font-size: 1rem; border: none; cursor: pointer; transition: transform 0.2s; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+                    <i class="fas fa-rocket"></i> Crear mi Tienda Gratis
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <nav class="bottom-nav">
+        <button class="bottom-nav-item active" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fas fa-home"></i><span>Inicio</span></button>
+        <button class="bottom-nav-item" onclick="document.getElementById('productosSection').scrollIntoView({behavior:'smooth'})"><i class="fas fa-compass"></i><span>Explorar</span></button>
+        <button class="bottom-nav-item" id="cartBtn"><i class="fas fa-shopping-bag"></i><span>Carrito</span><span class="cart-badge" id="cartCount">0</span></button>
+        <button class="bottom-nav-item" id="menuToggleBottom"><i class="fas fa-bars"></i><span>Menú</span></button>
+    </nav>
+
+    <footer class="site-footer">
+        <div class="footer-grid">
+            <div class="footer-col footer-brand">
+                <div class="footer-logo"><img src="https://i.ibb.co/LDG7Gf2d/fotor-ai-2025020222510.jpg" alt="Logo"> Tienda-fg</div>
+                <p class="footer-tagline">Calidad y confianza en cada pedido. Tu tienda de confianza, siempre cerca.</p>
+                <div class="footer-social">
+                    <a href="#" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+                    <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" aria-label="Telegram"><i class="fab fa-telegram"></i></a>
+                    <a href="#" aria-label="TikTok"><i class="fab fa-tiktok"></i></a>
+                </div>
+            </div>
+            <div class="footer-col">
+                <h4>Tienda</h4>
+                <ul>
+                    <li><a><i class="fas fa-angle-right"></i> Catálogo completo</a></li>
+                    <li><a><i class="fas fa-angle-right"></i> Ofertas del día</a></li>
+                    <li><a><i class="fas fa-angle-right"></i> Novedades</a></li>
+                    <li><a><i class="fas fa-angle-right"></i> Más vendidos</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Ayuda</h4>
+                <ul>
+                    <li><a><i class="fas fa-angle-right"></i> Cómo comprar</a></li>
+                    <li><a><i class="fas fa-angle-right"></i> Métodos de pago</a></li>
+                    <li><a><i class="fas fa-angle-right"></i> Envíos y entregas</a></li>
+                    <li><a><i class="fas fa-angle-right"></i> Devoluciones</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Contacto</h4>
+                <ul class="footer-contact">
+                    <li><i class="fas fa-location-dot"></i> La Habana, Cuba</li>
+                    <li><i class="fas fa-phone"></i> +53 5 000 0000</li>
+                    <li><i class="fas fa-envelope"></i> hola@tienda-fg.com</li>
+                    <li><i class="fas fa-clock"></i> Lun–Dom · 8:00–20:00</li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="footer-payments">
+                <span class="pay-chip"><i class="fas fa-money-bill-wave"></i> Efectivo</span>
+                <span class="pay-chip"><i class="fas fa-building-columns"></i> Transferencia</span>
+                <span class="pay-chip"><i class="fab fa-whatsapp"></i> WhatsApp Pay</span>
+            </div>
+            <span class="footer-status" id="footerStatus"><i class="fas fa-circle"></i> En línea</span>
+            <p class="footer-copy">© 2026 Tienda-fg · Todos los derechos reservados · Hecho con <i class="fas fa-heart" style="color:#EF4444"></i> en Cuba</p>
+        </div>
+    </footer>
+
+    <div class="overlay" id="overlay"></div>
+    <aside class="panel-desplegable" id="sideMenu">
+        <div class="panel-header">
+            <h3><i class="fas fa-bars-staggered"></i> Menú</h3>
+            <button class="close-panel-btn" id="closeMenu"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="panel-body">
+            <div class="tiendas-list">
+                <p><i class="fas fa-store"></i> Nuestras Tiendas</p>
+                <div id="tiendasList"></div>
+            </div>
+            <div class="panel-section">
+                <p><i class="fas fa-user-circle"></i> Cuenta</p>
+                <a class="panel-link"><i class="fas fa-user"></i> Mi perfil</a>
+                <a class="panel-link"><i class="fas fa-box"></i> Mis pedidos</a>
+                <a class="panel-link"><i class="fas fa-heart"></i> Favoritos</a>
+                <a class="panel-link"><i class="fas fa-bell"></i> Notificaciones</a>
+            </div>
+            <div class="panel-section">
+                <p><i class="fas fa-circle-info"></i> Información</p>
+                <a class="panel-link"><i class="fas fa-circle-question"></i> Centro de ayuda</a>
+                <a class="panel-link"><i class="fas fa-shield-halved"></i> Privacidad</a>
+                <a class="panel-link"><i class="fas fa-file-contract"></i> Términos</a>
+            </div>
+        </div>
+    </aside>
+
+    <div class="cart-panel" id="cartPanel">
+        <div class="cart-header">
+            <h3><i class="fas fa-shopping-bag"></i> Tu Carrito</h3>
+            <button class="close-cart" id="closeCart"><i class="fas fa-times"></i></button>
+        </div>
+        <div id="cartItemsView" style="display:flex;flex-direction:column;height:100%;">
+            <div class="cart-items" id="cartItemsContainer">
+                <div class="cart-empty-state">
+                    <div class="empty-icon"><i class="fas fa-shopping-basket"></i></div>
+                    <h4>Tu carrito está vacío</h4>
+                    <p>Agrega productos para empezar tu compra.</p>
+                </div>
+            </div>
+            <div class="cart-footer">
+                <div class="cart-summary-row">
+                    <div class="cart-total"><span>Subtotal</span> <span id="cartSubtotal">0 CUP</span></div>
+                    <div class="cart-total"><span>Envío</span> <span class="text-success"><i class="fas fa-circle-check"></i> Gratis</span></div>
+                </div>
+                <div class="cart-total final"><span>Total</span> <span id="cartTotal">0 CUP</span></div>
+                <button class="btn-block btn-checkout" onclick="StoreApp.showCheckoutForm()"><i class="fas fa-arrow-right"></i> Continuar</button>
+            </div>
+        </div>
+        <div id="checkoutFormView" style="display:none;overflow-y:auto;flex:1;">
+            <div style="padding: 22px;">
+                <h4 style="margin-bottom: 20px; font-family: var(--font-display); font-weight: 800; font-size: 1.3rem; color: var(--text-main); display: flex; align-items: center; gap: 10px;">
+                    <i class="fas fa-clipboard-list"></i> Datos de Envío
+                </h4>
+
+                <div class="form-group">
+                    <label for="cliName">Nombre Completo <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="cliName" placeholder="Ej: Juan Pérez" maxlength="60" required>
+                    <div id="nameWarning" style="display:none;color:var(--danger);font-size:0.75rem;margin-top:4px;"><i class="fas fa-exclamation-circle"></i> <span id="nameWarningText"></span></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="cliPhone">Teléfono <span class="text-danger">*</span></label>
+                    <input type="tel" class="form-control" id="cliPhone" placeholder="5XXXXXXX" maxlength="12" required>
+                    <small class="form-text">Formato: 5XXXXXXX (8 dígitos) o +53 5XXXXXXX</small>
+                    <div id="phoneWarning" style="display:none;color:var(--danger);font-size:0.75rem;margin-top:4px;"><i class="fas fa-exclamation-circle"></i> <span id="phoneWarningText"></span></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="cliAddress">Dirección de Envío <span class="text-danger">*</span></label>
+                    <textarea class="form-control" id="cliAddress" rows="2" placeholder="Ej: Calle 123 #456" maxlength="200" required></textarea>
+                    <div id="addressWarning" style="display:none;color:var(--danger);font-size:0.75rem;margin-top:4px;"><i class="fas fa-exclamation-circle"></i> <span id="addressWarningText"></span></div>
+                </div>
+
+                <div class="form-group">
+                    <label>Método de Pago</label>
+                    <div class="payment-methods">
+                        <label class="payment-option"><input type="radio" name="paymentMethod" value="Efectivo" checked onchange="StoreUI.toggleBankInfo()"> Efectivo</label>
+                        <label class="payment-option"><input type="radio" name="paymentMethod" value="Transferencia" onchange="StoreUI.toggleBankInfo()"> Transferencia</label>
+                    </div>
+                </div>
+
+                <div class="bank-info-box" id="bankInfoBox">
+                    <h5><i class="fas fa-university"></i> Datos para Transferencia</h5>
+                    <div class="bank-detail"><i class="fas fa-credit-card"></i><div><small>Número de Tarjeta</small><strong id="bankCardNumber">---</strong></div></div>
+                    <div class="transfer-warning"><i class="fas fa-exclamation-triangle"></i> Envía el comprobante por WhatsApp después de transferir.</div>
+                    <a href="#" class="whatsapp-link-btn" id="whatsappBankLink" target="_blank" rel="noopener"><i class="fab fa-whatsapp"></i> Enviar Comprobante</a>
+                </div>
+
+                <div class="bank-info-box" id="noCardWarning" style="display:none;border-color:var(--danger);">
+                    <div class="transfer-warning" style="margin:0;background:rgba(239,68,68,0.12);border-color:var(--danger);"><i class="fas fa-exclamation-circle" style="color:var(--danger);"></i> <strong>Transferencia no disponible</strong> — Esta tienda no tiene configurado el número de tarjeta.</div>
+                </div>
+
+                <div class="codigo-cliente-box" id="codigoClienteBox" style="display:none;">
+                    <h4><i class="fas fa-qrcode"></i> Su Código de Pedido</h4>
+                    <div class="codigo-cliente-display" id="codigoClienteDisplay"></div>
+                    <small>Guarde este código para dar seguimiento.</small>
+                </div>
+
+                <div style="background:var(--bg-card);border-radius:var(--radius-md);padding:16px;margin:16px 0;box-shadow:var(--shadow-xs);">
+                    <div style="display:flex;justify-content:space-between;">
+                        <span>Total a pagar:</span>
+                        <strong id="checkoutTotalAmount" style="color:var(--primary);font-size:1.1rem;">0 CUP</strong>
+                    </div>
+                </div>
+
+                <button class="btn-block btn-checkout" id="btnConfirmarPedido" onclick="StoreApp.enviarPedido()"><i class="fas fa-check-circle"></i> Confirmar Pedido</button>
+                <button class="btn-block btn-ghost" onclick="StoreApp.cancelarCheckout()"><i class="fas fa-arrow-left"></i> Volver al Carrito</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="product-modal" id="productModal">
+        <div class="product-modal-content">
+            <button class="modal-close" onclick="StoreApp.closeProductModal()"><i class="fas fa-arrow-left"></i></button>
+            <div class="product-modal-body" id="modalBody"></div>
+        </div>
+    </div>
+
+    <div class="toast-notification" id="toast">
+        <i class="fas fa-check-circle"></i>
+        <span id="toastMsg">Operación exitosa</span>
+    </div>
+
+    <!-- MODAL DE REGISTRO -->
+    <div class="modal fade" id="registroModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border-radius: 24px; border: none; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.3);">
+                <div class="modal-body" style="padding: 40px 30px; text-align: center; position: relative;">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="position: absolute; top: 16px; right: 16px;"></button>
+                    
+                    <div id="regStep1">
+                        <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #1E64FF, #1248C7); border-radius: 24px; margin: 0 auto 24px; display: flex; align-items: center; justify-content: center; color: white; font-size: 2.2rem; box-shadow: 0 10px 20px rgba(30,100,255,0.3);">
+                            <i class="fas fa-store"></i>
+                        </div>
+                        <h2 style="font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; color: #1A2B4C; margin-bottom: 8px; font-size: 1.6rem;">Crea tu tienda</h2>
+                        <p style="color: #6B7A99; font-size: 0.9rem; margin-bottom: 28px;">1 Mes de prueba Gratis<br>(10 productos max.)</p>
+                        
+                        <button onclick="loginConGoogle()" style="display: flex; align-items: center; justify-content: center; gap: 12px; background: white; border: 2px solid #E2E8F0; padding: 14px; border-radius: 12px; width: 100%; font-weight: 700; color: #1A2B4C; cursor: pointer; transition: all 0.3s; font-size: 1rem; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+                            <img src="https://www.google.com/favicon.ico" alt="Google" style="width: 22px;"> Continuar con Google
+                        </button>
+                    </div>
+
+                    <div id="regStep2" style="display: none; text-align: left;">
+                        <h2 style="font-weight: 800; color: #1A2B4C; margin-bottom: 20px; text-align: center; font-size: 1.3rem;">Datos de tu Negocio</h2>
+                        <div class="mb-3">
+                            <label class="form-label" style="font-weight: 600; font-size: 0.85rem;">Nombre del Negocio</label>
+                            <input type="text" id="regNombreNegocio" class="form-control" placeholder="Ej: Barbería Pacho" style="padding: 12px; border-radius: 10px;">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" style="font-weight: 600; font-size: 0.85rem;">Tipo de Negocio</label>
+                            <select id="regTipoNegocio" class="form-select" style="padding: 12px; border-radius: 10px;">
+                                <option value="tienda">🛒 Tienda de Ventas</option>
+                                <option value="reserva">📅 Sistema de Reservas</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" style="font-weight: 600; font-size: 0.85rem;">WhatsApp</label>
+                            <input type="tel" id="regTelefono" class="form-control" placeholder="+53 5XXXXXXX" style="padding: 12px; border-radius: 10px;">
+                        </div>
+                        <button onclick="crearTiendaCliente()" style="background: linear-gradient(135deg, #1E64FF, #1248C7); color: white; border: none; padding: 14px; border-radius: 12px; width: 100%; font-weight: 700; margin-top: 10px; font-size: 1rem; box-shadow: 0 4px 15px rgba(30,100,255,0.3);">Crear mi Tienda</button>
+                    </div>
+
+                    <div id="regStep3" style="display: none;">
+                        <div style="width: 80px; height: 80px; background: #E6F9F0; color: #10B981; border-radius: 50%; margin: 0 auto 24px; display: flex; align-items: center; justify-content: center; font-size: 2.5rem;">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <h2 style="font-weight: 800; color: #1A2B4C; margin-bottom: 12px;">¡Tienda Creada!</h2>
+                        <p style="color: #6B7A99; line-height: 1.6;">Tu tienda está activa por 30 días. Ya puedes empezar a configurarla.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="/js/store/utils.js?v=13"></script>
+    <script src="/js/store/api.js?v=13"></script>
+    <script src="/js/store/cart.js?v=13"></script>
+    <script src="/js/store/ui.js?v=13"></script>
+    <script src="/js/store/app.js?v=13"></script>
+
+    <script>
+        let supabaseClient;
+        let currentUser;
+        let registroEnProceso = false; // 🚨 Bandera de seguridad
+
+        async function initSupabase() {
+            const res = await fetch('/api/public-config');
+            const config = await res.json();
+            if (!config.supabaseUrl || !config.supabaseAnonKey) {
+                throw new Error('Faltan las claves de configuración de Supabase.');
+            }
+            supabaseClient = window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey);
+        }
+
+        function abrirRegistroModal() {
+            // 🚨 Si no hay sesión, forzamos el paso 1
+            if (!currentUser) {
+                document.getElementById('regStep1').style.display = 'block';
+                document.getElementById('regStep2').style.display = 'none';
+                document.getElementById('regStep3').style.display = 'none';
+            }
+            new bootstrap.Modal(document.getElementById('registroModal')).show();
+        }
+
+        async function loginConGoogle() {
+            try {
+                await initSupabase();
+                registroEnProceso = true;
+                const { error } = await supabaseClient.auth.signInWithOAuth({
+                    provider: 'google',
+                    options: { redirectTo: `${window.location.origin}/?registro=1` }
+                });
+                if (error) throw error;
+            } catch (e) {
+                alert('Error al conectar con Google: ' + e.message);
+            }
+        }
+
+        async function checkSession() {
+            try {
+                await initSupabase();
+                const { data: { session } } = await supabaseClient.auth.getSession();
+                
+                const urlParams = new URLSearchParams(window.location.search);
+                
+                // 🚨 SOLO SI HAY SESIÓN REAL Y VIENE DE GOOGLE
+                if (session && session.user && urlParams.get('registro') === '1') {
+                    currentUser = session.user;
+                    
+                    // Abrir modal y pasar al paso 2
+                    abrirRegistroModal();
+                    document.getElementById('regStep1').style.display = 'none';
+                    document.getElementById('regStep2').style.display = 'block';
+                    
+                    // Limpiar URL
+                    window.history.replaceState({}, document.title, "/");
+                }
+            } catch (e) {
+                console.error('Error al verificar sesión:', e);
+            }
+        }
+
+        async function crearTiendaCliente() {
+            // 🚨 DOBLE SEGURIDAD: Si no hay usuario, no crear nada
+            if (!currentUser) {
+                alert('Debes iniciar sesión con Google primero.');
+                document.getElementById('regStep1').style.display = 'block';
+                document.getElementById('regStep2').style.display = 'none';
+                return;
+            }
+
+            const nombre = document.getElementById('regNombreNegocio').value.trim();
+            const tipo = document.getElementById('regTipoNegocio').value;
+            const telefono = document.getElementById('regTelefono').value.trim();
+
+            if (!nombre || !telefono) { alert('Completa todos los campos'); return; }
+
+            const btn = document.querySelector('#regStep2 button');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creando...';
+            btn.disabled = true;
+
+            const fechaVencimiento = new Date();
+            fechaVencimiento.setDate(fechaVencimiento.getDate() + 30);
+
+            try {
+                const res = await fetch('/api/crear-tienda-cliente', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        user_id: currentUser.id,
+                        email: currentUser.email,
+                        nombre_dueno: currentUser.user_metadata?.full_name || 'Sin nombre',
+                        nombre_negocio: nombre,
+                        tipo: tipo,
+                        telefono: telefono,
+                        fecha_vencimiento: fechaVencimiento.toISOString().split('T')[0]
+                    })
+                });
+
+                const data = await res.json();
+                if (data.success) {
+                    document.getElementById('regStep2').style.display = 'none';
+                    document.getElementById('regStep3').style.display = 'block';
+                    // Redirigir al panel después de 2 segundos
+                    setTimeout(() => {
+                        window.location.href = '/admin-cliente';
+                    }, 2000);
+                } else {
+                    alert('Error: ' + data.error);
+                    btn.innerHTML = 'Crear mi Tienda';
+                    btn.disabled = false;
+                }
+            } catch (e) {
+                alert('Error de conexión');
+                btn.innerHTML = 'Crear mi Tienda';
+                btn.disabled = false;
+            }
+        }
+
+        window.addEventListener('load', checkSession);
+    </script>
+</body>
+</html>
