@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crear mi Tienda - Tienda-fg</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #0F172A, #1E64FF, #0F172A); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .card-registro { background: white; border-radius: 28px; padding: 40px; width: 100%; max-width: 460px; text-align: center; box-shadow: 0 25px 60px rgba(0,0,0,0.3); }
+        .logo { width: 72px; height: 72px; background: linear-gradient(135deg, #1E64FF, #1248C7); border-radius: 20px; margin: 0 auto 24px; display: flex; align-items: center; justify-content: center; color: white; font-size: 2rem; }
+        h1 { font-weight: 800; color: #1A2B4C; margin-bottom: 8px; font-size: 1.5rem; }
+        p.subtitle { color: #6B7A99; font-size: 0.9rem; margin-bottom: 24px; }
+        .btn-google { display: flex; align-items: center; justify-content: center; gap: 12px; background: white; border: 2px solid #E2E8F0; padding: 14px; border-radius: 12px; width: 100%; font-weight: 600; color: #1A2B4C; cursor: pointer; transition: all 0.3s; font-size: 0.95rem; }
+        .btn-google:hover { border-color: #1E64FF; background: #F8FAFF; }
+        .btn-google img { width: 20px; height: 20px; }
+        .form-step { display: none; text-align: left; margin-top: 20px; }
+        .form-step.active { display: block; }
+        .form-label { font-weight: 600; color: #1A2B4C; margin-bottom: 6px; font-size: 0.85rem; }
+        .form-control, .form-select { padding: 12px 16px; border-radius: 10px; border: 1.5px solid #E2E8F0; }
+        .form-control:focus, .form-select:focus { border-color: #1E64FF; box-shadow: 0 0 0 3px rgba(30,100,255,0.1); }
+        .btn-primary-custom { background: linear-gradient(135deg, #1E64FF, #1248C7); color: white; border: none; padding: 14px; border-radius: 12px; width: 100%; font-weight: 700; margin-top: 20px; }
+    </style>
+</head>
+<body>
+
+<div class="card-registro">
+    <!-- PASO 1: LOGIN CON GOOGLE -->
+    <div id="step1">
+        <div class="logo"><i class="fas fa-store"></i></div>
+        <h1>Crea tu propia tienda</h1>
+        <p class="subtitle">Únete a la plataforma Tienda-fg</p>
+        <button class="btn-google" onclick="loginConGoogle()">
+            <img src="https://www.google.com/favicon.ico" alt="Google"> Continuar con Google
+        </button>
+        <div style="background:#F0F9FF; border:1px solid #BAE6FD; border-radius:12px; padding:16px; margin-top:24px; text-align:left; font-size:0.82rem; color:#0369A1;">
+            <i class="fas fa-info-circle"></i> <strong>¿Cómo funciona?</strong><br>
+            1. Regístrate con Google.<br>
+            2. Llena los datos de tu negocio.<br>
+            3. Realiza el pago y espera la aprobación.
+        </div>
+    </div>
+
+    <!-- PASO 2: FORMULARIO DE SOLICITUD -->
+    <div id="step2" class="form-step">
+        <h2 style="font-weight:800; color:#1A2B4C; margin-bottom:20px; text-align:center;">Datos de tu Negocio</h2>
+        
+        <div class="mb-3">
+            <label class="form-label">Nombre del Negocio</label>
+            <input type="text" id="nombreNegocio" class="form-control" placeholder="Ej: Barbería Pacho">
+        </div>
+        
+        <div class="mb-3">
+            <label class="form-label">Tipo de Negocio</label>
+            <select id="tipoNegocio" class="form-select">
+                <option value="tienda">🛒 Tienda de Ventas</option>
+                <option value="reserva">📅 Sistema de Reservas (Barbería, Spa, etc.)</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">WhatsApp de Contacto</label>
+            <input type="tel" id="telefono" class="form-control" placeholder="+53 5XXXXXXX">
+        </div>
+
+        <button class="btn-primary-custom" onclick="enviarSolicitud()">
+            <i class="fas fa-paper-plane"></i> Enviar Solicitud
+        </button>
+    </div>
+
+    <!-- PASO 3: MENSAJE DE ESPERA -->
+    <div id="step3" class="form-step" style="text-align:center;">
+        <div style="width:80px; height:80px; background:#E6F9F0; color:#10B981; border-radius:50%; margin: 0 auto 24px; display:flex; align-items:center; justify-content:center; font-size:2rem;">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <h1 style="font-size:1.3rem;">¡Solicitud enviada!</h1>
+        <p style="color:#6B7A99; line-height:1.6; margin-top:12px;">
+            Tu solicitud está siendo revisada.<br><br>
+            <strong>Paso siguiente:</strong> Realiza el pago por los medios de contacto que te enviaremos al WhatsApp.<br><br>
+            Cuando el pago sea confirmado, tu tienda será activada automáticamente.
+        </p>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+    let supabase;
+    let currentUser;
+
+    async function initSupabase() {
+        const res = await fetch('/api/public-config');
+        const config = await res.json();
+        supabase = window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey);
+    }
+
+    async function loginConGoogle() {
+        await initSupabase();
+        const { error } = await supabase.auth.signInWithOAuth({
+            provider: 'google',
+            options: { redirectTo: `${window.location.origin}/registro.html` }
+        });
+        if (error) alert('Error: ' + error.message);
+    }
+
+    async function checkSession() {
+        await initSupabase();
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+            currentUser = session.user;
+            document.getElementById('step1').style.display = 'none';
+            document.getElementById('step2').classList.add('active');
+        }
+    }
+
+    async function enviarSolicitud() {
+        const nombre = document.getElementById('nombreNegocio').value.trim();
+        const tipo = document.getElementById('tipoNegocio').value;
+        const telefono = document.getElementById('telefono').value.trim();
+
+        if (!nombre || !telefono) {
+            alert('Por favor, completa todos los campos.');
+            return;
+        }
+
+        const btn = document.querySelector('.btn-primary-custom');
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+        btn.disabled = true;
+
+        try {
+            const res = await fetch('/api/solicitud-tienda', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    user_id: currentUser.id,
+                    email: currentUser.email,
+                    nombre: currentUser.user_metadata?.full_name || 'Sin nombre',
+                    nombre_negocio: nombre,
+                    tipo: tipo,
+                    telefono: telefono
+                })
+            });
+
+            if (res.ok) {
+                document.getElementById('step2').classList.remove('active');
+                document.getElementById('step3').classList.add('active');
+            } else {
+                alert('Error al enviar la solicitud. Intenta de nuevo.');
+                btn.innerHTML = '<i class="fas fa-paper-plane"></i> Enviar Solicitud';
+                btn.disabled = false;
+            }
+        } catch (e) {
+            alert('Error de conexión. Intenta de nuevo.');
+            btn.innerHTML = '<i class="fas fa-paper-plane"></i> Enviar Solicitud';
+            btn.disabled = false;
+        }
+    }
+
+    window.addEventListener('load', checkSession);
+</script>
+</body>
+</html>
