@@ -24,7 +24,7 @@ window.AdminApp = {
                 this.updateStoreName();
                 const t = tiendaSelect.value;
                 
-                // 🚨 DETECTAR TIPO DE TIENDA AL CAMBIAR
+                // DETECTAR TIPO DE TIENDA AL CAMBIAR
                 const storeInfo = this.tiendasDisponibles.find(x => x.id === t);
                 this.currentStoreType = storeInfo?.configuracion?.tipo || 'tienda';
                 this.adaptMenu();
@@ -45,37 +45,48 @@ window.AdminApp = {
     },
 
     async loadInitialData() {
+        // 1. Cargar el selector de tiendas
         await this.loadTiendaSelector();
+        
+        // 2. Actualizar el nombre de la tienda
         this.updateStoreName();
+        
         const t = document.getElementById('tiendaSelect')?.value;
+        
         if (t) {
-            // 🚨 DETECTAR TIPO AL INICIAR
+            // 3. Detectar tipo de tienda
             const storeInfo = this.tiendasDisponibles.find(x => x.id === t);
             this.currentStoreType = storeInfo?.configuracion?.tipo || 'tienda';
             this.adaptMenu();
 
+            // 4. Cargar categorías y productos de esa tienda
             await AdminProducts.loadCategorias(t);
             await AdminProducts.loadProducts();
             await AdminOrders.loadOrders();
+        } else {
+            // Si no hay tiendas, mostrar mensaje
+            document.getElementById('productsList').innerHTML = '<tr><td colspan="8" class="text-center py-4 text-muted">No hay tiendas registradas. Ve a "Tiendas" para crear una.</td></tr>';
         }
+        
         AdminOrders.startPolling();
     },
 
-    // 🚨 ADAPTAR EL MENÚ SEGÚN EL TIPO DE TIENDA
+    // ADAPTAR EL MENÚ SEGÚN EL TIPO DE TIENDA
     adaptMenu() {
         const isBooking = this.currentStoreType === 'reserva';
         
         // Mostrar/Ocultar Pedidos
-        document.querySelector('[data-section="orders"]').style.display = isBooking ? 'none' : 'block';
+        const ordersBtn = document.querySelector('[data-section="orders"]');
+        if (ordersBtn) ordersBtn.style.display = isBooking ? 'none' : 'block';
         
         // Mostrar/Ocultar Reservas
-        document.querySelector('[data-section="bookings"]').style.display = isBooking ? 'block' : 'none';
+        const bookingsBtn = document.querySelector('[data-section="bookings"]');
+        if (bookingsBtn) bookingsBtn.style.display = isBooking ? 'block' : 'none';
 
-        // Si es reserva, forzar que la sección activa sea "Productos" (que ahora serán servicios)
-        if (isBooking) {
-            document.querySelector('[data-section="products"] span:last-child').innerText = 'Servicios';
-        } else {
-            document.querySelector('[data-section="products"] span:last-child').innerText = 'Productos';
+        // Cambiar nombre de "Productos" a "Servicios" si es reserva
+        const productsBtnText = document.querySelector('[data-section="products"] span:last-child');
+        if (productsBtnText) {
+            productsBtnText.innerText = isBooking ? 'Servicios' : 'Productos';
         }
     },
 
@@ -84,46 +95,76 @@ window.AdminApp = {
             const tiendas = await AdminAPI.getTiendas();
             const select = document.getElementById('tiendaSelect');
             if (!select) return;
-            if (!tiendas || tiendas.length === 0) { select.innerHTML = '<option value="">⚠️ No hay tiendas</option>'; return; }
+            
+            if (!tiendas || tiendas.length === 0) { 
+                select.innerHTML = '<option value="">⚠️ No hay tiendas</option>'; 
+                return; 
+            }
+            
             this.tiendasDisponibles = tiendas;
             select.innerHTML = tiendas.map(t => `<option value="${t.id}">${t.icono || '🛒'} ${t.nombre}</option>`).join('');
+            
             const saved = localStorage.getItem('adminSelectedStore');
             if (saved && tiendas.some(t => t.id === saved)) select.value = saved;
             else if (tiendas.length > 0) select.value = tiendas[0].id;
+            
             this.updateStoreName();
-        } catch (e) { AdminUI.showToast('❌ Error cargando tiendas', 'error'); }
+        } catch (e) { 
+            AdminUI.showToast('❌ Error cargando tiendas', 'error'); 
+        }
     },
 
     updateStoreName() {
         const select = document.getElementById('tiendaSelect');
         if (!select || !select.options || select.options.length === 0) return;
         const name = select.options[select.selectedIndex]?.text || 'Tienda';
-        document.getElementById('currentStoreName').innerText = name;
-        document.getElementById('currentStoreNameOrders').innerText = name;
+        
+        const el1 = document.getElementById('currentStoreName');
+        const el2 = document.getElementById('currentStoreNameOrders');
+        if (el1) el1.innerText = name;
+        if (el2) el2.innerText = name;
+        
         localStorage.setItem('adminSelectedStore', select.value);
     },
 
-    showSection(s) {
+    // 🚨 FUNCIÓN CORREGIDA PARA CAMBIAR DE SECCIÓN
+    showSection(s, btnElement = null) {
         // Validar que no entre a una sección que no le corresponde
         if (this.currentStoreType === 'reserva' && s === 'orders') s = 'products';
         if (this.currentStoreType === 'tienda' && s === 'bookings') s = 'products';
 
+        // Quitar la clase 'active' de todos los botones
         document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-        document.querySelector(`[data-section="${s}"]`)?.classList.add('active');
+        
+        // Poner la clase 'active' al botón que se clickeó o al que corresponde
+        if (btnElement) {
+            btnElement.classList.add('active');
+        } else {
+            document.querySelector(`[data-section="${s}"]`)?.classList.add('active');
+        }
+        
+        // Ocultar todas las vistas
         document.querySelectorAll('[id^="view-"]').forEach(v => v.style.display = 'none');
+        
+        // Mostrar la vista seleccionada
         const view = document.getElementById(`view-${s}`);
         if (view) view.style.display = 'block';
         
+        // Cargar los datos de esa sección
         if (s === 'products') AdminProducts.loadProducts();
-        if (s === 'orders') { AdminOrders.loadOrders(); document.getElementById('newOrderIndicator')?.classList.remove('active'); }
+        if (s === 'orders') { 
+            AdminOrders.loadOrders(); 
+            document.getElementById('newOrderIndicator')?.classList.remove('active'); 
+        }
         if (s === 'bookings') this.loadBookings();
         if (s === 'stores') AdminStores.loadStores();
         if (s === 'settings') this.loadCurrencyConfig();
         
+        // En móvil, cerrar el menú lateral
         if (window.innerWidth < 768) document.getElementById('sidebar')?.classList.remove('active');
     },
 
-    // 🚨 CARGAR RESERVAS FILTRADAS POR TIENDA
+    // CARGAR RESERVAS FILTRADAS POR TIENDA
     async loadBookings() {
         const t = document.getElementById('tiendaSelect')?.value;
         const tbody = document.getElementById('bookingsList');
@@ -222,7 +263,8 @@ window.AdminApp = {
     }
 };
 
-window.showSection = (s) => AdminApp.showSection(s);
+// 🚨 IMPORTANTE: Pasar el botón clickeado para que se marque como activo
+window.showSection = (s, btn) => AdminApp.showSection(s, btn);
 window.saveCurrencyConfig = (e) => AdminApp.saveCurrencyConfig(e);
 window.resetStoreForm = () => AdminStores.resetStoreForm();
 window.saveStore = (e) => AdminStores.saveStore(e);
