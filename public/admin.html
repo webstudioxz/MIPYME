@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Control - Tienda-fg</title>
+    <link rel="manifest" href="/manifest-admin.json">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1E64FF; --primary-dark: #1248C7; --primary-light: #E8F0FE; --primary-gradient: linear-gradient(135deg, #1E64FF, #1248C7);
+            --success: #10B981; --danger: #EF4444; --warning: #F59E0B; --info: #0EA5E9; --purple: #7C3AED;
+            --bg-body: #F4F7FE; --bg-card: #FFFFFF; --bg-sidebar: #0F172A;
+            --text-main: #1A2B4C; --text-secondary: #6B7A99; --text-muted: #9CA3AF;
+            --border-soft: #EEF2F7; --border-strong: #E2E8F0;
+            --shadow-sm: 0 2px 8px rgba(30,100,255,0.05); --shadow-md: 0 8px 24px rgba(30,100,255,0.08); --shadow-lg: 0 16px 40px rgba(30,100,255,0.12);
+            --radius: 16px; --radius-sm: 10px; --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --font-display: 'Plus Jakarta Sans', sans-serif; --font-body: 'Inter', sans-serif;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: var(--font-body); background: var(--bg-body); color: var(--text-main); font-size: 14px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+
+        .sidebar { width: 280px; background: var(--bg-sidebar); height: 100vh; position: fixed; left: 0; top: 0; padding: 24px 16px; transition: var(--transition); z-index: 1000; display: flex; flex-direction: column; overflow-y: auto; border-right: 1px solid rgba(255,255,255,0.05); }
+        .sidebar::-webkit-scrollbar { width: 3px; }
+        .sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
+        .sidebar-brand { display: flex; align-items: center; gap: 14px; padding: 8px 12px; margin-bottom: 28px; text-decoration: none; }
+        .sidebar-brand .brand-icon { width: 44px; height: 44px; background: var(--primary-gradient); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; color: white; flex-shrink: 0; box-shadow: 0 4px 12px rgba(30,100,255,0.4); }
+        .sidebar-brand span { font-family: var(--font-display); font-size: 1.2rem; font-weight: 800; color: white; }
+        .sidebar-section-label { font-size: 0.65rem; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.08em; padding: 12px 16px 6px; }
+        .nav-item { padding: 11px 16px; border-radius: 12px; color: #94a3b8; cursor: pointer; display: flex; align-items: center; gap: 14px; margin-bottom: 3px; transition: var(--transition); font-weight: 500; border: 1px solid transparent; background: transparent; width: 100%; text-align: left; font-size: 0.9rem; text-decoration: none; }
+        .nav-item:hover { background: rgba(30,100,255,0.1); color: white; border-color: rgba(30,100,255,0.2); }
+        .nav-item.active { background: var(--primary-gradient); color: white; box-shadow: 0 4px 15px rgba(30,100,255,0.3); }
+        .nav-item .icon { width: 20px; text-align: center; font-size: 1rem; flex-shrink: 0; }
+        .nav-item .badge-count { margin-left: auto; background: rgba(255,255,255,0.15); padding: 2px 8px; border-radius: 10px; font-size: 0.7rem; font-weight: 700; }
+        .nav-item.active .badge-count { background: rgba(255,255,255,0.25); }
+        .sidebar-divider { height: 1px; background: rgba(255,255,255,0.06); margin: 12px 0; }
+        .nav-item.logout { color: #f87171; margin-top: auto; }
+        .nav-item.logout:hover { background: rgba(239, 68, 68, 0.15); color: #f87171; border-color: rgba(239, 68, 68, 0.2); }
+
+        .main-content { margin-left: 280px; padding: 30px 35px; min-height: 100vh; transition: var(--transition); }
+        .mobile-menu-btn { display: none; position: fixed; top: 16px; left: 16px; z-index: 1100; background: var(--primary-gradient); color: white; border: none; padding: 12px 16px; border-radius: 12px; cursor: pointer; font-weight: 600; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(30,100,255,0.3); }
+
+        .card { background: var(--bg-card); border-radius: var(--radius); border: none; box-shadow: var(--shadow-sm); transition: var(--transition); overflow: hidden; margin-bottom: 20px; }
+        .card:hover { box-shadow: var(--shadow-md); }
+        .card-header { background: transparent; border-bottom: 1px solid var(--border-soft); padding: 18px 24px; font-weight: 700; font-family: var(--font-display); }
+
+        .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 24px; }
+        .stat-card { background: white; border-radius: var(--radius); padding: 20px 22px; box-shadow: var(--shadow-sm); border-left: 4px solid var(--primary); transition: var(--transition); display: flex; align-items: center; gap: 14px; }
+        .stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+        .stat-card .stat-icon { width: 48px; height: 48px; border-radius: 12px; background: var(--primary-light); color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; }
+        .stat-card.green { border-left-color: var(--success); } .stat-card.green .stat-icon { background: #D1FAE5; color: var(--success); }
+        .stat-card.orange { border-left-color: var(--warning); } .stat-card.orange .stat-icon { background: #FEF3C7; color: var(--warning); }
+        .stat-card.purple { border-left-color: var(--purple); } .stat-card.purple .stat-icon { background: #F3E8FF; color: var(--purple); }
+        .stat-card .stat-value { font-family: var(--font-display); font-size: 1.7rem; font-weight: 800; color: var(--text-main); line-height: 1.1; }
+        .stat-card .stat-label { font-size: 0.72rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
+
+        .btn { border-radius: var(--radius-sm); font-family: var(--font-display); font-weight: 700; padding: 9px 18px; transition: var(--transition); font-size: 0.82rem; }
+        .btn-primary { background: var(--primary-gradient); border: none; color: white; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 4px 20px rgba(30,100,255,0.3); color: white; }
+        .btn-sm { padding: 6px 12px; font-size: 0.75rem; }
+
+        .table { font-size: 0.85rem; margin-bottom: 0; }
+        .table th { font-family: var(--font-display); font-weight: 700; color: var(--text-secondary); text-transform: uppercase; font-size: 0.65rem; letter-spacing: 0.5px; padding: 14px 16px; background: #F8FAFF; border-bottom: 2px solid #E2E8F0; }
+        .table td { padding: 12px 16px; vertical-align: middle; border-bottom: 1px solid var(--border-soft); }
+        .table tr:hover td { background: #F8FAFF; }
+
+        .badge-plan { padding: 5px 12px; border-radius: 8px; font-family: var(--font-display); font-weight: 700; font-size: 0.68rem; text-transform: uppercase; }
+        .badge-prueba { background: #E0F2FE; color: #0369A1; }
+        .badge-basico { background: #D1FAE5; color: #065F46; }
+        .badge-pro { background: #FEF3C7; color: #92400E; }
+        .badge-pausada { background: #FEF3C7; color: #92400E; padding: 4px 10px; border-radius: 20px; font-weight: 700; font-size: 0.7rem; display: inline-flex; align-items: center; gap: 4px; }
+        .badge-activa { background: #D1FAE5; color: #065F46; padding: 4px 10px; border-radius: 20px; font-weight: 700; font-size: 0.7rem; display: inline-flex; align-items: center; gap: 4px; }
+        .badge-status { padding: 5px 14px; border-radius: 20px; font-family: var(--font-display); font-weight: 700; font-size: 0.7rem; text-transform: uppercase; }
+        .badge-pendiente { background: #FEF3C7; color: #92400E; }
+        .badge-confirmado { background: #DBEAFE; color: #1E40AF; }
+        .badge-enviado { background: #D1FAE5; color: #065F46; }
+        .badge-entregado { background: #D1FAE5; color: #065F46; }
+
+        /* Cronómetro */
+        .timer-badge {
+            background: #F1F5F9;
+            border-radius: 6px;
+            padding: 4px 8px;
+            font-family: monospace;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-main);
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .timer-badge.danger { background: #FEE2E2; color: #B91C1C; }
+        .timer-badge.warning { background: #FEF3C7; color: #B45309; }
+        .timer-badge.success { background: #D1FAE5; color: #065F46; }
+
+        .form-label { font-family: var(--font-display); font-weight: 600; color: var(--text-main); margin-bottom: 6px; font-size: 0.8rem; }
+        .form-control:focus, .form-select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(30,100,255,0.12); }
+
+        .order-card { border-left: 4px solid var(--primary); margin-bottom: 20px; transition: var(--transition); }
+        .order-card:hover { box-shadow: var(--shadow-md); }
+        .order-card .card-body { padding: 20px 24px; }
+
+        #loginScreen { position: fixed; inset: 0; background: linear-gradient(135deg, #0F172A, #1E64FF, #0F172A); z-index: 2000; display: flex; align-items: center; justify-content: center; }
+        .login-card { background: white; padding: 48px 40px; border-radius: 28px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 25px 60px rgba(0,0,0,0.3); }
+        .login-card .login-icon { width: 72px; height: 72px; background: var(--primary-gradient); border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 2rem; color: white; margin: 0 auto 20px; }
+        .login-card h2 { font-family: var(--font-display); font-weight: 800; margin-bottom: 4px; }
+        .login-card .subtitle { color: var(--text-secondary); margin-bottom: 28px; font-size: 0.9rem; }
+        .login-error { color: var(--danger); font-size: 0.85rem; margin-top: 8px; min-height: 24px; font-weight: 500; }
+
+        .admin-toast { position: fixed; top: 24px; right: 24px; background: white; padding: 16px 24px; border-radius: var(--radius); box-shadow: var(--shadow-lg); border-left: 5px solid var(--success); display: flex; align-items: center; gap: 14px; z-index: 9999; transform: translateX(120%); transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); font-family: var(--font-display); font-weight: 600; min-width: 280px; max-width: 400px; }
+        .admin-toast.show { transform: translateX(0); }
+        .admin-toast i { font-size: 1.3rem; flex-shrink: 0; }
+        .admin-toast .toast-close { margin-left: auto; background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 1rem; padding: 4px; }
+
+        .view-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
+        .view-header h1 { font-family: var(--font-display); font-weight: 800; font-size: 1.5rem; color: var(--text-main); margin: 0; display: flex; align-items: center; gap: 10px; }
+        .view-header h1 i { color: var(--primary); }
+        .view-header .subtitle { color: var(--text-secondary); font-size: 0.85rem; margin-top: 4px; }
+
+        .modal-content { border-radius: var(--radius); border: none; }
+        .modal-header { border-bottom: 1px solid var(--border-soft); padding: 20px 24px; }
+        .modal-footer { border-top: 1px solid var(--border-soft); padding: 16px 24px; }
+
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.active { transform: translateX(0); }
+            .main-content { margin-left: 0; padding: 80px 16px 30px; }
+            .mobile-menu-btn { display: flex !important; }
+        }
+        @media (max-width: 576px) {
+            .stat-grid { grid-template-columns: 1fr 1fr; }
+            .main-content { padding: 80px 12px 20px; }
+            .login-card { padding: 32px 24px; }
+        }
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 4px; }
+    </style>
+</head>
+<body>
+
+<button class="mobile-menu-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i> Menú</button>
+
+<div id="loginScreen">
+    <div class="login-card">
+        <div class="login-icon"><i class="fas fa-crown"></i></div>
+        <h2>Panel de Control</h2>
+        <p class="subtitle">Tienda-fg · Super Admin</p>
+        <form id="loginForm">
+            <div class="mb-3"><input type="password" id="passInput" class="form-control" placeholder="Ingresa la contraseña" required style="padding: 12px; border-radius: 12px;" autofocus></div>
+            <button class="btn btn-primary w-100" id="loginBtn" style="padding: 12px; font-size: 0.95rem;"><i class="fas fa-arrow-right me-2"></i> Ingresar</button>
+            <div class="login-error" id="loginError"></div>
+        </form>
+    </div>
+</div>
+
+<div class="sidebar" id="sidebar">
+    <a href="/admin" class="sidebar-brand">
+        <div class="brand-icon"><i class="fas fa-crown"></i></div>
+        <span>Super Admin</span>
+    </a>
+
+    <div class="sidebar-section-label">Vista Global</div>
+    <button class="nav-item active" data-section="dashboard" onclick="showSection('dashboard')"><span class="icon"><i class="fas fa-chart-pie"></i></span> Dashboard</button>
+    <button class="nav-item" data-section="tiendas" onclick="showSection('tiendas')"><span class="icon"><i class="fas fa-store"></i></span> Tiendas <span class="badge-count" id="countTiendas">0</span></button>
+    <button class="nav-item" data-section="usuarios" onclick="showSection('usuarios')"><span class="icon"><i class="fas fa-users"></i></span> Usuarios <span class="badge-count" id="countUsuarios">0</span></button>
+    <button class="nav-item" data-section="pedidos-global" onclick="showSection('pedidos-global')"><span class="icon"><i class="fas fa-receipt"></i></span> Pedidos Globales</button>
+
+    <div class="sidebar-divider"></div>
+    <a href="/" target="_blank" class="nav-item"><span class="icon"><i class="fas fa-external-link-alt"></i></span> Ver Sitio</a>
+    <button class="nav-item logout" onclick="logout()"><span class="icon"><i class="fas fa-sign-out-alt"></i></span> Cerrar Sesión</button>
+</div>
+
+<div class="main-content" id="app" style="display:none;">
+
+    <!-- DASHBOARD -->
+    <div id="view-dashboard">
+        <div class="view-header">
+            <div>
+                <h1><i class="fas fa-chart-pie"></i> Dashboard</h1>
+                <div class="subtitle">Resumen general del proyecto</div>
+            </div>
+        </div>
+        <div class="stat-grid">
+            <div class="stat-card"><div class="stat-icon"><i class="fas fa-store"></i></div><div><div class="stat-value" id="dashTotalTiendas">0</div><div class="stat-label">Tiendas</div></div></div>
+            <div class="stat-card green"><div class="stat-icon"><i class="fas fa-users"></i></div><div><div class="stat-value" id="dashTotalUsuarios">0</div><div class="stat-label">Usuarios</div></div></div>
+            <div class="stat-card orange"><div class="stat-icon"><i class="fas fa-box"></i></div><div><div class="stat-value" id="dashTotalProductos">0</div><div class="stat-label">Productos</div></div></div>
+            <div class="stat-card purple"><div class="stat-icon"><i class="fas fa-receipt"></i></div><div><div class="stat-value" id="dashTotalPedidos">0</div><div class="stat-label">Pedidos</div></div></div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><i class="fas fa-clock me-2" style="color:var(--primary);"></i> Tiendas recientes</div>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead><tr><th>Tienda</th><th>Dueño</th><th>Plan</th><th>Tiempo Restante</th><th>Estado</th></tr></thead>
+                    <tbody id="dashRecentTiendas"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- TIENDAS (empresarial) -->
+    <div id="view-tiendas" style="display:none;">
+        <div class="view-header">
+            <div>
+                <h1><i class="fas fa-store"></i> Gestión Empresarial de Tiendas</h1>
+                <div class="subtitle">Administra, configura y supervisa todas las tiendas del ecosistema</div>
+            </div>
+            <div class="d-flex gap-2 flex-wrap">
+                <button class="btn btn-primary" onclick="abrirModalTienda()"><i class="fas fa-plus me-1"></i> Nueva Tienda</button>
+                <button class="btn btn-outline-primary" onclick="abrirModalCrearTiendaCliente()"><i class="fas fa-user-plus me-1"></i> Asignar a Usuario</button>
+            </div>
+        </div>
+
+        <div class="stat-grid" style="margin-bottom: 24px;">
+            <div class="stat-card"><div class="stat-icon"><i class="fas fa-store"></i></div><div><div class="stat-value" id="kpiTotalTiendas">0</div><div class="stat-label">Total Tiendas</div></div></div>
+            <div class="stat-card green"><div class="stat-icon"><i class="fas fa-check-circle"></i></div><div><div class="stat-value" id="kpiActivas">0</div><div class="stat-label">Activas</div></div></div>
+            <div class="stat-card orange"><div class="stat-icon"><i class="fas fa-pause-circle"></i></div><div><div class="stat-value" id="kpiPausadas">0</div><div class="stat-label">Pausadas</div></div></div>
+            <div class="stat-card purple"><div class="stat-icon"><i class="fas fa-exclamation-triangle"></i></div><div><div class="stat-value" id="kpiVencidas">0</div><div class="stat-label">Vencidas</div></div></div>
+        </div>
+
+        <div class="card mb-3" style="padding: 16px;">
+            <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-search" style="color:var(--primary);"></i></span>
+                <input type="text" id="searchTiendas" class="form-control" placeholder="Buscar por nombre, ID o email del dueño..." oninput="loadTiendas()">
+            </div>
+        </div>
+
+        <div class="card p-0 overflow-hidden">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Tienda</th><th>Dueño</th><th>Plan</th><th>Vence / Tiempo</th><th>Productos</th><th>Estado</th><th style="text-align:right;">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tiendasList"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- USUARIOS (Limpio y sin repeticiones) -->
+    <div id="view-usuarios" style="display:none;">
+        <div class="view-header">
+            <div>
+                <h1><i class="fas fa-users"></i> Usuarios</h1>
+                <div class="subtitle">Todos los usuarios registrados</div>
+            </div>
+        </div>
+        <div class="card p-0 overflow-hidden">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Usuario</th>
+                            <th>Registro</th>
+                            <th>Tienda Asociada</th>
+                            <th>Plan</th>
+                            <th>Estado</th>
+                            <th style="text-align:right;">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usuariosList"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- PEDIDOS GLOBALES -->
+    <div id="view-pedidos-global" style="display:none;">
+        <div class="view-header">
+            <div>
+                <h1><i class="fas fa-receipt"></i> Pedidos Globales</h1>
+                <div class="subtitle">Todos los pedidos de todas las tiendas</div>
+            </div>
+            <select id="filterTiendaPedidos" class="form-select" style="max-width: 280px;" onchange="loadPedidosGlobal()">
+                <option value="">Todas las tiendas</option>
+            </select>
+        </div>
+        <div id="pedidosGlobalList"></div>
+    </div>
+
+</div>
+
+<!-- MODAL TIENDA (FORM COMPLETO) -->
+<div class="modal fade" id="tiendaModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="fw-bold m-0"><i class="fas fa-store me-2" style="color:var(--primary);"></i> <span id="tiendaModalTitle">Editar Tienda</span></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="tiendaForm">
+                    <input type="hidden" id="storeOriginalId">
+                    <h6 class="fw-bold text-primary mb-3"><i class="fas fa-info-circle me-1"></i> Información Básica</h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-4"><label class="form-label">ID de Tienda (slug)</label><input type="text" id="storeSlug" class="form-control" required placeholder="mi-tienda"></div>
+                        <div class="col-md-4"><label class="form-label">Nombre Comercial</label><input type="text" id="storeDisplayName" class="form-control" required placeholder="Mi Tienda"></div>
+                        <div class="col-md-4"><label class="form-label">Icono</label><input type="text" id="storeIcon" class="form-control" value="🛒" maxlength="4"></div>
+                        <div class="col-12"><label class="form-label">Descripción</label><textarea id="storeDescription" class="form-control" rows="2"></textarea></div>
+                        <div class="col-md-6"><label class="form-label">Categorías (separadas por coma)</label><input type="text" id="storeCategories" class="form-control" value="otros"></div>
+                        <div class="col-md-6"><label class="form-label">Tipo de Tienda</label>
+                            <select id="storeTipo" class="form-select" onchange="toggleHorarioFields()">
+                                <option value="tienda">🛒 Tienda Normal</option>
+                                <option value="reserva">📅 Sistema de Reservas</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- 🚨 TASAS DE MONEDA -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-12">
+                            <label class="form-label fw-bold text-dark">Tasas de Cambio de la Tienda (Base: CUP)</label>
+                            <div class="row g-2">
+                                <div class="col-md-4">
+                                    <div class="input-group">
+                                        <span class="input-group-text" style="background:#F0FDF4; color:#166534; font-weight:700;">🇨🇺 CUP</span>
+                                        <input type="number" id="storeTasaCUP" class="form-control" value="1" readonly title="La moneda base siempre es 1">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="input-group">
+                                        <span class="input-group-text" style="background:#EFF6FF; color:#1E40AF; font-weight:700;">🇺🇸 USD</span>
+                                        <input type="number" id="storeTasaUSD" class="form-control" value="25" step="0.01" min="1" placeholder="Ej: 25">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="input-group">
+                                        <span class="input-group-text" style="background:#F3E8FF; color:#6B21A8; font-weight:700;">🇪🇺 EUR</span>
+                                        <input type="number" id="storeTasaEUR" class="form-control" value="27" step="0.01" min="1" placeholder="Ej: 27">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h6 class="fw-bold text-primary mb-3"><i class="fas fa-clock me-1"></i> Horario</h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-4" id="divHorarioApertura" style="display:none;"><label class="form-label">Apertura</label><input type="time" id="storeHorarioApertura" class="form-control" value="09:00"></div>
+                        <div class="col-md-4" id="divHorarioCierre" style="display:none;"><label class="form-label">Cierre</label><input type="time" id="storeHorarioCierre" class="form-control" value="18:00"></div>
+                    </div>
+                    <h6 class="fw-bold text-primary mb-3"><i class="fas fa-truck me-1"></i> Envío</h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-4"><label class="form-label">Domicilio</label><select id="storeEnvioDisponible" class="form-select"><option value="true">Sí disponible</option><option value="false">No disponible</option></select></div>
+                        <div class="col-md-4"><label class="form-label">Costo de Envío (CUP)</label><input type="number" id="storeEnvioCosto" class="form-control" value="0" min="0"></div>
+                        <div class="col-md-4"><label class="form-label">Tiempo Estimado</label><input type="text" id="storeEnvioTiempo" class="form-control" value="24-48 horas"></div>
+                    </div>
+                    <h6 class="fw-bold text-primary mb-3"><i class="fas fa-shield-alt me-1"></i> Garantía</h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-4"><label class="form-label">Garantía</label><select id="storeGarantiaDisponible" class="form-select"><option value="true">Sí disponible</option><option value="false">No disponible</option></select></div>
+                        <div class="col-md-4"><label class="form-label">Duración</label><input type="text" id="storeGarantiaDuracion" class="form-control" value="12 meses"></div>
+                        <div class="col-md-4"><label class="form-label">Descripción</label><input type="text" id="storeGarantiaDesc" class="form-control" value="Garantía contra defectos"></div>
+                    </div>
+                    <h6 class="fw-bold text-primary mb-3"><i class="fas fa-credit-card me-1"></i> Modos de Pago</h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label d-block">Activar métodos</label>
+                            <div class="d-flex gap-4 mt-1">
+                                <label class="form-check"><input type="checkbox" id="pagoEfectivo" checked> 💵 Físico / Efectivo</label>
+                                <label class="form-check"><input type="checkbox" id="pagoTransferencia" checked> 🏦 Transferencia</label>
+                            </div>
+                        </div>
+                        <div class="col-md-3"><label class="form-label">Número de Tarjeta</label><input type="text" id="storeNumeroTarjeta" class="form-control" placeholder="1234 5678..."></div>
+                        <div class="col-md-3"><label class="form-label">WhatsApp Comprobante</label><input type="text" id="storeWhatsAppConfirmacion" class="form-control" placeholder="+53 5XXXXXXX"></div>
+                    </div>
+                    <h6 class="fw-bold text-primary mb-3"><i class="fas fa-address-book me-1"></i> Contacto</h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-4"><label class="form-label">Teléfono del Dueño (WhatsApp)</label><input type="text" id="storeTelefono" class="form-control" placeholder="+53 5XXXXXXX"></div>
+                        <div class="col-md-4"><label class="form-label">Email</label><input type="text" id="storeEmail" class="form-control" placeholder="contacto@tienda.com"></div>
+                        <div class="col-md-4"><label class="form-label">Dirección de la Tienda</label><input type="text" id="storeUbicacion" class="form-control" placeholder="La Habana, Cuba"></div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button class="btn btn-primary" onclick="guardarTienda()"><i class="fas fa-save me-1"></i> Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL GESTIÓN DE TIEMPO -->
+<div class="modal fade" id="tiempoModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="fw-bold m-0"><i class="fas fa-clock me-2" style="color:var(--primary);"></i> Gestionar Tiempo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="tiempoStoreId">
+                <p class="text-muted small mb-3">Ajusta el tiempo de suscripción de la tienda.</p>
+                <div class="row g-3">
+                    <div class="col-6">
+                        <label class="form-label">Días a sumar</label>
+                        <input type="number" id="tiempoDias" class="form-control" value="0" min="0">
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label">Horas a sumar</label>
+                        <input type="number" id="tiempoHoras" class="form-control" value="0" min="0">
+                    </div>
+                </div>
+                <div class="alert alert-warning mt-3 mb-0 small">
+                    <i class="fas fa-exclamation-triangle me-1"></i> Si la tienda ya venció, el tiempo se sumará desde hoy.
+                </div>
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button class="btn btn-danger btn-sm" onclick="cancelarTiempo()"><i class="fas fa-ban"></i> Cancelar Suscripción</button>
+                <div>
+                    <button class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cerrar</button>
+                    <button class="btn btn-primary btn-sm" onclick="guardarTiempo()"><i class="fas fa-plus"></i> Añadir Tiempo</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL ASIGNAR TIENDA A USUARIO -->
+<div class="modal fade" id="crearTiendaModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header"><h5 class="fw-bold">Asignar Tienda a Usuario</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+            <div class="modal-body">
+                <div class="mb-3"><label class="form-label fw-semibold">Email del Dueño</label><input type="email" id="manualEmail" class="form-control" placeholder="cliente@gmail.com" required></div>
+                <div class="mb-3"><label class="form-label fw-semibold">Nombre de la Tienda</label><input type="text" id="manualNombre" class="form-control" required></div>
+                <div class="mb-3"><label class="form-label fw-semibold">Tipo</label><select id="manualTipo" class="form-select"><option value="tienda">Tienda</option><option value="reserva">Reservas</option></select></div>
+                <div class="mb-3"><label class="form-label fw-semibold">Plan</label><select id="manualPlan" class="form-select"><option value="prueba">Prueba</option><option value="basico">Básico</option><option value="pro">Pro</option></select></div>
+                <div class="alert alert-info small mb-0" style="font-size:0.8rem;"><i class="fas fa-info-circle me-1"></i> El usuario debe haberse registrado previamente con Google.</div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button class="btn btn-primary" onclick="crearTiendaManual()"><i class="fas fa-save"></i> Crear</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="admin-toast" id="adminToast">
+    <i class="fas fa-check-circle" style="color: var(--success);"></i>
+    <span id="adminToastMsg">Operación exitosa</span>
+    <button class="toast-close" onclick="this.closest('.admin-toast').classList.remove('show')">&times;</button>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+const ADMIN_TOKEN_KEY = 'superadminToken';
+const ADMIN_EXPIRY_KEY = 'superadminExpiry';
+let allTiendas = [];
+let allUsuarios = [];
+let tiendaModalInstance = null;
+let tiempoModalInstance = null;
+let timerInterval = null;
+
+function getToken() { return localStorage.getItem(ADMIN_TOKEN_KEY); }
+function getExpiry() { return localStorage.getItem(ADMIN_EXPIRY_KEY); }
+function saveSession(token, expiry) { localStorage.setItem(ADMIN_TOKEN_KEY, token); localStorage.setItem(ADMIN_EXPIRY_KEY, expiry); }
+function clearSession() { localStorage.removeItem(ADMIN_TOKEN_KEY); localStorage.removeItem(ADMIN_EXPIRY_KEY); }
+function isSessionValid() { return getToken() && getExpiry() && Date.now() < parseInt(getExpiry()); }
+
+function showToast(msg, type = 'success') {
+    const toast = document.getElementById('adminToast');
+    const icon = toast.querySelector('i');
+    const span = document.getElementById('adminToastMsg');
+    const colors = { success: '#10B981', warning: '#F59E0B', error: '#EF4444' };
+    const icons = { success: 'fas fa-check-circle', warning: 'fas fa-exclamation-triangle', error: 'fas fa-exclamation-circle' };
+    toast.style.borderLeftColor = colors[type] || colors.success;
+    icon.style.color = colors[type] || colors.success;
+    icon.className = icons[type] || icons.success;
+    span.innerHTML = msg;
+    toast.classList.add('show');
+    clearTimeout(toast._t);
+    toast._t = setTimeout(() => toast.classList.remove('show'), 3500);
+}
+
+function toggleSidebar() { document.getElementById('sidebar').classList.toggle('active'); }
+
+async function doLogin(e) {
+    if (e) e.preventDefault();
+    const password = document.getElementById('passInput').value;
+    const btn = document.getElementById('loginBtn');
+    const err = document.getElementById('loginError');
+    if (!password) { err.textContent = '⚠️ Ingresa la contraseña'; return; }
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verificando...';
+    btn.disabled = true;
+    err.textContent = '';
+    try {
+        const res = await fetch('/api/admin/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password }) });
+        const data = await res.json();
+        if (data.success) { saveSession(data.token, data.expires); showToast('✅ Acceso concedido'); await showApp(); }
+        else { err.textContent = '❌ ' + (data.error || 'Contraseña incorrecta'); }
+    } catch (e) { err.textContent = '❌ Error de conexión'; }
+    finally { btn.innerHTML = '<i class="fas fa-arrow-right me-2"></i> Ingresar'; btn.disabled = false; }
+}
+
+async function verifySession() {
+    if (!isSessionValid()) return false;
+    try {
+        const res = await fetch('/api/admin/verify-session', { headers: { 'Authorization': `Bearer ${getToken()}` } });
+        if (!res.ok) return false;
+        const data = await res.json();
+        return data.valid === true;
+    } catch { return false; }
+}
+
+async function showApp() {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    await refreshAllData();
+    showSection('dashboard');
+    startGlobalTimer();
+}
+
+function logout() {
+    clearSession();
+    document.getElementById('app').style.display = 'none';
+    document.getElementById('loginScreen').style.display = 'flex';
+    document.getElementById('passInput').value = '';
+    if (timerInterval) clearInterval(timerInterval);
+    showToast('👋 Sesión cerrada');
+}
+
+function showSection(section) {
+    document.querySelectorAll('[id^="view-"]').forEach(v => v.style.display = 'none');
+    const view = document.getElementById(`view-${section}`);
+    if (view) view.style.display = 'block';
+
+    document.querySelectorAll('.nav-item[data-section]').forEach(b => b.classList.remove('active'));
+    document.querySelector(`[data-section="${section}"]`)?.classList.add('active');
+
+    if (section === 'dashboard') loadDashboard();
+    if (section === 'tiendas') loadTiendas();
+    if (section === 'usuarios') loadUsuarios();
+    if (section === 'pedidos-global') loadPedidosGlobal();
+
+    if (window.innerWidth < 768) document.getElementById('sidebar')?.classList.remove('active');
+}
+
+async function refreshAllData() {
+    await Promise.all([loadTiendasData(), loadUsuariosData()]);
+    document.getElementById('countTiendas').innerText = allTiendas.length;
+    document.getElementById('countUsuarios').innerText = allUsuarios.length;
+}
+
+async function loadTiendasData() {
+    try { const res = await fetch('/api/superadmin/tiendas'); allTiendas = await res.json(); return allTiendas; }
+    catch { allTiendas = []; return []; }
+}
+
+async function loadUsuariosData() {
+    try { const res = await fetch('/api/superadmin/usuarios'); allUsuarios = await res.json(); return allUsuarios; }
+    catch { allUsuarios = []; return []; }
+}
+
+// 🚨 FUNCIÓN DEL CRONÓMETRO
+function getTimeRemaining(endtime) {
+    const total = Date.parse(endtime) - Date.parse(new Date());
+    const seconds = Math.floor((total / 1000) % 60);
+    const minutes = Math.floor((total / 1000 / 60) % 60);
+    const hours = Math.floor((total / (1000 * 60 * 60)) % 24);
+    const days = Math.floor(total / (1000 * 60 * 60 * 24));
+    return { total, days, hours, minutes, seconds };
+}
+
+function formatTimer(remaining) {
+    if (remaining.total <= 0) return '<span class="timer-badge danger"><i class="fas fa-clock"></i> Vencida</span>';
+    
+    let parts = [];
+    if (remaining.days > 0) parts.push(`${remaining.days}d`);
+    if (remaining.hours > 0 || remaining.days > 0) parts.push(`${remaining.hours}h`);
+    parts.push(`${remaining.minutes}m`);
+    parts.push(`${remaining.seconds}s`);
+
+    let colorClass = 'success';
+    if (remaining.total < 86400000) colorClass = 'danger'; // < 1 día
+    else if (remaining.total < 259200000) colorClass = 'warning'; // < 3 días
+
+    return `<span class="timer-badge ${colorClass}"><i class="fas fa-clock"></i> ${parts.join(' ')}</span>`;
+}
+
+function startGlobalTimer() {
+    if (timerInterval) clearInterval(timerInterval);
+    timerInterval = setInterval(() => {
+        document.querySelectorAll('.timer-live').forEach(el => {
+            const endtime = el.dataset.end;
+            el.innerHTML = formatTimer(getTimeRemaining(endtime));
+        });
+    }, 1000);
+}
+
+function loadDashboard() {
+    const totalProductos = allTiendas.reduce((s, t) => s + (t.productos_count || 0), 0);
+    document.getElementById('dashTotalTiendas').innerText = allTiendas.length;
+    document.getElementById('dashTotalUsuarios').innerText = allUsuarios.length;
+    document.getElementById('dashTotalProductos').innerText = totalProductos;
+    document.getElementById('dashTotalPedidos').innerText = '—';
+
+    const recientes = [...allTiendas].sort((a, b) => new Date(b.created_at) - new Date(a.created_at)).slice(0, 5);
+    const tbody = document.getElementById('dashRecentTiendas');
+    if (!recientes.length) { tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-4">Sin tiendas</td></tr>'; return; }
+    tbody.innerHTML = recientes.map(t => {
+        const plan = t.plan || 'prueba';
+        const estadoBadge = t.pausada ? '<span class="badge-pausada"><i class="fas fa-pause"></i>Pausada</span>' : '<span class="badge-activa"><i class="fas fa-check"></i>Activa</span>';
+        const timerHtml = t.fecha_vencimiento ? `<span class="timer-live" data-end="${t.fecha_vencimiento}">${formatTimer(getTimeRemaining(t.fecha_vencimiento))}</span>` : '-';
+        
+        return `<tr><td><strong>${t.nombre}</strong><br><small class="text-muted">${t.id}</small></td><td>${t.owner_email || '-'}</td><td><span class="badge-plan badge-${plan}">${plan.toUpperCase()}</span></td><td>${timerHtml}</td><td>${estadoBadge}</td></tr>`;
+    }).join('');
+}
+
+async function loadTiendas() {
+    await loadTiendasData();
+
+    const total = allTiendas.length;
+    const activas = allTiendas.filter(t => !t.pausada).length;
+    const pausadas = allTiendas.filter(t => t.pausada).length;
+    const hoy = new Date();
+    const vencidas = allTiendas.filter(t => t.fecha_vencimiento && new Date(t.fecha_vencimiento) < hoy).length;
+    document.getElementById('kpiTotalTiendas').innerText = total;
+    document.getElementById('kpiActivas').innerText = activas;
+    document.getElementById('kpiPausadas').innerText = pausadas;
+    document.getElementById('kpiVencidas').innerText = vencidas;
+
+    const q = (document.getElementById('searchTiendas')?.value || '').toLowerCase().trim();
+    const filtradas = q
+        ? allTiendas.filter(t =>
+            (t.nombre || '').toLowerCase().includes(q) ||
+            (t.id || '').toLowerCase().includes(q) ||
+            (t.owner_email || '').toLowerCase().includes(q))
+        : allTiendas;
+
+    const tbody = document.getElementById('tiendasList');
+    if (!filtradas.length) {
+        tbody.innerHTML = `<tr><td colspan="7" class="text-center py-4 text-muted">${q ? 'Sin resultados para "' + q + '"' : 'No hay tiendas registradas.'}</td></tr>`;
+        return;
+    }
+
+    tbody.innerHTML = filtradas.map(t => {
+        const plan = t.plan || 'prueba';
+        const vencido = t.fecha_vencimiento && new Date(t.fecha_vencimiento) < new Date();
+        const estadoBadge = t.pausada
+            ? '<span class="badge-pausada"><i class="fas fa-pause"></i>Pausada</span>'
+            : '<span class="badge-activa"><i class="fas fa-check"></i>Activa</span>';
+
+        // 🚨 CRONÓMETRO EN VIVO
+        const timerHtml = t.fecha_vencimiento 
+            ? `<div class="timer-live" data-end="${t.fecha_vencimiento}">${formatTimer(getTimeRemaining(t.fecha_vencimiento))}</div>
+               <small class="text-muted" style="font-size:0.7rem;">${new Date(t.fecha_vencimiento).toLocaleString()}</small>` 
+            : '<small class="text-muted">Sin fecha</small>';
+
+        return `<tr>
+            <td>
+                <div class="d-flex align-items-center gap-2">
+                    <div style="width:38px;height:38px;background:var(--primary-light);color:var(--primary);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;">${t.icono || '🛒'}</div>
+                    <div>
+                        <div class="fw-bold">${t.nombre}</div>
+                        <small class="text-muted">${t.id}</small>
+                    </div>
+                </div>
+            </td>
+            <td>${t.owner_email || '<span class="text-muted">Sin dueño</span>'}</td>
+            <td><span class="badge-plan badge-${plan}">${plan.toUpperCase()}</span></td>
+            <td class="${vencido ? 'text-danger fw-bold' : ''}">${timerHtml}</td>
+            <td><strong>${t.productos_count || 0}</strong> <small class="text-muted">/ ${t.max_productos || 10}</small></td>
+            <td>${estadoBadge}</td>
+            <td style="text-align:right; white-space:nowrap;">
+                <button class="btn btn-sm btn-outline-primary me-1" onclick="editarTienda('${t.id}')" title="Editar información"><i class="fas fa-edit"></i></button>
+                <button class="btn btn-sm btn-outline-success me-1" onclick="abrirModalTiempo('${t.id}')" title="Gestionar Tiempo"><i class="fas fa-clock"></i></button>
+                <button class="btn btn-sm btn-outline-${t.pausada ? 'success' : 'warning'} me-1" onclick="togglePausarTienda('${t.id}', ${!t.pausada})" title="${t.pausada ? 'Reactivar' : 'Pausar'}"><i class="fas fa-${t.pausada ? 'play' : 'pause'}"></i></button>
+                <button class="btn btn-sm btn-outline-danger" onclick="eliminarTienda('${t.id}')" title="Eliminar"><i class="fas fa-trash"></i></button>
+            </td>
+        </tr>`;
+    }).join('');
+}
+
+// 🚨 MODAL DE TIEMPO
+function abrirModalTiempo(id) {
+    document.getElementById('tiempoStoreId').value = id;
+    document.getElementById('tiempoDias').value = '0';
+    document.getElementById('tiempoHoras').value = '0';
+    tiempoModalInstance = new bootstrap.Modal(document.getElementById('tiempoModal'));
+    tiempoModalInstance.show();
+}
+
+async function guardarTiempo() {
+    const id = document.getElementById('tiempoStoreId').value;
+    const dias = parseInt(document.getElementById('tiempoDias').value) || 0;
+    const horas = parseInt(document.getElementById('tiempoHoras').value) || 0;
+
+    if (dias === 0 && horas === 0) {
+        showToast('⚠️ Debes añadir al menos 1 día o 1 hora', 'warning');
+        return;
+    }
+
+    try {
+        const res = await fetch(`/api/superadmin/tiendas/${id}/tiempo`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ dias, horas })
+        });
+        if (res.ok) {
+            showToast('✅ Tiempo actualizado');
+            tiempoModalInstance.hide();
+            await refreshAllData();
+            loadTiendas();
+        } else {
+            showToast('❌ Error al actualizar tiempo', 'error');
+        }
+    } catch (e) { showToast('❌ Error de conexión', 'error'); }
+}
+
+async function cancelarTiempo() {
+    const id = document.getElementById('tiempoStoreId').value;
+    if (!confirm('⚠️ ¿Cancelar suscripción? La tienda se pausará y vencerá hoy mismo.')) return;
+
+    try {
+        const res = await fetch(`/api/superadmin/tiendas/${id}/cancelar`, { method: 'POST' });
+        if (res.ok) {
+            showToast('✅ Suscripción cancelada');
+            tiempoModalInstance.hide();
+            await refreshAllData();
+            loadTiendas();
+        } else {
+            showToast('❌ Error al cancelar', 'error');
+        }
+    } catch (e) { showToast('❌ Error de conexión', 'error'); }
+}
+
+async function togglePausarTienda(id, pausar) {
+    if (!confirm(`¿${pausar ? 'Pausar' : 'Reactivar'} esta tienda?`)) return;
+    const res = await fetch(`/api/superadmin/pausar/${id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ pausar }) });
+    if (res.ok) { showToast('✅ Actualizado'); await refreshAllData(); loadTiendas(); if (document.getElementById('view-usuarios').style.display !== 'none') loadUsuarios(); }
+    else showToast('❌ Error', 'error');
+}
+
+async function eliminarTienda(id) {
+    if (!confirm('⚠️ ¿Eliminar esta tienda permanentemente? Se borrarán productos y pedidos.')) return;
+    if (!confirm('Última confirmación. ¿Continuar?')) return;
+    const res = await fetch(`/api/superadmin/tiendas/${id}`, { method: 'DELETE' });
+    if (res.ok) { showToast('🗑️ Eliminada'); await refreshAllData(); loadTiendas(); }
+    else showToast('❌ Error', 'error');
+}
+
+function toggleHorarioFields() {
+    const isReserva = document.getElementById('storeTipo').value === 'reserva';
+    document.getElementById('divHorarioApertura').style.display = isReserva ? 'block' : 'none';
+    document.getElementById('divHorarioCierre').style.display = isReserva ? 'block' : 'none';
+}
+
+function abrirModalTienda() {
+    document.getElementById('tiendaModalTitle').innerText = 'Nueva Tienda';
+    document.getElementById('storeOriginalId').value = '';
+    document.getElementById('tiendaForm').reset();
+    document.getElementById('storeSlug').readOnly = false;
+    document.getElementById('storeSlug').style.opacity = '1';
+    document.getElementById('storeIcon').value = '🛒';
+    document.getElementById('storeTipo').value = 'tienda';
+    document.getElementById('storeCategories').value = 'otros';
+    document.getElementById('storeEnvioDisponible').value = 'true';
+    document.getElementById('storeEnvioCosto').value = '0';
+    document.getElementById('storeEnvioTiempo').value = '24-48 horas';
+    document.getElementById('storeGarantiaDisponible').value = 'true';
+    document.getElementById('storeGarantiaDuracion').value = '12 meses';
+    document.getElementById('storeGarantiaDesc').value = 'Garantía contra defectos';
+    document.getElementById('pagoEfectivo').checked = true;
+    document.getElementById('pagoTransferencia').checked = true;
+    document.getElementById('storeTelefono').value = '+53 5XXXXXXX';
+    document.getElementById('storeEmail').value = 'contacto@tienda.com';
+    document.getElementById('storeUbicacion').value = 'La Habana, Cuba';
+    document.getElementById('storeNumeroTarjeta').value = '';
+    document.getElementById('storeWhatsAppConfirmacion').value = '';
+    
+    // 🚨 VALORES POR DEFECTO DE LAS MONEDAS
+    document.getElementById('storeTasaCUP').value = '1';
+    document.getElementById('storeTasaUSD').value = '25';
+    document.getElementById('storeTasaEUR').value = '27';
+    
+    toggleHorarioFields();
+    tiendaModalInstance = new bootstrap.Modal(document.getElementById('tiendaModal'));
+    tiendaModalInstance.show();
+}
+
+async function editarTienda(slug) {
+    try {
+        const res = await fetch(`/api/admin/tiendas/${slug}`, { headers: { 'Authorization': `Bearer ${getToken()}` } });
+        if (!res.ok) { showToast('❌ Error cargando tienda', 'error'); return; }
+        const store = await res.json();
+
+        document.getElementById('tiendaModalTitle').innerText = 'Editar Tienda';
+        document.getElementById('storeOriginalId').value = store.id;
+        document.getElementById('storeSlug').value = store.id;
+        document.getElementById('storeSlug').readOnly = true;
+        document.getElementById('storeSlug').style.opacity = '0.6';
+        document.getElementById('storeDisplayName').value = store.nombre || '';
+        document.getElementById('storeIcon').value = store.icono || '🛒';
+        document.getElementById('storeDescription').value = store.descripcion || '';
+        document.getElementById('storeCategories').value = (store.categorias || []).join(', ');
+
+        const cfg = store.configuracion || {};
+        document.getElementById('storeTipo').value = cfg.tipo || 'tienda';
+
+        // 🚨 CARGAR LAS TASAS DE MONEDA
+        const tasas = cfg.tasas || { CUP: 1, USD: 0.04, EUR: 0.037 };
+        const usdEnCUP = tasas.USD ? (1 / tasas.USD) : 25;
+        const eurEnCUP = tasas.EUR ? (1 / tasas.EUR) : 27;
+
+        document.getElementById('storeTasaCUP').value = '1';
+        document.getElementById('storeTasaUSD').value = usdEnCUP.toFixed(2);
+        document.getElementById('storeTasaEUR').value = eurEnCUP.toFixed(2);
+
+        if (cfg.horario) {
+            document.getElementById('storeHorarioApertura').value = cfg.horario.apertura || '09:00';
+            document.getElementById('storeHorarioCierre').value = cfg.horario.cierre || '18:00';
+        }
+        if (cfg.envio) {
+            document.getElementById('storeEnvioDisponible').value = cfg.envio.disponible ? 'true' : 'false';
+            document.getElementById('storeEnvioCosto').value = cfg.envio.costo || 0;
+            document.getElementById('storeEnvioTiempo').value = cfg.envio.tiempo_estimado || '24-48 horas';
+        }
+        if (cfg.garantia) {
+            document.getElementById('storeGarantiaDisponible').value = cfg.garantia.disponible ? 'true' : 'false';
+            document.getElementById('storeGarantiaDuracion').value = cfg.garantia.duracion || '12 meses';
+            document.getElementById('storeGarantiaDesc').value = cfg.garantia.descripcion || '';
+        }
+        document.getElementById('pagoEfectivo').checked = (cfg.metodos_pago || []).includes('Efectivo');
+        document.getElementById('pagoTransferencia').checked = (cfg.metodos_pago || []).includes('Transferencia');
+
+        if (cfg.datos_bancarios) {
+            document.getElementById('storeNumeroTarjeta').value = cfg.datos_bancarios.numero_tarjeta || '';
+            document.getElementById('storeWhatsAppConfirmacion').value = cfg.datos_bancarios.whatsapp_confirmacion || '';
+        }
+        if (cfg.contacto) {
+            document.getElementById('storeTelefono').value = cfg.contacto.telefono || '';
+            document.getElementById('storeEmail').value = cfg.contacto.email || '';
+            document.getElementById('storeUbicacion').value = cfg.contacto.ubicacion || 'La Habana, Cuba';
+        }
+
+        toggleHorarioFields();
+        tiendaModalInstance = new bootstrap.Modal(document.getElementById('tiendaModal'));
+        tiendaModalInstance.show();
+    } catch (e) { showToast('❌ Error cargando tienda', 'error'); }
+}
+
+async function guardarTienda() {
+    const originalId = document.getElementById('storeOriginalId').value;
+    const isEdit = !!originalId;
+
+    const slug = document.getElementById('storeSlug').value.trim().toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9\-_]/g, '');
+    const nombre = document.getElementById('storeDisplayName').value.trim();
+    if (!slug || !nombre) { showToast('❌ Completa ID y Nombre', 'error'); return; }
+
+    const metodos = [];
+    if (document.getElementById('pagoEfectivo').checked) metodos.push('Efectivo');
+    if (document.getElementById('pagoTransferencia').checked) metodos.push('Transferencia');
+
+    // 🚨 CAPTURAR LAS TASAS DE MONEDA
+    const tasaUSD = parseFloat(document.getElementById('storeTasaUSD').value) || 25;
+    const tasaEUR = parseFloat(document.getElementById('storeTasaEUR').value) || 27;
+
+    const configuracion = {
+        tipo: document.getElementById('storeTipo').value,
+        horario: {
+            apertura: document.getElementById('storeHorarioApertura').value || '09:00',
+            cierre: document.getElementById('storeHorarioCierre').value || '18:00'
+        },
+        envio: {
+            disponible: document.getElementById('storeEnvioDisponible').value === 'true',
+            costo: Number(document.getElementById('storeEnvioCosto').value) || 0,
+            tiempo_estimado: document.getElementById('storeEnvioTiempo').value || '24-48h'
+        },
+        garantia: {
+            disponible: document.getElementById('storeGarantiaDisponible').value === 'true',
+            duracion: document.getElementById('storeGarantiaDuracion').value || '12 meses',
+            descripcion: document.getElementById('storeGarantiaDesc').value || ''
+        },
+        metodos_pago: metodos,
+        datos_bancarios: {
+            numero_tarjeta: document.getElementById('storeNumeroTarjeta').value.trim(),
+            whatsapp_confirmacion: document.getElementById('storeWhatsAppConfirmacion').value.trim()
+        },
+        contacto: {
+            telefono: document.getElementById('storeTelefono').value || '',
+            email: document.getElementById('storeEmail').value || '',
+            ubicacion: document.getElementById('storeUbicacion').value || 'La Habana, Cuba'
+        },
+        // 🚨 GUARDAR LAS TRES TASAS EN EL JSON
+        tasas: {
+            CUP: 1,
+            USD: 1 / tasaUSD,
+            EUR: 1 / tasaEUR
+        }
+    };
+
+    const payload = {
+        id: slug,
+        nombre: nombre,
+        icono: (document.getElementById('storeIcon').value || '🛒').slice(0, 4),
+        descripcion: document.getElementById('storeDescription').value.trim(),
+        categorias: document.getElementById('storeCategories').value.split(',').map(c => c.trim()).filter(Boolean),
+        configuracion
+    };
+
+    try {
+        const url = isEdit ? `/api/admin/tiendas/${originalId}` : '/api/admin/tiendas';
+        const method = isEdit ? 'PUT' : 'POST';
+        const res = await fetch(url, {
+            method,
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` },
+            body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (res.ok) {
+            showToast(isEdit ? '✅ Tienda actualizada' : '✅ Tienda creada');
+            tiendaModalInstance.hide();
+            await refreshAllData();
+            loadTiendas();
+        } else {
+            showToast('❌ ' + (data.error || 'Error'), 'error');
+        }
+    } catch { showToast('❌ Error de conexión', 'error'); }
+}
+
+// 🚨 FUNCIÓN DE COPIAR ENLACES
+function copiarEnlace(texto, tipo) {
+    navigator.clipboard.writeText(texto).then(() => {
+        showToast(`✅ ${tipo} copiada al portapapeles`);
+    }).catch(err => {
+        alert('Error al copiar: ' + err);
+    });
+}
+
+// 🚨 TABLA DE USUARIOS LIMPIA Y PROFESIONAL
+async function loadUsuarios() {
+    await loadUsuariosData();
+    const tbody = document.getElementById('usuariosList');
+    if (!allUsuarios.length) { tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-muted">No hay usuarios.</td></tr>'; return; }
+    
+    tbody.innerHTML = allUsuarios.map(u => {
+        const tieneTienda = !!u.tienda;
+        
+        let tiendaHtml = '<span class="text-muted small">Sin tienda</span>';
+        if (tieneTienda) {
+            const baseUrl = window.location.origin;
+            const urlTienda = `${baseUrl}/?tienda=${u.tienda.id}`;
+            const urlAdmin = `${baseUrl}/admin?tienda=${u.tienda.id}`;
+            
+            tiendaHtml = `
+                <div class="fw-bold" style="font-size:0.85rem;">${u.tienda.nombre}</div>
+                <div class="d-flex gap-1 mt-1">
+                    <button class="btn btn-sm btn-light border" onclick="copiarEnlace('${urlTienda}', 'URL de Tienda')" title="Copiar URL Pública"><i class="fas fa-link text-primary"></i></button>
+                    <button class="btn btn-sm btn-light border" onclick="copiarEnlace('${urlAdmin}', 'URL de Admin')" title="Copiar URL Admin"><i class="fas fa-lock text-dark"></i></button>
+                </div>
+            `;
+        }
+
+        const planHtml = tieneTienda ? `<span class="badge-plan badge-${u.tienda.plan || 'prueba'}">${(u.tienda.plan || 'prueba').toUpperCase()}</span>` : '-';
+        const estadoHtml = tieneTienda ? (u.tienda.pausada ? '<span class="badge-pausada">Pausada</span>' : '<span class="badge-activa">Activa</span>') : '-';
+        
+        const accionesHtml = `
+            ${tieneTienda ? `
+                <button class="btn btn-sm btn-outline-primary me-1" onclick="editarTienda('${u.tienda.id}')" title="Editar tienda"><i class="fas fa-edit"></i></button>
+                <button class="btn btn-sm btn-outline-${u.tienda.pausada ? 'success' : 'warning'} me-1" onclick="togglePausarTienda('${u.tienda.id}', ${!u.tienda.pausada})" title="${u.tienda.pausada ? 'Reactivar' : 'Pausar'}"><i class="fas fa-${u.tienda.pausada ? 'play' : 'pause'}"></i></button>
+            ` : ''}
+            <button class="btn btn-sm btn-outline-danger" onclick="eliminarUsuario('${u.id}', '${u.email}')" title="Eliminar usuario"><i class="fas fa-user-slash"></i></button>
+        `;
+        
+        return `<tr>
+            <td>
+                <div class="fw-bold">${u.email}</div>
+                <small class="text-muted">${u.nombre}</small>
+            </td>
+            <td>${new Date(u.created_at).toLocaleDateString('es-ES')}</td>
+            <td>${tiendaHtml}</td>
+            <td>${planHtml}</td>
+            <td>${estadoHtml}</td>
+            <td style="text-align:right; white-space:nowrap;">${accionesHtml}</td>
+        </tr>`;
+    }).join('');
+}
+
+async function eliminarUsuario(id, email) {
+    if (!confirm(`⚠️ ¿Eliminar el usuario "${email}"?\n\nEsto borrará:\n- Su cuenta de login\n- Su tienda (si tiene)\n- Todos sus productos y pedidos\n\nEsta acción NO se puede deshacer.`)) return;
+    if (!confirm('Última confirmación. ¿Continuar?')) return;
+    try {
+        const res = await fetch(`/api/superadmin/usuarios/${id}`, { method: 'DELETE' });
+        const data = await res.json();
+        if (data.success) {
+            showToast('🗑️ Usuario eliminado');
+            await refreshAllData();
+            loadUsuarios();
+        } else {
+            showToast('❌ ' + (data.error || 'Error'), 'error');
+        }
+    } catch { showToast('❌ Error de conexión', 'error'); }
+}
+
+async function loadPedidosGlobal() {
+    const container = document.getElementById('pedidosGlobalList');
+    const selector = document.getElementById('filterTiendaPedidos');
+    container.innerHTML = '<div class="text-center py-5"><i class="fas fa-spinner fa-spin" style="font-size:2rem;color:var(--primary);"></i></div>';
+
+    if (selector.options.length <= 1) {
+        allTiendas.forEach(t => {
+            const opt = document.createElement('option');
+            opt.value = t.id; opt.textContent = `${t.icono || '🛒'} ${t.nombre}`;
+            selector.appendChild(opt);
+        });
+    }
+
+    const tiendaFiltro = selector.value;
+    try {
+        const urls = tiendaFiltro
+            ? [fetch(`/api/mis-pedidos?tienda=${tiendaFiltro}`).then(r => r.json()).then(d => d.map(p => ({ ...p, _tienda: tiendaFiltro })))]
+            : allTiendas.map(t => fetch(`/api/mis-pedidos?tienda=${t.id}`).then(r => r.json()).then(d => d.map(p => ({ ...p, _tienda: t.id }))));
+        const results = await Promise.all(urls);
+        const pedidos = results.flat().sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+        document.getElementById('dashTotalPedidos').innerText = pedidos.length;
+
+        if (!pedidos.length) { container.innerHTML = '<div class="alert alert-info text-center">No hay pedidos registrados.</div>'; return; }
+
+        container.innerHTML = pedidos.map(p => {
+            const tiendaInfo = allTiendas.find(t => t.id === p._tienda);
+            const tiendaNombre = tiendaInfo?.nombre || p._tienda;
+            const badgeClass = `badge-${p.estado || 'pendiente'}`;
+            const items = p.items || [];
+            return `<div class="card order-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+                        <div>
+                            <h5 class="fw-bold mb-0">Pedido #${p.id} <small class="text-muted">· ${tiendaNombre}</small></h5>
+                            <small class="text-muted">${new Date(p.created_at).toLocaleString('es-ES')}</small>
+                        </div>
+                        <span class="badge-status ${badgeClass}">${p.estado || 'pendiente'}</span>
+                    </div>
+                    <hr>
+                    <div class="row mb-2">
+                        <div class="col-md-4"><i class="fas fa-user text-primary me-1"></i> ${p.nombre}</div>
+                        <div class="col-md-4"><i class="fas fa-phone text-primary me-1"></i> ${p.telefono}</div>
+                        <div class="col-md-4"><i class="fas fa-map-marker-alt text-primary me-1"></i> ${p.direccion}</div>
+                    </div>
+                    <div class="bg-light p-3 rounded-3">
+                        ${items.map(i => `<div class="d-flex justify-content-between mb-1"><span>${i.qty}x ${i.nombre}</span><span class="fw-semibold">$${((i.precio||0)*(i.qty||0)).toFixed(2)}</span></div>`).join('')}
+                        <hr class="my-2">
+                        <div class="d-flex justify-content-between fw-bold"><span>Total</span><span style="color:var(--primary);">$${parseFloat(p.total||0).toFixed(2)} ${p.moneda || 'CUP'}</span></div>
+                    </div>
+                </div>
+            </div>`;
+        }).join('');
+    } catch { container.innerHTML = '<div class="alert alert-danger">Error al cargar pedidos.</div>'; }
+}
+
+function abrirModalCrearTiendaCliente() {
+    new bootstrap.Modal(document.getElementById('crearTiendaModal')).show();
+}
+
+async function crearTiendaManual() {
+    const email = document.getElementById('manualEmail').value.trim();
+    const nombre = document.getElementById('manualNombre').value.trim();
+    const tipo = document.getElementById('manualTipo').value;
+    const plan = document.getElementById('manualPlan').value;
+    if (!email || !nombre) { alert('Completa todos los campos'); return; }
+
+    const res = await fetch('/api/superadmin/crear-tienda', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, nombre_negocio: nombre, tipo, plan })
+    });
+    const data = await res.json();
+    if (data.success) {
+        showToast('✅ Tienda creada: ' + data.slug);
+        bootstrap.Modal.getInstance(document.getElementById('crearTiendaModal')).hide();
+        document.getElementById('manualEmail').value = '';
+        document.getElementById('manualNombre').value = '';
+        await refreshAllData(); loadTiendas();
+    } else { showToast('❌ ' + (data.error || 'Error'), 'error'); }
+}
+
+document.getElementById('loginForm').addEventListener('submit', doLogin);
+window.addEventListener('load', async () => {
+    if (await verifySession()) await showApp();
+    else document.getElementById('loginScreen').style.display = 'flex';
+});
+</script>
+</body>
+</html>
