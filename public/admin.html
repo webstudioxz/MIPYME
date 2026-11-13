@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Control - Tienda-fg</title>
+    <link rel="manifest" href="/manifest-admin.json">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary: #1E64FF; --primary-light: #E8F0FE; --primary-gradient: linear-gradient(135deg, #1E64FF, #1248C7); --success: #10B981; --danger: #EF4444; --warning: #F59E0B; --info: #0EA5E9; --purple: #7C3AED; --bg-body: #F4F7FE; --bg-card: #FFFFFF; --bg-sidebar: #0F172A; --text-main: #1A2B4C; --text-secondary: #6B7A99; --text-muted: #9CA3AF; --border-soft: #EEF2F7; --border-strong: #E2E8F0; --shadow-sm: 0 2px 8px rgba(30,100,255,0.05); --shadow-md: 0 8px 24px rgba(30,100,255,0.08); --shadow-lg: 0 16px 40px rgba(30,100,255,0.12); --radius: 16px; --radius-sm: 10px; --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); --font-display: 'Plus Jakarta Sans', sans-serif; --font-body: 'Inter', sans-serif; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: var(--font-body); background: var(--bg-body); color: var(--text-main); font-size: 14px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+        .sidebar { width: 280px; background: var(--bg-sidebar); height: 100vh; position: fixed; left: 0; top: 0; padding: 24px 16px; z-index: 1000; display: flex; flex-direction: column; overflow-y: auto; border-right: 1px solid rgba(255,255,255,0.05); }
+        .sidebar-brand { display: flex; align-items: center; gap: 14px; padding: 8px 12px; margin-bottom: 28px; text-decoration: none; }
+        .sidebar-brand .brand-icon { width: 44px; height: 44px; background: var(--primary-gradient); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; color: white; flex-shrink: 0; box-shadow: 0 4px 12px rgba(30,100,255,0.4); }
+        .sidebar-brand span { font-family: var(--font-display); font-size: 1.2rem; font-weight: 800; color: white; }
+        .nav-item { padding: 11px 16px; border-radius: 12px; color: #94a3b8; cursor: pointer; display: flex; align-items: center; gap: 14px; margin-bottom: 3px; transition: var(--transition); font-weight: 500; border: 1px solid transparent; background: transparent; width: 100%; text-align: left; font-size: 0.9rem; text-decoration: none; }
+        .nav-item:hover { background: rgba(30,100,255,0.1); color: white; border-color: rgba(30,100,255,0.2); }
+        .nav-item.active { background: var(--primary-gradient); color: white; box-shadow: 0 4px 15px rgba(30,100,255,0.3); }
+        .nav-item .icon { width: 20px; text-align: center; font-size: 1rem; flex-shrink: 0; }
+        .sidebar-divider { height: 1px; background: rgba(255,255,255,0.06); margin: 12px 0; }
+        .nav-item.logout { color: #f87171; margin-top: auto; }
+        .nav-item.logout:hover { background: rgba(239, 68, 68, 0.15); color: #f87171; border-color: rgba(239, 68, 68, 0.2); }
+        .main-content { margin-left: 280px; padding: 30px 35px; min-height: 100vh; }
+        .mobile-menu-btn { display: none; position: fixed; top: 16px; left: 16px; z-index: 1100; background: var(--primary-gradient); color: white; border: none; padding: 12px 16px; border-radius: 12px; cursor: pointer; font-weight: 600; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(30,100,255,0.3); }
+        .card { background: var(--bg-card); border-radius: var(--radius); border: none; box-shadow: var(--shadow-sm); margin-bottom: 20px; overflow: hidden; }
+        .card-header { background: transparent; border-bottom: 1px solid var(--border-soft); padding: 18px 24px; font-weight: 700; font-family: var(--font-display); }
+        .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 24px; }
+        .stat-card { background: white; border-radius: var(--radius); padding: 20px 22px; box-shadow: var(--shadow-sm); border-left: 4px solid var(--primary); display: flex; align-items: center; gap: 14px; }
+        .stat-card .stat-icon { width: 48px; height: 48px; border-radius: 12px; background: var(--primary-light); color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; }
+        .stat-card .stat-value { font-family: var(--font-display); font-size: 1.7rem; font-weight: 800; color: var(--text-main); line-height: 1.1; }
+        .stat-card .stat-label { font-size: 0.72rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
+        .btn { border-radius: var(--radius-sm); font-family: var(--font-display); font-weight: 700; padding: 9px 18px; font-size: 0.82rem; }
+        .btn-primary { background: var(--primary-gradient); border: none; color: white; }
+        .btn-sm { padding: 6px 12px; font-size: 0.75rem; }
+        .table { font-size: 0.85rem; margin-bottom: 0; }
+        .table th { font-family: var(--font-display); font-weight: 700; color: var(--text-secondary); text-transform: uppercase; font-size: 0.65rem; letter-spacing: 0.5px; padding: 14px 16px; background: #F8FAFF; border-bottom: 2px solid #E2E8F0; }
+        .table td { padding: 12px 16px; vertical-align: middle; border-bottom: 1px solid var(--border-soft); }
+        .table tr:hover td { background: #F8FAFF; }
+        .badge-plan { padding: 5px 12px; border-radius: 8px; font-family: var(--font-display); font-weight: 700; font-size: 0.68rem; text-transform: uppercase; }
+        .badge-prueba { background: #E0F2FE; color: #0369A1; }
+        .badge-basico { background: #D1FAE5; color: #065F46; }
+        .badge-pro { background: #FEF3C7; color: #92400E; }
+        .badge-pausada { background: #FEF3C7; color: #92400E; padding: 4px 10px; border-radius: 20px; font-weight: 700; font-size: 0.7rem; display: inline-flex; align-items: center; gap: 4px; }
+        .badge-activa { background: #D1FAE5; color: #065F46; padding: 4px 10px; border-radius: 20px; font-weight: 700; font-size: 0.7rem; display: inline-flex; align-items: center; gap: 4px; }
+        .badge-status { padding: 5px 14px; border-radius: 20px; font-family: var(--font-display); font-weight: 700; font-size: 0.7rem; text-transform: uppercase; }
+        .badge-pendiente { background: #FEF3C7; color: #92400E; }
+        .badge-confirmado { background: #DBEAFE; color: #1E40AF; }
+        .badge-enviado { background: #D1FAE5; color: #065F46; }
+        .badge-entregado { background: #D1FAE5; color: #065F46; }
+        .timer-badge { background: #F1F5F9; border-radius: 6px; padding: 4px 8px; font-family: monospace; font-size: 0.75rem; font-weight: 700; color: var(--text-main); display: inline-flex; align-items: center; gap: 4px; }
+        .timer-badge.danger { background: #FEE2E2; color: #B91C1C; }
+        .timer-badge.warning { background: #FEF3C7; color: #B45309; }
+        .timer-badge.success { background: #D1FAE5; color: #065F46; }
+        .form-label { font-family: var(--font-display); font-weight: 600; color: var(--text-main); margin-bottom: 6px; font-size: 0.8rem; }
+        .form-control:focus, .form-select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(30,100,255,0.12); }
+        .order-card { border-left: 4px solid var(--primary); margin-bottom: 20px; }
+        .order-card .card-body { padding: 20px 24px; }
+        #loginScreen { position: fixed; inset: 0; background: linear-gradient(135deg, #0F172A, #1E64FF, #0F172A); z-index: 2000; display: flex; align-items: center; justify-content: center; }
+        .login-card { background: white; padding: 48px 40px; border-radius: 28px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 25px 60px rgba(0,0,0,0.3); }
+        .login-card .login-icon { width: 72px; height: 72px; background: var(--primary-gradient); border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 2rem; color: white; margin: 0 auto 20px; }
+        .login-card h2 { font-family: var(--font-display); font-weight: 800; margin-bottom: 4px; }
+        .login-card .subtitle { color: var(--text-secondary); margin-bottom: 28px; font-size: 0.9rem; }
+        .login-error { color: var(--danger); font-size: 0.85rem; margin-top: 8px; min-height: 24px; font-weight: 500; }
+        .admin-toast { position: fixed; top: 24px; right: 24px; background: white; padding: 16px 24px; border-radius: var(--radius); box-shadow: var(--shadow-lg); border-left: 5px solid var(--success); display: flex; align-items: center; gap: 14px; z-index: 9999; transform: translateX(120%); transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); font-family: var(--font-display); font-weight: 600; min-width: 280px; max-width: 400px; }
+        .admin-toast.show { transform: translateX(0); }
+        .admin-toast i { font-size: 1.3rem; flex-shrink: 0; }
+        .admin-toast .toast-close { margin-left: auto; background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 1rem; padding: 4px; }
+        .view-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
+        .view-header h1 { font-family: var(--font-display); font-weight: 800; font-size: 1.5rem; color: var(--text-main); margin: 0; display: flex; align-items: center; gap: 10px; }
+        .view-header h1 i { color: var(--primary); }
+        .view-header .subtitle { color: var(--text-secondary); font-size: 0.85rem; margin-top: 4px; }
+        .modal-content { border-radius: var(--radius); border: none; }
+        .modal-header { border-bottom: 1px solid var(--border-soft); padding: 20px 24px; }
+        .modal-footer { border-top: 1px solid var(--border-soft); padding: 16px 24px; }
+        .btn-check-group { display: flex; flex-wrap: wrap; gap: 8px; }
+        .btn-check-group .btn { border: 1.5px solid var(--border-strong); color: var(--text-main); background: white; flex: 1; min-width: 120px; }
+        .btn-check-group .btn-check:checked + .btn { background: var(--primary); color: white; border-color: var(--primary); box-shadow: 0 4px 12px rgba(30,100,255,0.2); }
+        .image-preview-box { width: 100%; height: 200px; border: 2px dashed var(--border-strong); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; background: #F8FAFF; cursor: pointer; overflow: hidden; position: relative; }
+        .image-preview-box img { width: 100%; height: 100%; object-fit: contain; }
+        .image-preview-box i { font-size: 3rem; color: var(--text-muted); }
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.active { transform: translateX(0); }
+            .main-content { margin-left: 0; padding: 80px 16px 30px; }
+            .mobile-menu-btn { display: flex !important; }
+        }
+    </style>
+</head>
+<body>
+
+<button class="mobile-menu-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i> Menú</button>
+
+<div id="loginScreen">
+    <div class="login-card">
+        <div class="login-icon"><i class="fas fa-crown"></i></div>
+        <h2>Panel de Control</h2>
+        <p class="subtitle">Tienda-fg · Super Admin</p>
+        <form id="loginForm">
+            <div class="mb-3"><input type="password" id="passInput" class="form-control" placeholder="Ingresa la contraseña" required style="padding: 12px; border-radius: 12px;" autofocus></div>
+            <button class="btn btn-primary w-100" id="loginBtn" style="padding: 12px; font-size: 0.95rem;"><i class="fas fa-arrow-right me-2"></i> Ingresar</button>
+            <div class="login-error" id="loginError"></div>
+        </form>
+    </div>
+</div>
+
+<div class="sidebar" id="sidebar">
+    <a href="/admin" class="sidebar-brand">
+        <div class="brand-icon"><i class="fas fa-crown"></i></div>
+        <span>Super Admin</span>
+    </a>
+
+    <div class="sidebar-section-label" style="font-size: 0.65rem; font-weight: 700; color: #475569; padding: 12px 16px 6px; text-transform: uppercase;">Vista Global</div>
+    <button class="nav-item active" data-section="dashboard" onclick="showSection('dashboard')"><span class="icon"><i class="fas fa-chart-pie"></i></span> Dashboard</button>
+    <button class="nav-item" data-section="tiendas" onclick="showSection('tiendas')"><span class="icon"><i class="fas fa-store"></i></span> Tiendas</button>
+    <button class="nav-item" data-section="usuarios" onclick="showSection('usuarios')"><span class="icon"><i class="fas fa-users"></i></span> Usuarios</button>
+    <button class="nav-item" data-section="pedidos-global" onclick="showSection('pedidos-global')"><span class="icon"><i class="fas fa-receipt"></i></span> Pedidos Globales</button>
+
+    <div class="sidebar-divider"></div>
+    
+    <button class="nav-item" id="notifBtn" onclick="AdminNotifications.toggle()" style="color: #F59E0B;">
+        <span class="icon"><i class="fas fa-bell-slash"></i></span> Activar Notificaciones
+    </button>
+
+    <a href="/" target="_blank" class="nav-item"><span class="icon"><i class="fas fa-external-link-alt"></i></span> Ver Sitio</a>
+    <button class="nav-item logout" onclick="logout()"><span class="icon"><i class="fas fa-sign-out-alt"></i></span> Cerrar Sesión</button>
+</div>
+
+<div class="main-content" id="app" style="display:none;">
+
+    <div id="view-dashboard">
+        <div class="view-header">
+            <div>
+                <h1><i class="fas fa-chart-pie"></i> Dashboard</h1>
+                <div class="subtitle">Resumen general del proyecto</div>
+            </div>
+        </div>
+        <div class="stat-grid">
+            <div class="stat-card"><div class="stat-icon"><i class="fas fa-store"></i></div><div><div class="stat-value" id="dashTotalTiendas">0</div><div class="stat-label">Tiendas</div></div></div>
+            <div class="stat-card green"><div class="stat-icon"><i class="fas fa-users"></i></div><div><div class="stat-value" id="dashTotalUsuarios">0</div><div class="stat-label">Usuarios</div></div></div>
+            <div class="stat-card orange"><div class="stat-icon"><i class="fas fa-box"></i></div><div><div class="stat-value" id="dashTotalProductos">0</div><div class="stat-label">Productos</div></div></div>
+            <div class="stat-card purple"><div class="stat-icon"><i class="fas fa-receipt"></i></div><div><div class="stat-value" id="dashTotalPedidos">0</div><div class="stat-label">Pedidos</div></div></div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><i class="fas fa-clock me-2" style="color:var(--primary);"></i> Tiendas recientes</div>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead><tr><th>Tienda</th><th>Dueño</th><th>Plan</th><th>Tiempo Restante</th><th>Estado</th></tr></thead>
+                    <tbody id="dashRecentTiendas"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="view-tiendas" style="display:none;">
+        <div class="view-header">
+            <div>
+                <h1><i class="fas fa-store"></i> Gestión Empresarial de Tiendas</h1>
+                <div class="subtitle">Administra, configura y supervisa todas las tiendas del ecosistema</div>
+            </div>
+        </div>
+
+        <div class="stat-grid" style="margin-bottom: 24px;">
+            <div class="stat-card"><div class="stat-icon"><i class="fas fa-store"></i></div><div><div class="stat-value" id="kpiTotalTiendas">0</div><div class="stat-label">Total Tiendas</div></div></div>
+            <div class="stat-card green"><div class="stat-icon"><i class="fas fa-check-circle"></i></div><div><div class="stat-value" id="kpiActivas">0</div><div class="stat-label">Activas</div></div></div>
+            <div class="stat-card orange"><div class="stat-icon"><i class="fas fa-pause-circle"></i></div><div><div class="stat-value" id="kpiPausadas">0</div><div class="stat-label">Pausadas</div></div></div>
+            <div class="stat-card purple"><div class="stat-icon"><i class="fas fa-exclamation-triangle"></i></div><div><div class="stat-value" id="kpiVencidas">0</div><div class="stat-label">Vencidas</div></div></div>
+        </div>
+
+        <div class="card mb-3" style="padding: 16px;">
+            <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-search" style="color:var(--primary);"></i></span>
+                <input type="text" id="searchTiendas" class="form-control" placeholder="Buscar por nombre, ID o email del dueño..." oninput="loadTiendas()">
+            </div>
+        </div>
+
+        <div class="card p-0 overflow-hidden">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr><th>Tienda</th><th>Dueño</th><th>Plan</th><th>Vence / Tiempo</th><th>Productos</th><th>Estado</th><th style="text-align:right;">Acciones</th></tr>
+                    </thead>
+                    <tbody id="tiendasList"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="view-usuarios" style="display:none;">
+        <div class="view-header">
+            <div>
+                <h1><i class="fas fa-users"></i> Usuarios</h1>
+                <div class="subtitle">Todos los usuarios registrados</div>
+            </div>
+        </div>
+        <div class="card p-0 overflow-hidden">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr><th>Usuario</th><th>Registro</th><th>Tienda Asociada</th><th>Plan</th><th>Estado</th><th style="text-align:right;">Acciones</th></tr>
+                    </thead>
+                    <tbody id="usuariosList"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="view-pedidos-global" style="display:none;">
+        <div class="view-header">
+            <div>
+                <h1><i class="fas fa-receipt"></i> Pedidos Globales</h1>
+                <div class="subtitle">Todos los pedidos de todas las tiendas</div>
+            </div>
+            <select id="filterTiendaPedidos" class="form-select" style="max-width: 280px;" onchange="loadPedidosGlobal()">
+                <option value="">Todas las tiendas</option>
+            </select>
+        </div>
+        <div id="pedidosGlobalList"></div>
+    </div>
+
+</div>
+
+<!-- Modales de admin.html (igual que tu código original) -->
+<div class="modal fade" id="tiendaModal" tabindex="-1" aria-hidden="true"><div class="modal-dialog modal-xl modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="fw-bold m-0"><i class="fas fa-store me-2" style="color:var(--primary);"></i> <span id="tiendaModalTitle">Editar Tienda</span></h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><form id="tiendaForm"><input type="hidden" id="storeOriginalId"><div class="row g-3 mb-4"><div class="col-md-4"><label class="form-label">ID de Tienda (slug)</label><input type="text" id="storeSlug" class="form-control" required></div><div class="col-md-4"><label class="form-label">Nombre Comercial</label><input type="text" id="storeDisplayName" class="form-control" required></div><div class="col-md-4"><label class="form-label">Icono</label><input type="text" id="storeIcon" class="form-control" value="🛒" maxlength="4"></div><div class="col-12"><label class="form-label">Descripción</label><textarea id="storeDescription" class="form-control" rows="2"></textarea></div><div class="col-md-4"><label class="form-label">Categorías</label><input type="text" id="storeCategories" class="form-control" value="otros"></div><div class="col-md-4"><label class="form-label">Tipo de Tienda</label><select id="storeTipo" class="form-select" onchange="toggleHorarioFields()"><option value="tienda">🛒 Tienda Normal</option><option value="reserva">📅 Sistema de Reservas</option></select></div><div class="col-md-4"><label class="form-label">Tipo de Suscripción</label><div class="form-check form-switch mt-2"><input class="form-check-input" type="checkbox" id="storePermanente"><label class="form-check-label fw-bold" for="storePermanente">Tienda Permanente</label></div></div></div><div class="row g-3 mb-4"><div class="col-12"><label class="form-label fw-bold">Tasas de Cambio</label><div class="row g-2"><div class="col-md-4"><div class="input-group"><span class="input-group-text">🇨🇺 CUP</span><input type="number" id="storeTasaCUP" class="form-control" value="1" readonly></div></div><div class="col-md-4"><div class="input-group"><span class="input-group-text">🇺🇸 USD</span><input type="number" id="storeTasaUSD" class="form-control" value="25"></div></div><div class="col-md-4"><div class="input-group"><span class="input-group-text">🇪🇺 EUR</span><input type="number" id="storeTasaEUR" class="form-control" value="27"></div></div></div></div></div></form></div><div class="modal-footer"><button class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button><button class="btn btn-primary" onclick="guardarTienda()">Guardar</button></div></div></div></div>
+
+<div class="admin-toast" id="adminToast"><i class="fas fa-check-circle" style="color: var(--success);"></i><span id="adminToastMsg">Operación exitosa</span><button class="toast-close" onclick="this.closest('.admin-toast').classList.remove('show')">&times;</button></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+// 🚨 REDIRECCIÓN INTELIGENTE
+(function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const tiendaParam = urlParams.get('tienda');
+    if (tiendaParam && tiendaParam.trim() !== '') {
+        window.location.href = `/admin-cliente?tienda=${tiendaParam}`;
+    }
+})();
+
+window.AdminApp = window.AdminApp || { tiendaActual: null, tiendasDisponibles: [] };
+window.AdminUI = window.AdminUI || { showToast: function(msg) { alert(msg); } };
+</script>
+
+<script>
+    // 🚨 INYECTOR DE VERSIÓN DINÁMICA (ANTI-CACHÉ)
+    document.write(`<script src="/js/admin/notifications.js?v=${Date.now()}"><\/script>`);
+</script>
+
+<script>
+const ADMIN_TOKEN_KEY = 'superadminToken';
+const ADMIN_EXPIRY_KEY = 'superadminExpiry';
+let allTiendas = [];
+let allUsuarios = [];
+let tiendaModalInstance = null;
+let tiempoModalInstance = null;
+let timerInterval = null;
+let currentImageBase64 = null;
+
+document.addEventListener('DOMContentLoaded', () => {
+    if (window.AdminNotifications) AdminNotifications.init().catch(console.error);
+});
+
+function getToken() { return localStorage.getItem(ADMIN_TOKEN_KEY); }
+function getExpiry() { return localStorage.getItem(ADMIN_EXPIRY_KEY); }
+function saveSession(token, expiry) { localStorage.setItem(ADMIN_TOKEN_KEY, token); localStorage.setItem(ADMIN_EXPIRY_KEY, expiry); }
+function clearSession() { localStorage.removeItem(ADMIN_TOKEN_KEY); localStorage.removeItem(ADMIN_EXPIRY_KEY); }
+function isSessionValid() { return getToken() && getExpiry() && Date.now() < parseInt(getExpiry()); }
+
+function showToast(msg, type = 'success') {
+    const toast = document.getElementById('adminToast');
+    const icon = toast.querySelector('i');
+    const span = document.getElementById('adminToastMsg');
+    const colors = { success: '#10B981', warning: '#F59E0B', error: '#EF4444' };
+    const icons = { success: 'fas fa-check-circle', warning: 'fas fa-exclamation-triangle', error: 'fas fa-exclamation-circle' };
+    toast.style.borderLeftColor = colors[type] || colors.success;
+    icon.style.color = colors[type] || colors.success;
+    icon.className = icons[type] || icons.success;
+    span.innerHTML = msg;
+    toast.classList.add('show');
+    clearTimeout(toast._t);
+    toast._t = setTimeout(() => toast.classList.remove('show'), 3500);
+}
+
+function toggleSidebar() { document.getElementById('sidebar').classList.toggle('active'); }
+
+async function doLogin(e) {
+    if (e) e.preventDefault();
+    const password = document.getElementById('passInput').value;
+    const btn = document.getElementById('loginBtn');
+    const err = document.getElementById('loginError');
+    if (!password) { err.textContent = '⚠️ Ingresa la contraseña'; return; }
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verificando...';
+    btn.disabled = true;
+    err.textContent = '';
+    try {
+        const res = await fetch('/api/admin/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password }) });
+        const data = await res.json();
+        if (data.success) { saveSession(data.token, data.expires); showToast('✅ Acceso concedido'); await showApp(); }
+        else { err.textContent = '❌ ' + (data.error || 'Contraseña incorrecta'); }
+    } catch (e) { err.textContent = '❌ Error de conexión'; }
+    finally { btn.innerHTML = '<i class="fas fa-arrow-right me-2"></i> Ingresar'; btn.disabled = false; }
+}
+
+async function verifySession() {
+    if (!isSessionValid()) return false;
+    try {
+        const res = await fetch('/api/admin/verify-session', { headers: { 'Authorization': `Bearer ${getToken()}` } });
+        if (!res.ok) return false;
+        const data = await res.json();
+        return data.valid === true;
+    } catch { return false; }
+}
+
+async function showApp() {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    await refreshAllData();
+    showSection('dashboard');
+    startGlobalTimer();
+}
+
+function logout() {
+    clearSession();
+    document.getElementById('app').style.display = 'none';
+    document.getElementById('loginScreen').style.display = 'flex';
+    document.getElementById('passInput').value = '';
+    if (timerInterval) clearInterval(timerInterval);
+    showToast('👋 Sesión cerrada');
+}
+
+function showSection(section) {
+    document.querySelectorAll('[id^="view-"]').forEach(v => v.style.display = 'none');
+    const view = document.getElementById(`view-${section}`);
+    if (view) view.style.display = 'block';
+    document.querySelectorAll('.nav-item[data-section]').forEach(b => b.classList.remove('active'));
+    document.querySelector(`[data-section="${section}"]`)?.classList.add('active');
+    if (section === 'dashboard') loadDashboard();
+    if (section === 'tiendas') loadTiendas();
+    if (section === 'usuarios') loadUsuarios();
+    if (section === 'pedidos-global') loadPedidosGlobal();
+    if (window.innerWidth < 768) document.getElementById('sidebar')?.classList.remove('active');
+}
+
+async function refreshAllData() {
+    await Promise.all([loadTiendasData(), loadUsuariosData()]);
+}
+
+async function loadTiendasData() {
+    try { const res = await fetch('/api/superadmin/tiendas'); allTiendas = await res.json(); return allTiendas; }
+    catch { allTiendas = []; return []; }
+}
+
+async function loadUsuariosData() {
+    try { const res = await fetch('/api/superadmin/usuarios'); allUsuarios = await res.json(); return allUsuarios; }
+    catch { allUsuarios = []; return []; }
+}
+
+function loadDashboard() {
+    const totalProductos = allTiendas.reduce((s, t) => s + (t.productos_count || 0), 0);
+    document.getElementById('dashTotalTiendas').innerText = allTiendas.length;
+    document.getElementById('dashTotalUsuarios').innerText = allUsuarios.length;
+    document.getElementById('dashTotalProductos').innerText = totalProductos;
+    document.getElementById('dashTotalPedidos').innerText = '—';
+    const recientes = [...allTiendas].sort((a, b) => new Date(b.created_at) - new Date(a.created_at)).slice(0, 5);
+    const tbody = document.getElementById('dashRecentTiendas');
+    if (!recientes.length) { tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-4">Sin tiendas</td></tr>'; return; }
+    tbody.innerHTML = recientes.map(t => `<tr><td><strong>${t.nombre}</strong><br><small class="text-muted">${t.id}</small></td><td>${t.owner_email || '-'}</td><td><span class="badge-plan badge-${t.plan || 'prueba'}">${(t.plan || 'prueba').toUpperCase()}</span></td><td>${t.fecha_vencimiento ? new Date(t.fecha_vencimiento).toLocaleDateString() : '-'}</td><td>${t.pausada ? 'Pausada' : 'Activa'}</td></tr>`).join('');
+}
+
+async function loadTiendas() {
+    await loadTiendasData();
+    document.getElementById('kpiTotalTiendas').innerText = allTiendas.length;
+    const tbody = document.getElementById('tiendasList');
+    if (!allTiendas.length) { tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4">No hay tiendas.</td></tr>'; return; }
+    tbody.innerHTML = allTiendas.map(t => `<tr><td><strong>${t.nombre}</strong><br><small>${t.id}</small></td><td>${t.owner_email || 'Sin dueño'}</td><td>${t.plan || 'prueba'}</td><td>${t.fecha_vencimiento ? new Date(t.fecha_vencimiento).toLocaleDateString() : 'Sin fecha'}</td><td>${t.productos_count || 0}</td><td>${t.pausada ? 'Pausada' : 'Activa'}</td><td><button class="btn btn-sm btn-outline-primary" onclick="editarTienda('${t.id}')">Editar</button></td></tr>`).join('');
+}
+
+async function loadUsuarios() {
+    await loadUsuariosData();
+    const tbody = document.getElementById('usuariosList');
+    if (!allUsuarios.length) { tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4">No hay usuarios.</td></tr>'; return; }
+    tbody.innerHTML = allUsuarios.map(u => `<tr><td>${u.email}</td><td>${new Date(u.created_at).toLocaleDateString()}</td><td>${u.tienda ? u.tienda.nombre : 'Sin tienda'}</td><td>${u.tienda ? u.tienda.plan : '-'}</td><td>${u.tienda ? (u.tienda.pausada ? 'Pausada' : 'Activa') : '-'}</td><td><button class="btn btn-sm btn-outline-danger" onclick="eliminarUsuario('${u.id}')">Eliminar</button></td></tr>`).join('');
+}
+
+async function loadPedidosGlobal() {
+    const container = document.getElementById('pedidosGlobalList');
+    container.innerHTML = '<div class="text-center py-5"><i class="fas fa-spinner fa-spin"></i></div>';
+    let todosPedidos = [];
+    for (const t of allTiendas) {
+        const res = await fetch(`/api/mis-pedidos?tienda=${t.id}`);
+        const pedidos = await res.json();
+        pedidos.forEach(p => p._tienda = t.nombre);
+        todosPedidos = todosPedidos.concat(pedidos);
+    }
+    if (!todosPedidos.length) { container.innerHTML = '<div class="alert alert-info">No hay pedidos.</div>'; return; }
+    container.innerHTML = todosPedidos.map(p => `<div class="card order-card"><div class="card-body"><h5>Pedido #${p.id} - ${p._tienda}</h5><p>${p.nombre} - ${p.telefono}</p><p>Total: $${p.total}</p></div></div>`).join('');
+}
+
+function editarTienda(slug) { alert('Editar tienda: ' + slug); }
+async function eliminarUsuario(id) { if(confirm('¿Eliminar?')) { await fetch(`/api/superadmin/usuarios/${id}`, { method: 'DELETE' }); loadUsuarios(); } }
+function startGlobalTimer() {}
+function toggleHorarioFields() {}
+
+document.getElementById('loginForm').addEventListener('submit', doLogin);
+window.addEventListener('load', async () => {
+    if (await verifySession()) await showApp();
+    else document.getElementById('loginScreen').style.display = 'flex';
+});
+</script>
+</body>
+</html>
