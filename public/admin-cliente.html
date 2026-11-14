@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Panel - Tienda-fg</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1E64FF; --primary-dark: #1248C7; --primary-light: #E8F0FE; --primary-gradient: linear-gradient(135deg, #1E64FF, #1248C7);
+            --success: #10B981; --danger: #EF4444; --warning: #F59E0B; --bg-body: #F4F7FE; --bg-card: #FFFFFF;
+            --bg-sidebar: #0F172A; --text-main: #1A2B4C; --text-secondary: #6B7A99; --text-muted: #9CA3AF;
+            --border-soft: #EEF2F7; --shadow-sm: 0 2px 8px rgba(30,100,255,0.05); --shadow-md: 0 8px 24px rgba(30,100,255,0.08);
+            --shadow-lg: 0 16px 40px rgba(30,100,255,0.12); --radius: 16px; --radius-sm: 10px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); --font-display: 'Plus Jakarta Sans', sans-serif;
+            --font-body: 'Inter', sans-serif; --sidebar-width: 260px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: var(--font-body); background: var(--bg-body); color: var(--text-main); font-size: 14px; line-height: 1.6; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+        
+        /* SIDEBAR EMPRESARIAL */
+        .sidebar { width: var(--sidebar-width); background: var(--bg-sidebar); height: 100vh; position: fixed; left: 0; top: 0; padding: 24px 16px; display: flex; flex-direction: column; transition: transform 0.3s ease; z-index: 1040; overflow-y: auto; border-right: 1px solid rgba(255,255,255,0.05); }
+        .sidebar-brand { display: flex; align-items: center; gap: 12px; color: white; text-decoration: none; margin-bottom: 24px; padding: 8px 12px; }
+        .sidebar-brand .brand-icon { width: 42px; height: 42px; background: var(--primary-gradient); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; color: white; flex-shrink: 0; box-shadow: 0 4px 12px rgba(30,100,255,0.4); }
+        .sidebar-brand span { font-family: var(--font-display); font-weight: 800; font-size: 1.15rem; }
+        
+        .tienda-info-box { background: rgba(255,255,255,0.05); border-radius: 12px; padding: 14px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.06); }
+        .tienda-info-box small { color: #64748b; font-weight: 600; text-transform: uppercase; font-size: 0.65rem; letter-spacing: 0.5px; display: block; margin-bottom: 4px; }
+        .tienda-info-box .nombre { color: white; font-weight: 700; font-size: 0.95rem; margin-bottom: 8px; word-break: break-word; }
+        
+        .nav-item { padding: 11px 14px; border-radius: 10px; color: #94a3b8; cursor: pointer; display: flex; align-items: center; gap: 12px; margin-bottom: 3px; transition: var(--transition); border: none; background: transparent; width: 100%; text-align: left; font-weight: 500; font-size: 0.88rem; font-family: var(--font-body); text-decoration: none;}
+        .nav-item:hover { background: rgba(30,100,255,0.1); color: white; }
+        .nav-item.active { background: var(--primary-gradient); color: white; box-shadow: 0 4px 15px rgba(30,100,255,0.3); }
+        .nav-item i { width: 20px; text-align: center; font-size: 1rem; flex-shrink: 0; }
+        .nav-item.logout { margin-top: auto; color: #f87171; }
+        .nav-item.logout:hover { background: rgba(239, 68, 68, 0.15); color: #f87171; }
+        
+        .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(15,23,42,0.5); backdrop-filter: blur(4px); z-index: 1035; opacity: 0; transition: opacity 0.3s ease; }
+        .sidebar-overlay.active { display: block; opacity: 1; }
+        .mobile-menu-btn { display: none; position: fixed; top: 16px; left: 16px; z-index: 1030; background: var(--primary-gradient); color: white; border: none; width: 44px; height: 44px; border-radius: 12px; font-size: 1.1rem; cursor: pointer; box-shadow: 0 4px 15px rgba(30,100,255,0.35); align-items: center; justify-content: center; transition: var(--transition); }
+        
+        /* MAIN CONTENT */
+        .main-content { margin-left: var(--sidebar-width); padding: 30px 35px; min-height: 100vh; transition: var(--transition); }
+        .page-header { margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+        .page-header h1 { font-family: var(--font-display); font-weight: 800; font-size: 1.5rem; color: var(--text-main); margin: 0; display: flex; align-items: center; gap: 10px; }
+        .page-header h1 i { color: var(--primary); }
+        
+        /* CARDS Y TABLAS */
+        .card { background: var(--bg-card); border-radius: var(--radius); border: none; box-shadow: var(--shadow-sm); margin-bottom: 20px; overflow: hidden; transition: var(--transition); }
+        .card-header { background: transparent; border-bottom: 1px solid var(--border-soft); padding: 18px 22px; font-weight: 700; font-family: var(--font-display); font-size: 0.95rem; display: flex; justify-content: space-between; align-items: center; }
+        .card-body { padding: 22px; }
+        
+        .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        .table { font-size: 0.85rem; margin-bottom: 0; }
+        .table th { background: #F8FAFF; font-size: 0.7rem; text-transform: uppercase; color: var(--text-secondary); font-weight: 700; letter-spacing: 0.5px; padding: 12px 14px; border-bottom: 2px solid #E2E8F0; white-space: nowrap; }
+        .table td { padding: 12px 14px; vertical-align: middle; border-bottom: 1px solid var(--border-soft); }
+        .table tr:hover td { background: #F8FAFF; }
+        
+        /* BADGES Y BOTONES */
+        .badge-plan { background: #E0F2FE; color: #0369A1; padding: 5px 12px; border-radius: 20px; font-weight: 700; font-size: 0.7rem; text-transform: uppercase; display: inline-block; }
+        .badge-pausada { background: #FEF3C7; color: #92400E; padding: 4px 10px; border-radius: 20px; font-weight: 700; font-size: 0.7rem; display: inline-flex; align-items: center; gap: 4px; }
+        .badge-activa { background: #D1FAE5; color: #065F46; padding: 4px 10px; border-radius: 20px; font-weight: 700; font-size: 0.7rem; display: inline-flex; align-items: center; gap: 4px; }
+        
+        .form-label { font-family: var(--font-display); font-weight: 600; color: var(--text-main); margin-bottom: 6px; font-size: 0.82rem; }
+        .form-control, .form-select { border-radius: var(--radius-sm); border: 1.5px solid #E2E8F0; padding: 10px 14px; font-size: 0.9rem; }
+        .form-control:focus, .form-select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(30,100,255,0.12); }
+        
+        .btn { border-radius: var(--radius-sm); font-family: var(--font-display); font-weight: 700; transition: var(--transition); font-size: 0.85rem; padding: 10px 18px; }
+        .btn-primary { background: var(--primary-gradient); border: none; color: white; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 4px 20px rgba(30,100,255,0.3); color: white; }
+        .btn-sm { padding: 6px 12px; font-size: 0.75rem; }
+        
+        #loader { position: fixed; inset: 0; background: white; z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
+        .spinner { width: 50px; height: 50px; border: 4px solid #E2E8F0; border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        
+        .info-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px dashed var(--border-soft); gap: 12px; flex-wrap: wrap; }
+        .info-row:last-child { border-bottom: none; }
+        .info-row .label { color: var(--text-secondary); font-size: 0.85rem; font-weight: 500; }
+        .info-row .value { font-weight: 700; color: var(--text-main); text-align: right; }
+        
+        .danger-card { border: 2px solid #FEE2E2 !important; }
+        .danger-card .card-header { background: #FEF2F2; color: #991B1B; border-bottom-color: #FECACA; }
+        
+        .order-card { border-left: 4px solid var(--primary); padding: 16px 20px; background: white; border-radius: var(--radius); margin-bottom: 16px; box-shadow: var(--shadow-sm); position: relative; }
+        .order-img { width: 50px; height: 50px; border-radius: 8px; object-fit: cover; border: 1px solid var(--border-soft); }
+        
+        .switch-box { background: #F8FAFF; padding: 12px 14px 12px 46px; border-radius: 10px; border: 1.5px solid #E2E8F0; margin-top: 8px; }
+        
+        /* RESPONSIVE */
+        @media (max-width: 991px) {
+            .sidebar { transform: translateX(-100%); box-shadow: var(--shadow-lg); }
+            .sidebar.active { transform: translateX(0); }
+            .main-content { margin-left: 0; padding: 76px 16px 30px; }
+            .mobile-menu-btn { display: flex; }
+            .page-header { flex-direction: column; align-items: flex-start; }
+        }
+        @media (max-width: 575px) {
+            .main-content { padding: 72px 12px 24px; }
+            .card-body { padding: 16px; }
+            .card-header { padding: 14px 16px; font-size: 0.88rem; }
+            .table th, .table td { padding: 10px 10px; font-size: 0.78rem; }
+            .modal-body { padding: 16px; }
+        }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 4px; }
+    </style>
+</head>
+<body>
+
+<div id="loader">
+    <div class="spinner"></div>
+    <p class="mt-3 text-muted">Verificando acceso...</p>
+</div>
+
+<button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Abrir menú"><i class="fas fa-bars"></i></button>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<!-- SIDEBAR -->
+<div class="sidebar" id="sidebar">
+    <a href="#" class="sidebar-brand">
+        <div class="brand-icon"><i class="fas fa-store"></i></div>
+        <span>Mi Tienda</span>
+    </a>
+
+    <div class="tienda-info-box">
+        <small>Mi Negocio</small>
+        <div class="nombre" id="nombreTiendaSidebar">Cargando...</div>
+        <div id="estadoTiendaSidebar"></div>
+    </div>
+
+    <button class="nav-item active" data-section="products" onclick="showSection('products', this)">
+        <i class="fas fa-box"></i> Productos
+    </button>
+    <button class="nav-item" data-section="orders" onclick="showSection('orders', this)">
+        <i class="fas fa-shopping-cart"></i> Pedidos
+    </button>
+    <button class="nav-item" data-section="settings" onclick="showSection('settings', this)">
+        <i class="fas fa-cog"></i> Configuración
+    </button>
+    
+    <button class="nav-item" id="notifBtn" onclick="AdminNotifications.toggle()" style="color: #F59E0B;">
+        <i class="fas fa-bell-slash"></i> Notificaciones
+    </button>
+
+    <!-- BOTÓN PARA REGRESAR A LA TIENDA -->
+    <a href="#" id="btnVerTienda" class="nav-item" style="color: #10B981; margin-top: 15px;">
+        <i class="fas fa-external-link-alt"></i> Ver mi Tienda
+    </a>
+
+    <button class="nav-item logout" onclick="logout()">
+        <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+    </button>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main-content" id="app" style="display:none;">
+
+    <!-- VISTA PRODUCTOS -->
+    <div id="view-products">
+        <div class="page-header">
+            <div>
+                <h1><i class="fas fa-box"></i> Mis Productos</h1>
+            </div>
+            <button class="btn btn-primary" onclick="abrirModalProducto()">
+                <i class="fas fa-plus me-1"></i> Nuevo Producto
+            </button>
+        </div>
+        <div class="card p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Img</th>
+                            <th>Nombre</th>
+                            <th>Precio</th>
+                            <th>Categoría</th>
+                            <th>Stock</th>
+                            <th style="text-align:right;">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="productsList"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- VISTA PEDIDOS -->
+    <div id="view-orders" style="display:none;">
+        <div class="page-header">
+            <div>
+                <h1><i class="fas fa-shopping-cart"></i> Pedidos Recibidos</h1>
+            </div>
+            <button class="btn btn-danger" onclick="eliminarTodosLosPedidos()">
+                <i class="fas fa-trash-alt me-1"></i> Borrar Todos
+            </button>
+        </div>
+
+        <!-- BUSCADOR DE PEDIDOS -->
+        <div class="card mb-4">
+            <div class="card-body py-3">
+                <div class="input-group">
+                    <span class="input-group-text bg-white"><i class="fas fa-search text-muted"></i></span>
+                    <input type="text" id="searchOrderCode" class="form-control border-start-0" placeholder="Buscar por código de pedido (Ej: A1B2C)..." oninput="filtrarPedidos()">
+                </div>
+            </div>
+        </div>
+
+        <div id="ordersList"></div>
+    </div>
+
+    <!-- VISTA CONFIGURACIÓN -->
+    <div id="view-settings" style="display:none;">
+        <div class="page-header">
+            <h1><i class="fas fa-cog"></i> Configuración</h1>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><i class="fas fa-info-circle"></i> Información de la Tienda</div>
+            <div class="card-body">
+                <div class="info-row"><span class="label">Plan actual</span><span class="value"><span class="badge-plan" id="badgePlan">-</span></span></div>
+                <div class="info-row"><span class="label">Estado</span><span class="value" id="badgeEstado">-</span></div>
+                <div class="info-row"><span class="label">Vencimiento</span><span class="value" id="fechaVencimiento">-</span></div>
+                <div class="info-row"><span class="label">Límite de productos</span><span class="value" id="maxProductos">-</span></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><i class="fas fa-link"></i> Enlaces de mi Tienda</div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label">🌐 URL Pública</label>
+                    <div class="d-flex gap-2 flex-wrap">
+                        <input type="text" id="miUrlTienda" class="form-control flex-grow-1" readonly>
+                        <button class="btn btn-outline-primary" onclick="copiarInput('miUrlTienda')"><i class="fas fa-copy"></i></button>
+                    </div>
+                </div>
+                <div class="mb-0">
+                    <label class="form-label">🔒 URL Admin</label>
+                    <div class="d-flex gap-2 flex-wrap">
+                        <input type="text" id="miUrlAdmin" class="form-control flex-grow-1" readonly>
+                        <button class="btn btn-outline-primary" onclick="copiarInput('miUrlAdmin')"><i class="fas fa-copy"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><i class="fas fa-coins"></i> Tasas y Pagos</div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">1 USD = CUP</label>
+                        <input type="number" step="0.01" id="miRateUSD" class="form-control">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">1 EUR = CUP</label>
+                        <input type="number" step="0.01" id="miRateEUR" class="form-control">
+                    </div>
+                </div>
+                <hr class="my-4">
+                <label class="form-label d-block mb-3">Métodos de Pago Aceptados</label>
+                <div class="d-flex flex-column gap-2">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="pagoEfectivo">
+                        <label class="form-check-label fw-bold" for="pagoEfectivo">💵 Efectivo</label>
+                    </div>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="pagoTransferencia">
+                        <label class="form-check-label fw-bold" for="pagoTransferencia">🏦 Transferencia</label>
+                    </div>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="pagoTarjeta">
+                        <label class="form-check-label fw-bold" for="pagoTarjeta">💳 Tarjeta</label>
+                    </div>
+                </div>
+                <button class="btn btn-primary mt-4" onclick="guardarConfiguracion()">
+                    <i class="fas fa-save me-1"></i> Guardar Configuración
+                </button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><i class="fas fa-user-tie"></i> Gestor de Ventas</div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6"><label class="form-label">Nombre</label><input type="text" id="gestorNombre" class="form-control"></div>
+                    <div class="col-md-6"><label class="form-label">Carnet</label><input type="text" id="gestorCarnet" class="form-control"></div>
+                    <div class="col-md-6"><label class="form-label">Teléfono</label><input type="text" id="gestorTelefono" class="form-control"></div>
+                    <div class="col-md-6"><label class="form-label">Dirección</label><input type="text" id="gestorDireccion" class="form-control"></div>
+                </div>
+                <button class="btn btn-primary mt-3" onclick="guardarGestorVenta()"><i class="fas fa-save me-1"></i> Guardar Gestor</button>
+            </div>
+        </div>
+
+        <div class="card danger-card">
+            <div class="card-header"><i class="fas fa-exclamation-triangle"></i> Zona de Peligro</div>
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                    <div>
+                        <h6 class="fw-bold mb-1">Pausar Tienda</h6>
+                        <small class="text-muted">Los clientes no podrán acceder temporalmente.</small>
+                    </div>
+                    <button class="btn btn-warning" id="btnPausarTienda" onclick="togglePausarTienda()">Pausar</button>
+                </div>
+                <hr>
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <div>
+                        <h6 class="fw-bold mb-1">Eliminar Tienda</h6>
+                        <small class="text-muted">Irreversible. Se borrarán todos los datos.</small>
+                    </div>
+                    <button class="btn btn-danger" onclick="eliminarMiTienda()">Eliminar Tienda</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- MODAL PRODUCTO (CREAR / EDITAR) -->
+<div class="modal fade" id="productoModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="fw-bold m-0" id="modalProductoTitle"><i class="fas fa-box me-2" style="color:var(--primary);"></i> Nuevo Producto</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="prodId">
+                <div class="row g-3">
+                    <div class="col-md-8">
+                        <label class="form-label">Nombre *</label>
+                        <input type="text" id="prodName" class="form-control" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Precio (CUP) *</label>
+                        <input type="number" id="prodPrice" class="form-control" required min="0" step="0.01">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Descripción</label>
+                        <textarea id="prodDesc" class="form-control" rows="2"></textarea>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Descuento (%)</label>
+                        <input type="number" id="prodDiscount" class="form-control" value="0" min="0" max="100">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Categoría</label>
+                        <div class="d-flex gap-2">
+                            <select id="prodCategory" class="form-select flex-grow-1"></select>
+                            <button type="button" class="btn btn-outline-primary" onclick="agregarCategoria()" title="Añadir Categoría"><i class="fas fa-plus"></i></button>
+                            <button type="button" class="btn btn-outline-danger" onclick="eliminarCategoria()" title="Eliminar Categoría"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Imagen Principal (URL)</label>
+                        <input type="text" id="prodImage" class="form-control" placeholder="https://...">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Imagen para el Proveedor (URL) <span style="font-size:0.72rem; color:var(--text-muted); font-weight:400;">(Opcional)</span></label>
+                        <input type="text" id="prodImageProveedor" class="form-control" placeholder="https://...">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">📞 WhatsApp del Proveedor <span style="font-size:0.72rem; color:var(--text-muted); font-weight:400;">(privado)</span></label>
+                        <input type="tel" id="prodWhatsAppProveedor" class="form-control" placeholder="+53 5XXXXXXX">
+                    </div>
+                    <div class="col-12">
+                        <div class="form-check form-switch switch-box">
+                            <input class="form-check-input" type="checkbox" id="prodRequiereCarnet">
+                            <label class="form-check-label fw-bold" for="prodRequiereCarnet">🪪 Requerir carnet de identidad</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button class="btn btn-primary" onclick="guardarProducto()"><i class="fas fa-save me-1"></i> Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>document.write(`<script src="/js/admin/notifications.js?v=${Date.now()}"><\/script>`);</script>
+
+<script>
+    let supabaseClient;
+    let currentUser;
+    let myStore = null;
+    let myProducts = [];
+    let pedidosGlobales = []; // Caché de pedidos para el buscador
+
+    window.AdminApp = window.AdminApp || { tiendaActual: null, tiendasDisponibles: [] };
+    window.AdminUI = window.AdminUI || { showToast: function(msg) { alert(msg); } };
+
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+    const mobileBtn = document.getElementById('mobileMenuBtn');
+
+    function abrirMenu() { sidebar.classList.add('active'); overlay.classList.add('active'); document.body.style.overflow = 'hidden'; }
+    function cerrarMenu() { sidebar.classList.remove('active'); overlay.classList.remove('active'); document.body.style.overflow = ''; }
+    mobileBtn.addEventListener('click', () => { if (sidebar.classList.contains('active')) cerrarMenu(); else abrirMenu(); });
+    overlay.addEventListener('click', cerrarMenu);
+
+    function normalizePhone(phone) {
+        let n = String(phone || '').replace(/\D/g, '');
+        if (n.length === 8 && n.startsWith('5')) n = '53' + n;
+        return n;
+    }
+
+    async function initSupabase() {
+        const res = await fetch('/api/public-config');
+        const config = await res.json();
+        supabaseClient = window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey);
+    }
+
+    async function checkAuth() {
+        await initSupabase();
+        const { data: { session } } = await supabaseClient.auth.getSession();
+
+        if (!session || !session.user) {
+            document.getElementById('loader').innerHTML = '<p class="text-danger">Inicia sesión con Google en la tienda para continuar.</p>';
+            setTimeout(() => window.location.href = '/', 2000);
+            return;
+        }
+
+        currentUser = session.user;
+        const urlParams = new URLSearchParams(window.location.search);
+        const tiendaSlug = urlParams.get('tienda');
+
+        try {
+            let storeData = null;
+            if (tiendaSlug) {
+                const res = await fetch(`/api/mi-tienda?slug=${tiendaSlug}`);
+                const data = await res.json();
+                if (data.success) storeData = data.store;
+            } else {
+                const res = await fetch(`/api/mi-tienda?owner_id=${currentUser.id}`);
+                const data = await res.json();
+                if (data.success) storeData = data.store;
+            }
+
+            if (!storeData) { alert('No tienes acceso a esta tienda.'); window.location.href = '/'; return; }
+
+            myStore = storeData;
+            window.AdminApp.tiendaActual = myStore.id;
+            window.AdminApp.tiendasDisponibles = [myStore];
+
+            document.getElementById('nombreTiendaSidebar').innerText = myStore.nombre;
+            document.getElementById('btnVerTienda').href = `/?tienda=${myStore.id}`;
+            
+            const baseUrl = window.location.origin;
+            document.getElementById('miUrlTienda').value = `${baseUrl}/?tienda=${myStore.id}`;
+            document.getElementById('miUrlAdmin').value = `${baseUrl}/admin-cliente?tienda=${myStore.id}`;
+
+            document.getElementById('badgePlan').innerText = (myStore.plan || 'prueba').toUpperCase();
+            document.getElementById('maxProductos').innerText = `${myStore.max_productos || 10} productos`;
+            document.getElementById('fechaVencimiento').innerText = myStore.fecha_vencimiento ? new Date(myStore.fecha_vencimiento).toLocaleDateString() : 'Sin fecha';
+
+            actualizarEstadoPausa();
+            actualizarBadgeEstado();
+            cargarGestorDesdeStore();
+            cargarConfiguracionTienda();
+
+            if (window.AdminNotifications) AdminNotifications.init().catch(console.error);
+
+            document.getElementById('loader').style.display = 'none';
+            document.getElementById('app').style.display = 'block';
+
+            await cargarProductos();
+        } catch (e) {
+            console.error(e);
+            window.location.href = '/';
+        }
+    }
+
+    function cargarConfiguracionTienda() {
+        const cfg = myStore.configuracion || {};
+        const tasas = cfg.tasas || { USD: 0.04, EUR: 0.037 };
+        
+        document.getElementById('miRateUSD').value = tasas.USD ? (1 / tasas.USD).toFixed(2) : 25;
+        document.getElementById('miRateEUR').value = tasas.EUR ? (1 / tasas.EUR).toFixed(2) : 27;
+
+        const metodos = cfg.metodos_pago || [];
+        document.getElementById('pagoEfectivo').checked = metodos.includes('Efectivo');
+        document.getElementById('pagoTransferencia').checked = metodos.includes('Transferencia');
+        document.getElementById('pagoTarjeta').checked = metodos.includes('Tarjeta');
+    }
+
+    function cargarGestorDesdeStore() {
+        if (!myStore) return;
+        const g = myStore.configuracion?.gestor_venta || {};
+        document.getElementById('gestorNombre').value = g.nombre || '';
+        document.getElementById('gestorCarnet').value = g.carnet || '';
+        document.getElementById('gestorTelefono').value = g.telefono || '';
+        document.getElementById('gestorDireccion').value = g.direccion || '';
+    }
+
+    async function guardarConfiguracion() {
+        if (!currentUser || !myStore) return;
+        const usd = parseFloat(document.getElementById('miRateUSD').value) || 25;
+        const eur = parseFloat(document.getElementById('miRateEUR').value) || 27;
+        
+        const metodos = [];
+        if (document.getElementById('pagoEfectivo').checked) metodos.push('Efectivo');
+        if (document.getElementById('pagoTransferencia').checked) metodos.push('Transferencia');
+        if (document.getElementById('pagoTarjeta').checked) metodos.push('Tarjeta');
+
+        try {
+            const res = await fetch('/api/mi-tienda/config', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ owner_id: currentUser.id, slug: myStore.id, configuracion: { tasas: { CUP: 1, USD: 1 / usd, EUR: 1 / eur }, metodos_pago: metodos } })
+            });
+            const data = await res.json();
+            if (data.success) {
+                myStore.configuracion = data.configuracion;
+                alert('✅ Configuración guardada');
+            } else {
+                alert('Error: ' + (data.error || 'Desconocido'));
+            }
+        } catch { alert('Error de conexión'); }
+    }
+
+    async function guardarGestorVenta() {
+        if (!currentUser || !myStore) return;
+        const gestor_venta = {
+            nombre: document.getElementById('gestorNombre').value.trim(),
+            carnet: document.getElementById('gestorCarnet').value.trim(),
+            telefono: document.getElementById('gestorTelefono').value.trim(),
+            direccion: document.getElementById('gestorDireccion').value.trim()
+        };
+        try {
+            const res = await fetch('/api/mi-tienda/config', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ owner_id: currentUser.id, slug: myStore.id, configuracion: { gestor_venta } })
+            });
+            const data = await res.json();
+            if (data.success) {
+                myStore.configuracion = data.configuracion;
+                alert('✅ Datos del gestor guardados');
+            } else {
+                alert('Error: ' + (data.error || 'Desconocido'));
+            }
+        } catch { alert('Error de conexión'); }
+    }
+
+    function actualizarBadgeEstado() {
+        const el = document.getElementById('badgeEstado');
+        if (!el) return;
+        el.innerHTML = myStore.pausada ? '<span class="badge-pausada"><i class="fas fa-pause"></i>Pausada</span>' : '<span class="badge-activa"><i class="fas fa-check"></i>Activa</span>';
+        
+        const sidebarEstado = document.getElementById('estadoTiendaSidebar');
+        if (sidebarEstado) {
+            sidebarEstado.innerHTML = myStore.pausada ? '<span class="badge-pausada" style="font-size:0.62rem;">Pausada</span>' : '<span class="badge-activa" style="font-size:0.62rem;">Activa</span>';
+        }
+    }
+
+    function actualizarEstadoPausa() {
+        const btn = document.getElementById('btnPausarTienda');
+        if (!btn) return;
+        if (myStore.pausada) { btn.innerHTML = '<i class="fas fa-play"></i> Reactivar'; btn.className = 'btn btn-success'; }
+        else { btn.innerHTML = '<i class="fas fa-pause"></i> Pausar'; btn.className = 'btn btn-warning'; }
+    }
+
+    function showSection(section, btn) {
+        document.getElementById('view-products').style.display = section === 'products' ? 'block' : 'none';
+        document.getElementById('view-orders').style.display = section === 'orders' ? 'block' : 'none';
+        document.getElementById('view-settings').style.display = section === 'settings' ? 'block' : 'none';
+
+        document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+        if (btn) btn.classList.add('active');
+
+        if (section === 'orders') cargarPedidos();
+        if (window.innerWidth < 992) cerrarMenu();
+    }
+
+    // ==========================================
+    // GESTIÓN DE PRODUCTOS
+    // ==========================================
+    async function cargarProductos() {
+        const res = await fetch(`/api/mis-productos?tienda=${myStore.id}`);
+        myProducts = await res.json();
+        const tbody = document.getElementById('productsList');
+
+        if (!myProducts.length) {
+            tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-muted">No hay productos. Agrega uno nuevo.</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = myProducts.map(p => `
+            <tr>
+                <td><img src="${p.imagen || 'https://via.placeholder.com/40'}" style="width:40px;height:40px;border-radius:8px;object-fit:cover;"></td>
+                <td class="fw-semibold">${p.nombre}</td>
+                <td>$${parseFloat(p.precio).toFixed(2)}</td>
+                <td><span class="badge bg-light text-dark">${p.categoria || 'otros'}</span></td>
+                <td>${p.disponible ? '<span class="badge bg-success">Disponible</span>' : '<span class="badge bg-danger">Agotado</span>'}</td>
+                <td style="text-align:right;">
+                    <button class="btn btn-sm btn-outline-primary me-1" onclick="abrirModalProducto(${p.id})" title="Editar"><i class="fas fa-edit"></i></button>
+                    <button class="btn btn-sm btn-outline-danger" onclick="eliminarProducto(${p.id})" title="Eliminar"><i class="fas fa-trash"></i></button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    async function abrirModalProducto(id = null) {
+        const modal = new bootstrap.Modal(document.getElementById('productoModal'));
+        const title = document.getElementById('modalProductoTitle');
+        
+        document.getElementById('prodId').value = '';
+        document.getElementById('prodName').value = '';
+        document.getElementById('prodDesc').value = '';
+        document.getElementById('prodPrice').value = '';
+        document.getElementById('prodDiscount').value = '0';
+        document.getElementById('prodImage').value = '';
+        document.getElementById('prodImageProveedor').value = '';
+        document.getElementById('prodWhatsAppProveedor').value = '';
+        document.getElementById('prodRequiereCarnet').checked = false;
+
+        const cats = myStore.categorias || ['otros'];
+        document.getElementById('prodCategory').innerHTML = cats.map(c => `<option value="${c}">${c}</option>`).join('');
+
+        if (id) {
+            const p = myProducts.find(x => x.id == id);
+            if (!p) return;
+            title.innerHTML = '<i class="fas fa-edit me-2" style="color:var(--primary);"></i> Editar Producto';
+            document.getElementById('prodId').value = p.id;
+            document.getElementById('prodName').value = p.nombre;
+            document.getElementById('prodDesc').value = p.descripcion || '';
+            document.getElementById('prodPrice').value = p.precio;
+            document.getElementById('prodDiscount').value = p.descuento || 0;
+            document.getElementById('prodImage').value = p.imagen || '';
+            document.getElementById('prodImageProveedor').value = p.imagen_proveedor || '';
+            document.getElementById('prodWhatsAppProveedor').value = p.whatsapp_proveedor || '';
+            document.getElementById('prodRequiereCarnet').checked = p.requiere_carnet === true;
+            document.getElementById('prodCategory').value = p.categoria || 'otros';
+        } else {
+            const limite = myStore.max_productos || 10;
+            if (myProducts.length >= limite) { alert(`Has alcanzado el límite de ${limite} productos de tu plan.`); return; }
+            title.innerHTML = '<i class="fas fa-box me-2" style="color:var(--primary);"></i> Nuevo Producto';
+        }
+
+        modal.show();
+    }
+
+    async function guardarProducto() {
+        const id = document.getElementById('prodId').value;
+        const nombre = document.getElementById('prodName').value.trim();
+        const precio = parseFloat(document.getElementById('prodPrice').value);
+
+        if (!nombre || !precio || precio <= 0) { alert('Nombre y precio válido son obligatorios'); return; }
+
+        const payload = {
+            tienda: myStore.id,
+            nombre: nombre,
+            descripcion: document.getElementById('prodDesc').value,
+            precio: precio,
+            descuento: parseInt(document.getElementById('prodDiscount').value) || 0,
+            categoria: document.getElementById('prodCategory').value,
+            imagen: document.getElementById('prodImage').value || 'https://via.placeholder.com/300',
+            imagen_proveedor: document.getElementById('prodImageProveedor').value.trim() || null,
+            whatsapp_proveedor: document.getElementById('prodWhatsAppProveedor').value.trim() || null,
+            requiere_carnet: document.getElementById('prodRequiereCarnet').checked,
+            disponible: true
+        };
+
+        try {
+            let res;
+            if (id) {
+                const { error } = await supabaseClient.from('products').update(payload).eq('id', id);
+                if (error) throw error;
+                res = { ok: true };
+            } else {
+                const fetchRes = await fetch('/api/mis-productos', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                res = { ok: fetchRes.ok };
+            }
+
+            if (res.ok) {
+                bootstrap.Modal.getInstance(document.getElementById('productoModal')).hide();
+                await cargarProductos();
+            } else {
+                alert('Error al guardar el producto');
+            }
+        } catch (e) {
+            console.error(e);
+            alert('Error de conexión al guardar');
+        }
+    }
+
+    async function eliminarProducto(id) {
+        if (!confirm('¿Eliminar este producto?')) return;
+        await fetch(`/api/mis-productos/${id}`, { method: 'DELETE' });
+        await cargarProductos();
+    }
+
+    async function agregarCategoria() {
+        const nueva = prompt('Escribe el nombre de la nueva categoría:');
+        if (!nueva || !nueva.trim()) return;
+        const cat = nueva.trim().toLowerCase();
+        
+        if (myStore.categorias && myStore.categorias.includes(cat)) {
+            alert('La categoría ya existe'); return;
+        }
+
+        const cats = myStore.categorias || ['otros'];
+        cats.push(cat);
+
+        try {
+            const { error } = await supabaseClient.from('stores').update({ categorias: cats }).eq('id', myStore.id);
+            if (error) throw error;
+            myStore.categorias = cats;
+            document.getElementById('prodCategory').innerHTML = cats.map(c => `<option value="${c}">${c}</option>`).join('');
+            document.getElementById('prodCategory').value = cat;
+            alert('✅ Categoría agregada');
+        } catch (e) { alert('Error al agregar categoría'); }
+    }
+
+    async function eliminarCategoria() {
+        const select = document.getElementById('prodCategory');
+        const cat = select.value;
+        if (!cat || cat === 'otros') { alert('No puedes eliminar la categoría "otros"'); return; }
+        
+        if (!confirm(`¿Eliminar la categoría "${cat}"? Los productos en esta categoría pasarán a "otros".`)) return;
+
+        const cats = myStore.categorias.filter(c => c !== cat);
+        
+        try {
+            const { error } = await supabaseClient.from('stores').update({ categorias: cats }).eq('id', myStore.id);
+            if (error) throw error;
+            
+            await supabaseClient.from('products').update({ categoria: 'otros' }).eq('tienda', myStore.id).eq('categoria', cat);
+            
+            myStore.categorias = cats;
+            select.innerHTML = cats.map(c => `<option value="${c}">${c}</option>`).join('');
+            alert('✅ Categoría eliminada');
+            await cargarProductos();
+        } catch (e) { alert('Error al eliminar categoría'); }
+    }
+
+    // ==========================================
+    // GESTIÓN DE PEDIDOS (CON BUSCADOR Y ELIMINACIÓN)
+    // ==========================================
+    async function cargarPedidos() {
+        const res = await fetch(`/api/mis-pedidos?tienda=${myStore.id}`);
+        pedidosGlobales = await res.json();
+        filtrarPedidos(); // Aplica el filtro actual (o muestra todos si está vacío)
+    }
+
+    function filtrarPedidos() {
+        const query = (document.getElementById('searchOrderCode')?.value || '').toLowerCase().trim();
+        
+        const filtrados = pedidosGlobales.filter(o => {
+            const codigo = (o.codigo_cliente || '').toLowerCase();
+            const idStr = o.id.toString();
+            return codigo.includes(query) || idStr.includes(query);
+        });
+
+        renderizarPedidos(filtrados);
+    }
+
+    function renderizarPedidos(orders) {
+        const container = document.getElementById('ordersList');
+
+        if (!orders.length) {
+            container.innerHTML = '<div class="alert alert-info text-center py-4">No se encontraron pedidos.</div>';
+            return;
+        }
+
+        const g = myStore.configuracion?.gestor_venta || {};
+
+        container.innerHTML = orders.map(o => {
+            const badgeColor = o.estado === 'pendiente' ? 'warning' : (o.estado === 'entregado' ? 'success' : 'primary');
+            
+            const itemsHtml = (o.items || []).map(i => `
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <img src="${i.imagen || 'https://via.placeholder.com/50'}" class="order-img" alt="${i.nombre}">
+                    <div>
+                        <div class="fw-bold" style="font-size:0.85rem;">${i.qty}x ${i.nombre}</div>
+                        <div class="text-muted" style="font-size:0.75rem;">$${(i.precio * i.qty).toFixed(2)}</div>
+                    </div>
+                </div>
+            `).join('');
+
+            return `
+            <div class="order-card">
+                <div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2">
+                    <div>
+                        <h5 class="fw-bold m-0">Pedido #${o.id}</h5>
+                        <small class="text-muted">${new Date(o.created_at).toLocaleString('es-ES')}</small>
+                        ${o.codigo_cliente ? `<span class="badge bg-light text-dark ms-2" style="font-family:monospace;font-size:0.7rem;"><i class="fas fa-qrcode"></i> ${o.codigo_cliente}</span>` : ''}
+                    </div>
+                    <div class="d-flex gap-2">
+                        <span class="badge bg-${badgeColor} text-dark text-uppercase">${o.estado}</span>
+                        <button class="btn btn-sm btn-outline-danger" onclick="eliminarPedidoIndividual(${o.id})"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>
+                
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <div class="p-3 bg-light rounded-3">
+                            ${itemsHtml}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="small">
+                            <div class="mb-1"><i class="fas fa-user text-primary me-1"></i> <strong>${o.nombre}</strong></div>
+                            <div class="mb-1"><i class="fas fa-phone text-primary me-1"></i> ${o.telefono}</div>
+                            <div class="mb-1"><i class="fas fa-id-card text-primary me-1"></i> Carnet: ${o.carnet || '—'}</div>
+                            <div class="mb-1"><i class="fas fa-map-marker-alt text-primary me-1"></i> ${o.direccion}</div>
+                            <div class="mt-2 fw-bold" style="color:var(--primary); font-size:1.1rem;">Total: $${parseFloat(o.total).toFixed(2)} ${o.moneda || 'CUP'}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex gap-2 flex-wrap border-top pt-3">
+                    <button class="btn btn-sm" style="background:#FFF3E0;color:#B45309;border:1.5px solid #FEE0B0;font-weight:700;" onclick="enviarWhatsAppProveedor(${o.id})">
+                        <i class="fab fa-whatsapp"></i> Avisar al Proveedor
+                    </button>
+                    <button class="btn btn-sm btn-success" style="font-weight:700;" onclick="enviarWhatsAppCliente(${o.id})">
+                        <i class="fab fa-whatsapp"></i> Confirmar con Cliente
+                    </button>
+                </div>
+            </div>`;
+        }).join('');
+
+        window._pedidosCache = orders; // Para los botones de WhatsApp
+    }
+
+    async function eliminarPedidoIndividual(id) {
+        if (!confirm('¿Eliminar este pedido?')) return;
+        try {
+            const { error } = await supabaseClient.from('orders').delete().eq('id', id).eq('tienda', myStore.id);
+            if (error) throw error;
+            
+            // Eliminar del array local para actualizar la vista sin recargar
+            pedidosGlobales = pedidosGlobales.filter(o => o.id !== id);
+            filtrarPedidos();
+            
+        } catch (e) { 
+            console.error(e);
+            alert('Error al eliminar: ' + e.message); 
+        }
+    }
+
+    async function eliminarTodosLosPedidos() {
+        if (!confirm('⚠️ ¿Eliminar TODOS los pedidos de tu tienda?\n\nEsta acción no se puede deshacer.')) return;
+        if (!confirm('¿Estás completamente seguro?')) return;
+        try {
+            const { error } = await supabaseClient.from('orders').delete().eq('tienda', myStore.id);
+            if (error) throw error;
+            
+            pedidosGlobales = [];
+            filtrarPedidos();
+            
+        } catch (e) { 
+            console.error(e);
+            alert('Error al eliminar: ' + e.message); 
+        }
+    }
+
+    function enviarWhatsAppProveedor(pedidoId) {
+        const o = (window._pedidosCache || []).find(x => x.id == pedidoId);
+        if (!o) return;
+        
+        const primerItem = (o.items && o.items[0]) || {};
+        const prodInfo = myProducts.find(p => String(p.id) === String(primerItem.id)) || {};
+        const waProv = prodInfo.whatsapp_proveedor;
+
+        if (!waProv) { alert('❌ Este producto no tiene WhatsApp de proveedor configurado.'); return; }
+
+        const g = myStore.configuracion?.gestor_venta || {};
+        const tiendaNombre = myStore.nombre || myStore.id;
+        
+        let productosTexto = '';
+        (o.items || []).forEach(i => {
+            const pInfo = myProducts.find(p => String(p.id) === String(i.id)) || {};
+            const urlProv = pInfo.imagen_proveedor || i.imagen || 'No adjunta';
+            productosTexto += `• ${i.qty}x ${i.nombre}\n   📸 Foto: ${urlProv}\n`;
+        });
+
+        const msg =
+`🚚 *NUEVA VENTA — ${tiendaNombre}*
+
+*📦 Producto(s):*
+${productosTexto}
+*💰 Total:* $${parseFloat(o.total).toFixed(2)} ${o.moneda || 'CUP'}
+
+*👤 Datos del Cliente:*
+• Nombre: ${o.nombre}
+• Carnet: ${o.carnet || '—'}
+• Teléfono: ${o.telefono}
+• Dirección: ${o.direccion}
+
+*🧑‍💼 Gestor de Venta:*
+• Nombre: ${g.nombre || '—'}
+• Carnet: ${g.carnet || '—'}
+• Teléfono: ${g.telefono || '—'}
+• Dirección: ${g.direccion || '—'}
+
+*Pedido:* #${o.id}${o.codigo_cliente ? ' (Código: ' + o.codigo_cliente + ')' : ''}
+
+Por favor *confirme disponibilidad* de este pedido respondiendo a este mismo mensaje. 🙏`;
+
+        const n = normalizePhone(waProv);
+        if (!n) { alert('❌ Número de proveedor inválido'); return; }
+        window.open(`https://wa.me/${n}?text=${encodeURIComponent(msg)}`, '_blank');
+    }
+
+    function enviarWhatsAppCliente(pedidoId) {
+        const o = (window._pedidosCache || []).find(x => x.id == pedidoId);
+        if (!o) return;
+        const tiendaNombre = myStore.nombre || myStore.id;
+        const itemsTexto = (o.items || []).map(i => `• ${i.qty}x ${i.nombre} — $${(i.precio * i.qty).toFixed(2)}`).join('\n');
+
+        const msg =
+`¡Hola ${o.nombre}! 👋
+
+Le saludamos de *${tiendaNombre}*. Usted ha escogido el siguiente producto:
+
+*🛒 Su pedido:*
+${itemsTexto}
+
+*💰 Total:* $${parseFloat(o.total).toFixed(2)} ${o.moneda || 'CUP'}
+
+*📦 Datos de envío:*
+${o.carnet ? `• Carnet: ${o.carnet}\n` : ''}• Dirección: ${o.direccion}
+
+*¿Desea confirmar la venta?* Por favor responda a este mensaje con un *SÍ* para procesar su pedido.
+
+¡Gracias por su compra! 🙌`;
+
+        const n = normalizePhone(o.telefono);
+        if (!n) { alert('❌ Número de cliente inválido'); return; }
+        window.open(`https://wa.me/${n}?text=${encodeURIComponent(msg)}`, '_blank');
+    }
+
+    // ==========================================
+    // FUNCIONES GENERALES
+    // ==========================================
+    function copiarInput(id) {
+        const input = document.getElementById(id);
+        input.select();
+        navigator.clipboard.writeText(input.value).then(() => alert('✅ URL copiada'));
+    }
+
+    async function togglePausarTienda() {
+        const pausar = !myStore.pausada;
+        if (!confirm(`¿Estás seguro de ${pausar ? 'pausar' : 'reactivar'} tu tienda?`)) return;
+
+        try {
+            const res = await fetch('/api/mi-tienda/pausar', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ owner_id: currentUser.id, slug: myStore.id, pausar: pausar })
+            });
+            const data = await res.json();
+            if (data.success) {
+                myStore.pausada = data.pausada;
+                actualizarEstadoPausa();
+                actualizarBadgeEstado();
+                alert(pausar ? '✅ Tienda pausada' : '✅ Tienda reactivada');
+            } else { alert('Error: ' + (data.error || 'Desconocido')); }
+        } catch { alert('Error de conexión'); }
+    }
+
+    async function eliminarMiTienda() {
+        if (!confirm('⚠️ ¿ELIMINAR tu tienda? Se borrarán TODOS los productos, pedidos y reservas.')) return;
+        if (!confirm('¿Estás COMPLETAMENTE seguro? Esta es tu última oportunidad.')) return;
+
+        try {
+            const res = await fetch(`/api/mi-tienda/${myStore.id}?owner_id=${currentUser.id}`, { method: 'DELETE' });
+            const data = await res.json();
+            if (data.success) {
+                alert('✅ Tu tienda ha sido eliminada. Serás redirigido.');
+                await supabaseClient.auth.signOut();
+                window.location.href = '/';
+            } else { alert('Error: ' + (data.error || 'Desconocido')); }
+        } catch { alert('Error de conexión'); }
+    }
+
+    async function logout() {
+        if (!confirm('¿Cerrar sesión?')) return;
+        await supabaseClient.auth.signOut();
+        window.location.href = '/';
+    }
+
+    window.addEventListener('load', checkAuth);
+</script>
+</body>
+</html>
