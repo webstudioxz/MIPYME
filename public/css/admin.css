@@ -1,0 +1,9 @@
+/* ============================================================
+   public/css/admin.css — Archivo Maestro
+   ============================================================ */
+
+@import url('./admin/variables.css');
+@import url('./admin/sidebar.css');
+@import url('./admin/components.css');
+@import url('./admin/forms.css');
+@import url('./admin/responsive.css');

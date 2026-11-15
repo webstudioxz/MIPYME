@@ -1,0 +1,9 @@
+/* ============================================================
+   public/css/store.css — Archivo Maestro
+   ============================================================ */
+
+@import url('./store/variables.css');
+@import url('./store/header.css');
+@import url('./store/hero.css');
+@import url('./store/products.css');
+@import url('./store/cart.css');
