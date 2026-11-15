@@ -1,0 +1,57 @@
+/* ============================================================
+   Variables y Reset del Admin
+   ============================================================ */
+:root {
+    /* Colores base */
+    --primary: #1E64FF;
+    --primary-dark: #1248C7;
+    --primary-light: #E8F0FE;
+    --primary-gradient: linear-gradient(135deg, #1E64FF, #1248C7);
+    
+    --success: #10B981;
+    --danger: #EF4444;
+    --warning: #F59E0B;
+    
+    /* Fondos */
+    --bg-body: #F4F7FE;
+    --bg-card: #FFFFFF;
+    --bg-sidebar: #0F172A;
+    --bg-sidebar-hover: #1E293B;
+    
+    /* Textos */
+    --text-main: #1A2B4C;
+    --text-secondary: #6B7A99;
+    --text-muted: #9CA3AF;
+    
+    /* Bordes y sombras */
+    --border-soft: #EEF2F7;
+    --shadow-sm: 0 2px 8px rgba(30,100,255,0.05);
+    --shadow-md: 0 8px 24px rgba(30,100,255,0.08);
+    --shadow-lg: 0 16px 40px rgba(30,100,255,0.12);
+    
+    /* Radios y transiciones */
+    --radius: 16px;
+    --radius-sm: 10px;
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    /* Fuentes */
+    --font-display: 'Plus Jakarta Sans', -apple-system, sans-serif;
+    --font-body: 'Inter', -apple-system, sans-serif;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: var(--font-body);
+    background: var(--bg-body);
+    color: var(--text-main);
+    font-size: 14px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Scrollbar global */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #94A3B8; }

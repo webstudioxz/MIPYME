@@ -1,0 +1,80 @@
+/* ============================================================
+   Formularios y Modales del Admin
+   ============================================================ */
+.modal-content {
+    border-radius: var(--radius);
+    border: none;
+    box-shadow: var(--shadow-lg);
+}
+.modal-header {
+    border-bottom: 1px solid var(--border-soft);
+    padding: 20px 24px;
+}
+.modal-title {
+    font-family: var(--font-display);
+    font-weight: 800;
+    color: var(--text-main);
+}
+.modal-body {
+    padding: 24px;
+}
+.modal-footer {
+    border-top: 1px solid var(--border-soft);
+    padding: 16px 24px;
+}
+
+.form-control, .form-select {
+    border-radius: var(--radius-sm);
+    border: 1.5px solid #E2E8F0;
+    padding: 10px 14px;
+    font-size: 0.88rem;
+    transition: var(--transition);
+}
+.form-control:focus, .form-select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(30,100,255,0.12);
+}
+
+.image-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+.image-tab {
+    flex: 1;
+    padding: 8px 12px;
+    border-radius: var(--radius-sm);
+    border: 1.5px solid #E2E8F0;
+    background: white;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+}
+.image-tab.active {
+    border-color: var(--primary);
+    background: var(--primary-light);
+    color: var(--primary);
+}
+
+#imagePreview {
+    position: relative;
+    margin-top: 12px;
+    display: none;
+}
+#imagePreview img {
+    max-width: 120px;
+    border-radius: var(--radius-sm);
+    border: 2px solid var(--border-soft);
+}
+#imagePreview .remove-img {
+    position: absolute;
+    top: -8px; left: 112px;
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background: var(--danger);
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 0.7rem;
+}
