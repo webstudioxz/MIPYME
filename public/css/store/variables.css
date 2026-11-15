@@ -1,0 +1,36 @@
+/* ============================================================
+   Variables y Reset Base
+   ============================================================ */
+:root {
+    --bg-body: #F4F7FE; --bg-body-2: #EEF3FC; --bg-card: #FFFFFF; --bg-tint: #F8FAFF;
+    --primary: #1E64FF; --primary-dark: #1248C7; --primary-light: #E8F0FE; --primary-lighter: #F3F7FF; --primary-glow: rgba(30, 100, 255, 0.35);
+    --text-main: #1A2B4C; --text-secondary: #6B7A99; --text-muted: #9CA3AF;
+    --success: #10B981; --success-light: #E6F9F0; --danger: #EF4444; --danger-light: #FEE2E2; --warning: #F59E0B; --warning-light: #FEF3C7;
+    --border-light: #E2E8F0; --border-soft: #EEF2F7; --border-strong: #CBD5E1;
+    --font-display: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif; --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --shadow-xs: 0 1px 2px rgba(15,23,42,0.04); --shadow-sm: 0 2px 8px rgba(30,100,255,0.05); --shadow-md: 0 8px 24px rgba(30,100,255,0.08); --shadow-lg: 0 16px 40px rgba(30,100,255,0.12); --shadow-xl: 0 24px 60px rgba(30,100,255,0.18); --shadow-focus: 0 0 0 4px rgba(30,100,255,0.15); --shadow-card-hover: 0 20px 40px rgba(30,100,255,0.14);
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); --transition-fast: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    --radius-xs: 8px; --radius-sm: 12px; --radius-md: 18px; --radius-lg: 24px; --radius-xl: 32px; --radius-pill: 999px;
+    --header-h: 76px; --sticky-nav-h: 64px; --bottom-nav-h: 76px; --container-max: 1280px;
+    --z-sticky-nav: 900; --z-header: 1000; --z-overlay: 1099; --z-panel: 1100; --z-bottom-nav: 950; --z-floating: 800; --z-modal: 2000; --z-toast: 2500; --z-loader: 10000;
+    --success-color: var(--success); --danger-color: var(--danger);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+    background-color: var(--bg-body);
+    background-image: radial-gradient(at 0% 0%, rgba(30,100,255,0.06) 0px, transparent 50%), radial-gradient(at 100% 0%, rgba(124,58,237,0.04) 0px, transparent 50%);
+    background-attachment: fixed;
+    color: var(--text-main); font-family: var(--font-body); font-size: 16px; line-height: 1.6; letter-spacing: -0.011em; overflow-x: hidden; min-height: 100vh;
+    -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+}
+button { font-family: inherit; cursor: pointer; }
+a { text-decoration: none; color: inherit; }
+ul { list-style: none; }
+img { max-width: 100%; display: block; }
+input, textarea, select { font-family: inherit; }
+i { display: inline-block; line-height: 1; }
+.text-danger { color: var(--danger) !important; } .text-success { color: var(--success) !important; } .hidden { display: none !important; }
+::-webkit-scrollbar { width: 10px; height: 10px; } ::-webkit-scrollbar-track { background: var(--bg-tint); } ::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 10px; border: 2px solid var(--bg-tint); } ::-webkit-scrollbar-thumb:hover { background: var(--primary); } ::selection { background: var(--primary-light); color: var(--primary-dark); }
+:focus-visible { outline: none; box-shadow: var(--shadow-focus) !important; border-radius: 6px; }
