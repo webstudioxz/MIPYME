@@ -3,7 +3,7 @@
 // Maneja notificaciones push del panel (admin + admin-cliente)
 // ============================================================
 
-const CACHE_NAME = 'tienda-fg-v3';
+const CACHE_NAME = 'tienda-fg-v4';
 const SHELL_ASSETS = [
     '/manifest-admin.json',
     '/css/admin.css',
