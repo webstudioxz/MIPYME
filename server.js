@@ -1,0 +1,990 @@
+// ============================================================
+// server.js — Tienda-FG (v6 FINAL CON VARIABLE DE ENTORNO)
+// ============================================================
+
+import express from 'express';
+import path from 'path';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
+import dotenv from 'dotenv';
+import { createClient } from '@supabase/supabase-js';
+
+import apiRoutes from './src/routes/apiRoutes.js';
+import adminRoutes from './src/routes/adminRoutes.js';
+
+const __filename = fileURLToPath(import.meta.url);
+let __dirname = path.dirname(__filename);
+
+const envPaths = [
+    path.join(__dirname, '.env'),
+    path.join(__dirname, '../.env'),
+    path.join(process.cwd(), '.env'),
+    path.join(process.cwd(), '../.env')
+];
+for (const p of envPaths) {
+    if (fs.existsSync(p)) { dotenv.config({ path: p }); console.log(`✅ [ENV] ${p}`); break; }
+}
+
+let PROJECT_ROOT = __dirname;
+if (__dirname.endsWith('/src') || __dirname.endsWith('\\src')) PROJECT_ROOT = path.dirname(__dirname);
+let PUBLIC_PATH = path.join(PROJECT_ROOT, 'public');
+if (!fs.existsSync(PUBLIC_PATH)) {
+    const fallback = path.join(process.cwd(), 'public');
+    if (fs.existsSync(fallback)) PUBLIC_PATH = fallback;
+}
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+// 🚨 NUEVA VARIABLE DE ENTORNO: URL Base (Configurable desde Render)
+const APP_URL = process.env.APP_URL || 'https://tienda-fg.onrender.com';
+
+// 🚨 Decirle a Express que confíe en el proxy (necesario para Render)
+app.set('trust proxy', 1);
+
+const supabase = createClient(
+    process.env.SUPABASE_URL || 'https://placeholder.supabase.co',
+    process.env.SUPABASE_SERVICE_ROLE_KEY || 'placeholder'
+);
+
+const SUPERADMIN_EMAILS = (process.env.SUPERADMIN_EMAILS || '').split(',').map(e => e.trim().toLowerCase()).filter(Boolean);
+
+app.use(express.json({ limit: '20mb' }));
+app.use(express.urlencoded({ extended: true, limit: '20mb' }));
+
+app.use((req, res, next) => {
+    if (req.path.endsWith('.html') || req.path === '/' || req.path === '/admin' || req.path === '/admin-cliente') {
+        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+        res.setHeader('Pragma', 'no-cache');
+        res.setHeader('Expires', '0');
+    }
+    next();
+});
+
+app.use(express.static(PUBLIC_PATH));
+
+function sendHtml(res, filename) {
+    const posiblesRutas = [path.join(PUBLIC_PATH, filename), path.join(PROJECT_ROOT, 'public', filename), path.join(process.cwd(), 'public', filename)];
+    let foundPath = null;
+    for (const p of posiblesRutas) { if (fs.existsSync(p)) { foundPath = p; break; } }
+    if (!foundPath) return res.status(500).send(`<h1>Error 500</h1><p>No encontrado: ${filename}</p>`);
+    res.sendFile(foundPath, (err) => { if (err && !res.headersSent) res.status(500).send('Error'); });
+}
+
+// ============================================================
+// HELPERS
+// ============================================================
+function deepMerge(target = {}, source = {}) {
+    const output = { ...target };
+    Object.keys(source || {}).forEach(key => {
+        const sv = source[key];
+        const tv = target[key];
+        if (sv && typeof sv === 'object' && !Array.isArray(sv) &&
+            tv && typeof tv === 'object' && !Array.isArray(tv)) {
+            output[key] = deepMerge(tv, sv);
+        } else {
+            output[key] = sv;
+        }
+    });
+    return output;
+}
+
+function normalizeDias(dias) {
+    if (!Array.isArray(dias)) return [1, 2, 3, 4, 5, 6];
+    const mapa = { domingo: 0, lunes: 1, martes: 2, miercoles: 3, 'miércoles': 3, jueves: 4, viernes: 5, sabado: 6, 'sábado': 6, dom: 0, lun: 1, mar: 2, mie: 3, mié: 3, jue: 4, vie: 5, sab: 6, sáb: 6 };
+    const out = new Set();
+    dias.forEach(d => {
+        if (typeof d === 'number' && d >= 0 && d <= 6) out.add(d);
+        else if (typeof d === 'string') {
+            const k = d.trim().toLowerCase();
+            if (/^\d$/.test(k)) out.add(parseInt(k));
+            else if (mapa[k] !== undefined) out.add(mapa[k]);
+        }
+    });
+    return out.size ? [...out].sort() : [1, 2, 3, 4, 5, 6];
+}
+
+// ============ PUBLIC CONFIG ============
+app.get('/api/public-config', (req, res) => {
+    if (!process.env.SUPABASE_URL) return res.status(500).json({ error: "Faltan credenciales" });
+    res.json({ 
+        supabaseUrl: process.env.SUPABASE_URL, 
+        supabaseAnonKey: process.env.SUPABASE_ANON_KEY,
+        appUrl: APP_URL // 🚨 Enviamos la URL base al frontend
+    });
+});
+
+// ============ PUSH ============
+app.get('/api/push/public-key', (req, res) => res.json({ publicKey: process.env.VAPID_PUBLIC_KEY }));
+
+app.get('/api/push/check', async (req, res) => {
+    try {
+        const { tienda } = req.query;
+        let query = supabase.from('push_subscriptions').select('id');
+        if (tienda) query = query.eq('tienda_id', tienda);
+        else query = query.is('tienda_id', null);
+        const { data } = await query.limit(1);
+        res.json({ subscribed: !!(data && data.length > 0) });
+    } catch (e) { res.json({ subscribed: false }); }
+});
+
+app.post('/api/push/subscribe', async (req, res) => {
+    try {
+        const { endpoint, keys, tienda_id } = req.body;
+        if (!endpoint || !keys || !keys.p256dh || !keys.auth) return res.status(400).json({ success: false, error: 'Faltan datos' });
+        let deleteQuery = supabase.from('push_subscriptions').delete().eq('endpoint', endpoint);
+        if (tienda_id) deleteQuery = deleteQuery.eq('tienda_id', tienda_id);
+        else deleteQuery = deleteQuery.is('tienda_id', null);
+        await deleteQuery;
+        const { error } = await supabase.from('push_subscriptions').insert({ endpoint, p256dh: keys.p256dh, auth: keys.auth, tienda_id: tienda_id || null });
+        if (error) throw error;
+        res.json({ success: true });
+    } catch (e) { res.status(500).json({ success: false, error: e.message }); }
+});
+
+app.post('/api/push/test', async (req, res) => {
+    try {
+        const { tienda } = req.body;
+        const module = await import('./src/utils/pushNotifications.js');
+        await module.sendPushToAll({ title: `🧪 Prueba`, body: `Funcionan para ${tienda || 'Admin'}`, url: tienda ? `${APP_URL}/admin-cliente?tienda=${tienda}` : `${APP_URL}/admin`, tienda });
+        res.json({ success: true });
+    } catch (e) { res.status(500).json({ success: false, error: e.message }); }
+});
+
+// ============ MI-TIENDA ============
+app.get('/api/mi-tienda', async (req, res) => {
+    try {
+        const { owner_id, slug } = req.query;
+        if (!owner_id && !slug) return res.status(400).json({ success: false, error: 'Falta owner_id o slug' });
+        
+        let query = supabase.from('stores').select('*');
+        if (slug) {
+            query = query.eq('id', slug);
+        } else if (owner_id) {
+            query = query.eq('owner_id', owner_id);
+        }
+        
+        const { data, error } = await query.maybeSingle();
+        if (error) throw error;
+        if (!data) return res.status(404).json({ success: false, error: 'No encontrada' });
+        
+        res.json({ success: true, store: data });
+    } catch (error) { 
+        res.status(500).json({ success: false, error: error.message }); 
+    }
+});
+
+app.post('/api/mi-tienda/pausar', async (req, res) => {
+    try {
+        const { owner_id, slug, pausar, mensaje } = req.body;
+        const { data: tienda } = await supabase.from('stores').select('id').eq('id', slug).eq('owner_id', owner_id).maybeSingle();
+        if (!tienda) return res.status(404).json({ success: false, error: 'No autorizado' });
+
+        const update = { pausada: pausar === true, updated_at: new Date() };
+
+        if (pausar === true) {
+            update.pausada_por = 'owner';
+            update.pausada_mensaje = (mensaje || 'Volvemos mañana').toString().slice(0, 200);
+        } else {
+            update.pausada_por = null;
+            update.pausada_mensaje = null;
+        }
+
+        await supabase.from('stores').update(update).eq('id', slug);
+        res.json({ success: true });
+    } catch (error) { res.status(500).json({ success: false, error: error.message }); }
+});
+
+app.delete('/api/mi-tienda/:slug', async (req, res) => {
+    try {
+        const { owner_id } = req.query;
+        const { slug } = req.params;
+        const { data: tienda } = await supabase.from('stores').select('id').eq('id', slug).eq('owner_id', owner_id).maybeSingle();
+        if (!tienda) return res.status(404).json({ success: false, error: 'No autorizado' });
+        await borrarTodoDeTienda(slug);
+        res.json({ success: true });
+    } catch (error) { res.status(500).json({ success: false, error: error.message }); }
+});
+
+app.put('/api/mi-tienda/config', async (req, res) => {
+    try {
+        const { owner_id, slug, configuracion } = req.body;
+        if (!slug) return res.status(400).json({ success: false, error: 'Falta slug' });
+
+        if (owner_id) {
+            const { data: tienda } = await supabase.from('stores').select('configuracion').eq('id', slug).eq('owner_id', owner_id).maybeSingle();
+            if (!tienda) return res.status(404).json({ success: false, error: 'No autorizado' });
+        }
+
+        const { data: current } = await supabase.from('stores').select('configuracion').eq('id', slug).maybeSingle();
+        if (!current) return res.status(404).json({ success: false, error: 'Tienda no encontrada' });
+
+        const incoming = { ...(configuracion || {}) };
+        if (incoming.horario && incoming.horario.dias !== undefined) {
+            incoming.horario.dias = normalizeDias(incoming.horario.dias);
+        }
+        const merged = deepMerge(current.configuracion || {}, incoming);
+        if (!merged.horario) merged.horario = {};
+        if (!Array.isArray(merged.horario.dias)) merged.horario.dias = [1, 2, 3, 4, 5, 6];
+
+        const { error } = await supabase.from('stores').update({
+            configuracion: merged,
+            updated_at: new Date()
+        }).eq('id', slug);
+
+        if (error) throw error;
+        res.json({ success: true, configuracion: merged });
+    } catch (error) { res.status(500).json({ success: false, error: error.message }); }
+});
+
+app.put('/api/mi-tienda/categorias', async (req, res) => {
+    try {
+        const { owner_id, slug, categorias } = req.body;
+        const { data: tienda } = await supabase.from('stores').select('id').eq('id', slug).eq('owner_id', owner_id).maybeSingle();
+        if (!tienda) return res.status(404).json({ success: false, error: 'No autorizado' });
+        await supabase.from('stores').update({ categorias }).eq('id', slug);
+        res.json({ success: true });
+    } catch (error) { res.status(500).json({ success: false, error: error.message }); }
+});
+
+// ============ PRODUCTOS ============
+app.get('/api/mis-productos', async (req, res) => {
+    try {
+        const { data, error } = await supabase.from('products').select('*').eq('tienda', req.query.tienda).order('created_at', { ascending: false });
+        if (error) throw error;
+        res.json(data || []);
+    } catch (error) { res.status(500).json({ error: error.message }); }
+});
+
+app.put('/api/mis-productos/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { tienda, owner_id, ...data } = req.body;
+        const { data: store } = await supabase.from('stores').select('id').eq('id', tienda).eq('owner_id', owner_id).maybeSingle();
+        if (!store) return res.status(403).json({ error: 'No autorizado' });
+        delete data.created_at; delete data.id;
+        data.updated_at = new Date();
+        const { error } = await supabase.from('products').update(data).eq('id', id).eq('tienda', tienda);
+        if (error) throw error;
+        res.json({ success: true });
+    } catch (error) { res.status(500).json({ error: error.message }); }
+});
+
+app.post('/api/mis-productos', async (req, res) => {
+    try {
+        const { data: tienda } = await supabase.from('stores').select('max_productos').eq('id', req.body.tienda).single();
+        const { count } = await supabase.from('products').select('*', { count: 'exact', head: true }).eq('tienda', req.body.tienda);
+        if (tienda && count >= (tienda.max_productos || 10)) return res.status(400).json({ error: 'Límite alcanzado' });
+        const payload = {
+            tienda: req.body.tienda, nombre: req.body.nombre, descripcion: req.body.descripcion || '',
+            precio: parseFloat(req.body.precio), descuento: parseInt(req.body.descuento) || 0,
+            categoria: req.body.categoria || 'otros', imagen: req.body.imagen || 'https://via.placeholder.com/300',
+            disponible: req.body.disponible === true || req.body.disponible === 'true',
+            tamanio: req.body.tamanio || 'pequeno', created_at: new Date()
+        };
+        if (req.body.imagen_proveedor !== undefined) payload.imagen_proveedor = req.body.imagen_proveedor;
+        if (req.body.whatsapp_proveedor !== undefined) payload.whatsapp_proveedor = req.body.whatsapp_proveedor;
+        if (req.body.contacto_nombre !== undefined) payload.contacto_nombre = (req.body.contacto_nombre || '').toString().trim() || null;
+        if (req.body.requiere_carnet !== undefined) payload.requiere_carnet = req.body.requiere_carnet === true || req.body.requiere_carnet === 'true';
+        if (req.body.imagenes_servicio !== undefined) payload.imagenes_servicio = req.body.imagenes_servicio;
+        const { error } = await supabase.from('products').insert(payload);
+        if (error) throw error;
+        res.json({ success: true });
+    } catch (error) { res.status(500).json({ error: error.message }); }
+});
+
+app.delete('/api/mis-productos/:id', async (req, res) => {
+    try {
+        await supabase.from('products').delete().eq('id', req.params.id);
+        res.json({ success: true });
+    } catch (error) { res.status(500).json({ error: error.message }); }
+});
+
+app.get('/api/mis-pedidos', async (req, res) => {
+    try {
+        const { data, error } = await supabase.from('orders').select('*').eq('tienda', req.query.tienda).order('created_at', { ascending: false });
+        if (error) throw error;
+        res.json(data || []);
+    } catch (error) { res.status(500).json({ error: error.message }); }
+});
+
+// ============ RESERVAS ============
+app.get('/api/reservas/disponibles', async (req, res) => {
+    try {
+        const { tienda, fecha } = req.query;
+        if (!tienda || !fecha) return res.status(400).json({ success: false, error: 'Faltan datos' });
+
+        const { data: store } = await supabase.from('stores').select('configuracion').eq('id', tienda).single();
+        const cfg = store?.configuracion?.horario || {};
+        const apertura = cfg.apertura || '09:00';
+        const cierre = cfg.cierre || '18:00';
+        const diasLaborables = normalizeDias(cfg.dias);
+        const intervalo = parseInt(cfg.intervalo) || 60;
+
+        const fechaDate = new Date(fecha + 'T12:00:00');
+        const diaSemana = fechaDate.getDay();
+
+        if (!diasLaborables.includes(diaSemana)) {
+            return res.json({ success: true, slots: [], noLaborable: true });
+        }
+
+        const [hAp, mAp] = apertura.split(':').map(Number);
+        const [hCi, mCi] = cierre.split(':').map(Number);
+        const startMins = hAp * 60 + (mAp || 0);
+        const endMins = hCi * 60 + (mCi || 0);
+
+        const now = new Date();
+        const today = now.toISOString().split('T')[0];
+        const isToday = fecha === today;
+        const currentMins = now.getHours() * 60 + now.getMinutes();
+
+        const { data: ocupados } = await supabase.from('bookings')
+            .select('hora').eq('tienda', tienda).eq('fecha', fecha);
+        const ocupadasSet = new Set((ocupados || []).map(o => o.hora));
+
+        const slots = [];
+        for (let m = startMins; m < endMins; m += intervalo) {
+            const h = Math.floor(m / 60);
+            const min = m % 60;
+            const hora = `${String(h).padStart(2,'0')}:${String(min).padStart(2,'0')}`;
+            const ocupado = ocupadasSet.has(hora);
+            const pasado = isToday && m <= currentMins;
+            slots.push({ hora, ocupado, pasado, disponible: !ocupado && !pasado });
+        }
+
+        res.json({ success: true, slots, noLaborable: false });
+    } catch (e) { res.status(500).json({ success: false, error: e.message }); }
+});
+
+app.post('/api/reservas', async (req, res) => {
+    try {
+        const { tienda, producto_id, cliente_nombre, cliente_telefono, fecha, hora } = req.body;
+        if (!tienda || !producto_id || !cliente_nombre || !cliente_telefono || !fecha || !hora) {
+            return res.status(400).json({ success: false, error: 'Faltan datos' });
+        }
+        const { data: existente } = await supabase.from('bookings').select('id').eq('tienda', tienda).eq('fecha', fecha).eq('hora', hora).maybeSingle();
+        if (existente) return res.status(400).json({ success: false, error: 'Turno ya ocupado' });
+
+        const ahora = new Date();
+        if (new Date(`${fecha}T${hora}:00`) < ahora) {
+            return res.status(400).json({ success: false, error: 'No puedes reservar un turno pasado' });
+        }
+
+        const { error } = await supabase.from('bookings').insert({
+            tienda, producto_id, cliente_nombre, cliente_telefono, fecha, hora, estado: 'pendiente', created_at: new Date()
+        });
+        if (error) throw error;
+
+        import('./src/utils/pushNotifications.js').then(m => {
+            m.sendPushToAll({ title: `📅 Nueva Reserva`, body: `${cliente_nombre} - ${fecha} ${hora}`, url: `${APP_URL}/admin-cliente?tienda=${tienda}`, tienda }).catch(console.error);
+        }).catch(console.error);
+
+        res.json({ success: true });
+    } catch (e) { res.status(500).json({ success: false, error: e.message }); }
+});
+
+app.get('/api/reservas', async (req, res) => {
+    try {
+        const { tienda } = req.query;
+        let q = supabase.from('bookings').select('*').order('fecha', { ascending: false });
+        if (tienda) q = q.eq('tienda', tienda);
+        const { data } = await q;
+        if (data && data.length > 0) {
+            const productIds = [...new Set(data.map(b => b.producto_id))];
+            const { data: prods } = await supabase.from('products').select('id, nombre, precio, imagen, imagenes_servicio, whatsapp_proveedor, contacto_nombre').in('id', productIds);
+            const prodMap = {};
+            (prods || []).forEach(p => prodMap[p.id] = p);
+            data.forEach(b => { b.producto = prodMap[b.producto_id] || null; });
+        }
+        res.json(data || []);
+    } catch (e) { res.json([]); }
+});
+
+app.put('/api/reservas/:id/confirmar', async (req, res) => {
+    try {
+        await supabase.from('bookings').update({ estado: 'confirmado' }).eq('id', req.params.id);
+        res.json({ success: true });
+    } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.delete('/api/reservas/:id', async (req, res) => {
+    try {
+        await supabase.from('bookings').delete().eq('id', req.params.id);
+        res.json({ success: true });
+    } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// ============ CREAR TIENDA CLIENTE ============
+app.post('/api/crear-tienda-cliente', async (req, res) => {
+    try {
+        const { user_id, email, nombre_dueno, nombre_negocio, tipo, telefono, plan, fecha_vencimiento, direccion, hora_apertura, hora_cierre, tasa_usd, metodos_pago, garantia, transporte, dias_laborables, notificaciones_modo } = req.body;
+        if (!user_id || !nombre_negocio) return res.status(400).json({ success: false, error: 'Faltan datos' });
+        
+        const esSuperadmin = SUPERADMIN_EMAILS.includes((email || '').toLowerCase());
+        if (!esSuperadmin) {
+            const { data: exist } = await supabase.from('stores').select('id').eq('owner_id', user_id).maybeSingle();
+            if (exist) return res.status(400).json({ success: false, error: 'Ya tienes una tienda', codigo: 'TIENDA_EXISTENTE' });
+        }
+        
+        let slug = nombre_negocio.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^a-z0-9\-]/g, '');
+        const { data: dup } = await supabase.from('stores').select('id').eq('id', slug).maybeSingle();
+        if (dup) return res.status(400).json({ success: false, error: 'Nombre en uso', codigo: 'NOMBRE_DUPLICADO' });
+        
+        const maxProd = plan === 'premium' ? 100 : (plan === 'pro' ? 20 : (plan === 'basico' ? 10 : 5));
+        const tasa = (parseFloat(tasa_usd) > 0) ? parseFloat(tasa_usd) : 25;
+        const diasFinales = dias_laborables !== undefined ? normalizeDias(dias_laborables) : [1,2,3,4,5,6];
+        const modoNotif = ['admin', 'whatsapp', 'ambos'].includes(notificaciones_modo) ? notificaciones_modo : 'admin';
+
+        const { data, error } = await supabase.from('stores').insert({
+            id: slug, nombre: nombre_negocio, descripcion: 'Bienvenido a ' + nombre_negocio, icono: '🛒', categorias: ['otros'],
+            configuracion: {
+                tipo,
+                whatsapp_por_producto: false,
+                notificaciones_modo: modoNotif,
+                contacto: { telefono, email, ubicacion: direccion || 'Cuba' },
+                horario: { apertura: hora_apertura || '09:00', cierre: hora_cierre || '18:00', dias: diasFinales, intervalo: 60 },
+                envio: { disponible: transporte === true, costo: 0, tiempo_estimado: '24-48h' },
+                garantia: { disponible: garantia === true, duracion: '12 meses', descripcion: 'Garantía del vendedor' },
+                metodos_pago: Array.isArray(metodos_pago) && metodos_pago.length ? metodos_pago : ['Efectivo'],
+                datos_bancarios: { numero_tarjeta: '', whatsapp_confirmacion: telefono },
+                tasas: { CUP: 1, USD: 1 / tasa, EUR: 1 / (tasa * 1.1) }
+            },
+            owner_id: user_id, plan, fecha_vencimiento,
+            estado_pago: plan === 'prueba' ? 'prueba' : 'pendiente_pago',
+            max_productos: maxProd,
+            activa: plan === 'prueba', // Planes de pago quedan inactivos hasta confirmación
+            pausada: false,
+            es_superadmin: esSuperadmin,
+            pago_metodo: plan === 'prueba' ? null : 'transferencia',
+            pago_monto: plan === 'prueba' ? 0 : (plan === 'premium' ? 2500 : (plan === 'pro' ? 1500 : (plan === 'basico' ? 1000 : 0))),
+            created_at: new Date(), updated_at: new Date()
+        }).select();
+        
+        if (error) throw error;
+        
+        import('./src/utils/pushNotifications.js').then(m => { m.sendPushToAll({ title: '🏪 Nueva Tienda', body: `${nombre_negocio}${plan !== 'prueba' ? ' (Pago pendiente)' : ''}`, url: `${APP_URL}/admin`, tienda: null }).catch(console.error); }).catch(console.error);
+        
+        res.json({ success: true, slug, store: data[0], en_revision: plan !== 'prueba' });
+    } catch (error) { res.status(500).json({ success: false, error: error.message }); }
+});
+
+// ============ SUPER-ADMIN ============
+app.get('/api/superadmin/usuarios', async (req, res) => {
+    try {
+        const { data: userList } = await supabase.auth.admin.listUsers();
+        const usuarios = await Promise.all((userList?.users || []).map(async (u) => {
+            const { data: tienda } = await supabase.from('stores').select('id, nombre, plan, fecha_vencimiento, pausada, activa, pausada_por, pausada_mensaje').eq('owner_id', u.id).maybeSingle();
+            return { id: u.id, email: u.email, nombre: u.user_metadata?.full_name || 'Sin nombre', created_at: u.created_at, es_superadmin: SUPERADMIN_EMAILS.includes((u.email || '').toLowerCase()), tienda: tienda || null };
+        }));
+        res.json(usuarios);
+    } catch (error) { res.status(500).json({ error: error.message }); }
+});
+
+app.delete('/api/superadmin/usuarios/:id', async (req, res) => {
+    try {
+        const { data: userData } = await supabase.auth.admin.getUserById(req.params.id);
+        if (SUPERADMIN_EMAILS.includes((userData.user.email || '').toLowerCase())) return res.status(403).json({ error: 'No puedes eliminar un superadmin' });
+        const { data: tienda } = await supabase.from('stores').select('id').eq('owner_id', req.params.id).maybeSingle();
+        if (tienda) {
+            await borrarTodoDeTienda(tienda.id);
+        }
+        await supabase.auth.admin.deleteUser(req.params.id);
+        res.json({ success: true });
+    } catch (error) { res.status(500).json({ success: false, error: error.message }); }
+});
+
+app.get('/api/superadmin/tiendas', async (req, res) => {
+    try {
+        const { data } = await supabase.from('stores').select('*').order('created_at', { ascending: false });
+        const tiendas = await Promise.all((data || []).map(async (t) => {
+            const { count } = await supabase.from('products').select('*', { count: 'exact', head: true }).eq('tienda', t.id);
+            let ownerEmail = null;
+            if (t.owner_id) { try { const { data: u } = await supabase.auth.admin.getUserById(t.owner_id); if (u?.user) ownerEmail = u.user.email; } catch (e) {} }
+            const esMia = t.es_superadmin === true || !t.owner_id || (ownerEmail && SUPERADMIN_EMAILS.includes(ownerEmail.toLowerCase()));
+            return { ...t, productos_count: count || 0, owner_email: ownerEmail, es_mia: !!esMia };
+        }));
+        res.json(tiendas);
+    } catch (error) { res.status(500).json({ error: error.message }); }
+});
+
+app.post('/api/superadmin/extender/:id', async (req, res) => {
+    try {
+        const d = new Date(); d.setDate(d.getDate() + 30);
+        await supabase.from('stores').update({ fecha_vencimiento: d.toISOString(), estado_pago: 'activo' }).eq('id', req.params.id);
+        res.json({ success: true });
+    } catch (error) { res.status(500).json({ error: error.message }); }
+});
+
+app.post('/api/superadmin/pausar/:id', async (req, res) => {
+    try {
+        const pausar = req.body.pausar === true;
+        const update = { pausada: pausar, updated_at: new Date() };
+        if (pausar) {
+            update.pausada_por = 'admin';
+            update.pausada_mensaje = (req.body.mensaje || 'Tienda pausada por administración').toString().slice(0, 200);
+        } else {
+            update.pausada_por = null;
+            update.pausada_mensaje = null;
+        }
+        await supabase.from('stores').update(update).eq('id', req.params.id);
+        res.json({ success: true });
+    } catch (error) { res.status(500).json({ error: error.message }); }
+});
+
+app.delete('/api/superadmin/tiendas/:id', async (req, res) => {
+    try {
+        await borrarTodoDeTienda(req.params.id);
+        res.json({ success: true });
+    } catch (error) { res.status(500).json({ error: error.message }); }
+});
+
+app.post('/api/superadmin/tiendas/:id/tiempo', async (req, res) => {
+    try {
+        const { dias, horas } = req.body;
+        const { data: tienda } = await supabase.from('stores').select('fecha_vencimiento').eq('id', req.params.id).single();
+        let base = new Date();
+        if (tienda?.fecha_vencimiento && new Date(tienda.fecha_vencimiento) > base && !tienda.fecha_vencimiento.startsWith('9999')) base = new Date(tienda.fecha_vencimiento);
+        base.setDate(base.getDate() + parseInt(dias || 0));
+        base.setHours(base.getHours() + parseInt(horas || 0));
+        await supabase.from('stores').update({ fecha_vencimiento: base.toISOString(), estado_pago: 'activo' }).eq('id', req.params.id);
+        res.json({ success: true, nuevaFecha: base.toISOString() });
+    } catch (error) { res.status(500).json({ success: false, error: error.message }); }
+});
+
+app.post('/api/superadmin/tiendas/:id/cancelar', async (req, res) => {
+    try {
+        await supabase.from('stores').update({ fecha_vencimiento: new Date().toISOString(), estado_pago: 'cancelado' }).eq('id', req.params.id);
+        res.json({ success: true });
+    } catch (error) { res.status(500).json({ success: false, error: error.message }); }
+});
+
+// ============================================================
+// SISTEMA DE PAGO - Tienda-FG Enterprise
+// ============================================================
+
+// ============ CONFIRMAR PAGO DE TIENDA ============
+app.post('/api/superadmin/confirmar-pago/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { admin_email, pago_referencia, pago_notas } = req.body;
+        
+        // Obtener datos actuales de la tienda
+        const { data: tienda, error: errGet } = await supabase.from('stores')
+            .select('id, nombre, plan, owner_id, pago_monto, fecha_vencimiento')
+            .eq('id', id).single();
+        if (errGet || !tienda) return res.status(404).json({ success: false, error: 'Tienda no encontrada' });
+        
+        // Calcular nueva fecha de vencimiento (30 días desde hoy)
+        const nuevaFecha = new Date();
+        nuevaFecha.setDate(nuevaFecha.getDate() + 30);
+        
+        const updatePayload = {
+            estado_pago: 'pagado',
+            activa: true,
+            fecha_pago: new Date().toISOString(),
+            pago_confirmado_por: admin_email || 'admin',
+            pago_referencia: pago_referencia || null,
+            pago_notas: pago_notas || null,
+            fecha_vencimiento: nuevaFecha.toISOString(),
+            updated_at: new Date().toISOString()
+        };
+        
+        const { error } = await supabase.from('stores').update(updatePayload).eq('id', id);
+        if (error) throw error;
+        
+        // Notificar al dueño de la tienda vía push
+        import('./src/utils/pushNotifications.js').then(m => {
+            m.sendPushToAll({
+                title: '✅ Pago Confirmado',
+                body: `Tu tienda "${tienda.nombre}" ya está pública. ¡Comienza a vender!`,
+                url: `${APP_URL}/admin-cliente?tienda=${id}`,
+                tienda: id
+            }).catch(console.error);
+        }).catch(console.error);
+        
+        res.json({ success: true, mensaje: 'Pago confirmado. Tienda liberada públicamente.', fecha_vencimiento: nuevaFecha.toISOString() });
+    } catch (error) {
+        console.error('❌ [confirmar-pago]', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// ============ RECHAZAR PAGO DE TIENDA ============
+app.post('/api/superadmin/rechazar-pago/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { admin_email, motivo } = req.body;
+        
+        const updatePayload = {
+            estado_pago: 'cancelado',
+            activa: false,
+            pago_notas: motivo || 'Pago rechazado por administración',
+            pago_confirmado_por: admin_email || 'admin',
+            updated_at: new Date().toISOString()
+        };
+        
+        const { error } = await supabase.from('stores').update(updatePayload).eq('id', id);
+        if (error) throw error;
+        
+        res.json({ success: true, mensaje: 'Pago rechazado. Tienda permanece oculta.' });
+    } catch (error) {
+        console.error('❌ [rechazar-pago]', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// ============ LISTAR PAGOS PENDIENTES ============
+app.get('/api/superadmin/pagos-pendientes', async (req, res) => {
+    try {
+        const { data } = await supabase.from('stores')
+            .select('*')
+            .eq('estado_pago', 'pendiente_pago')
+            .order('created_at', { ascending: false });
+        
+        const tiendas = await Promise.all((data || []).map(async (t) => {
+            let ownerEmail = null;
+            if (t.owner_id) {
+                try {
+                    const { data: u } = await supabase.auth.admin.getUserById(t.owner_id);
+                    if (u?.user) ownerEmail = u.user.email;
+                } catch (e) {}
+            }
+            return {
+                ...t,
+                owner_email: ownerEmail,
+                dias_desde_creacion: Math.floor((Date.now() - new Date(t.created_at).getTime()) / (1000 * 60 * 60 * 24))
+            };
+        }));
+        
+        res.json(tiendas);
+    } catch (error) { res.status(500).json({ success: false, error: error.message }); }
+});
+
+// ============ VERIFICAR TIENDA PÚBLICA (visibilidad pública) ============
+app.get('/api/tienda-publica/:slug', async (req, res) => {
+    try {
+        const { slug } = req.params;
+        const { data: tienda, error } = await supabase.from('stores')
+            .select('id, nombre, activa, estado_pago, pausada, pausada_mensaje, plan')
+            .eq('id', slug)
+            .maybeSingle();
+        
+        if (error || !tienda) {
+            return res.json({ success: false, codigo: 'NO_ENCONTRADA', mensaje: 'Tienda no encontrada' });
+        }
+        
+        // Verificar si la tienda está disponible públicamente
+        if (!tienda.activa || tienda.estado_pago === 'pendiente_pago') {
+            return res.json({
+                success: false,
+                codigo: 'EN_REVISION',
+                mensaje: 'Esta tienda está en proceso de revisión. Próximamente disponible.',
+                tienda_nombre: tienda.nombre,
+                estado_pago: tienda.estado_pago
+            });
+        }
+        
+        if (tienda.estado_pago === 'cancelado') {
+            return res.json({
+                success: false,
+                codigo: 'CANCELADA',
+                mensaje: 'Esta tienda no está disponible.',
+                tienda_nombre: tienda.nombre
+            });
+        }
+        
+        if (tienda.pausada) {
+            return res.json({
+                success: false,
+                codigo: 'PAUSADA',
+                mensaje: tienda.pausada_mensaje || 'Tienda temporalmente pausada',
+                tienda_nombre: tienda.nombre
+            });
+        }
+        
+        res.json({ success: true, tienda: tienda });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// ============ CONFIGURACIÓN DE PAGO (Público) ============
+app.get('/api/config-pago', async (req, res) => {
+    try {
+        const { data: configRow } = await supabase.from('config')
+            .select('pago_config')
+            .eq('id', 1)
+            .maybeSingle();
+        
+        const configDefault = {
+            tarjeta_numero: '9200 XXXX XXXX XXXX',
+            tarjeta_titular: 'Francisco García',
+            whatsapp: '+5353571569',
+            whatsapp_nombre: 'Francisco García',
+            email: 'pagos@tienda-fg.com',
+            instrucciones: 'Realiza la transferencia del monto correspondiente a tu plan y envía el comprobante por WhatsApp. Una vez confirmado el pago, tu tienda será liberada públicamente.',
+            activo: true
+        };
+        
+        res.json(configRow?.pago_config || configDefault);
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+});
+
+// ============ ACTUALIZAR CONFIGURACIÓN DE PAGO (Admin) ============
+app.put('/api/superadmin/config-pago', async (req, res) => {
+    try {
+        const { tarjeta_numero, tarjeta_titular, whatsapp, whatsapp_nombre, email, instrucciones, activo } = req.body;
+        
+        const pago_config = {
+            tarjeta_numero: tarjeta_numero || '9200 XXXX XXXX XXXX',
+            tarjeta_titular: tarjeta_titular || 'Francisco García',
+            whatsapp: whatsapp || '+5353571569',
+            whatsapp_nombre: whatsapp_nombre || 'Francisco García',
+            email: email || 'pagos@tienda-fg.com',
+            instrucciones: instrucciones || 'Realiza la transferencia y envía comprobante por WhatsApp.',
+            activo: activo !== false,
+            actualizado: new Date().toISOString()
+        };
+        
+        const { data: current } = await supabase.from('config').select('*').eq('id', 1).maybeSingle();
+        if (current) {
+            await supabase.from('config').update({ pago_config }).eq('id', 1);
+        } else {
+            await supabase.from('config').insert({
+                id: 1,
+                moneda_base: 'CUP',
+                tasas: { CUP: 1, USD: 0.04, EUR: 0.037 },
+                pago_config
+            });
+        }
+        
+        res.json({ success: true, pago_config });
+    } catch (e) {
+        res.status(500).json({ success: false, error: e.message });
+    }
+});
+
+app.post('/api/superadmin/crear-tienda', async (req, res) => {
+    try {
+        const { email, nombre_negocio, nombre, icono, descripcion, categorias, telefono, email_contacto, ubicacion, apertura, cierre, tasaUSD, tasaEUR, tarjeta, whatsapp, tipo, plan, permanente, dias_laborables, notificaciones_modo } = req.body;
+        const finalNombre = (nombre || nombre_negocio || '').trim();
+        if (!email || !finalNombre) return res.status(400).json({ success: false, error: 'Email y nombre obligatorios' });
+        const { data: userList } = await supabase.auth.admin.listUsers();
+        const user = userList?.users?.find(u => u.email?.toLowerCase() === email.toLowerCase());
+        if (!user) return res.status(404).json({ success: false, error: 'Usuario no encontrado' });
+        let slug = finalNombre.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^a-z0-9\-]/g, '');
+        if (!slug) slug = 'tienda-' + Date.now();
+        const { data: dup } = await supabase.from('stores').select('id').eq('id', slug).maybeSingle();
+        if (dup) slug = slug + '-' + Math.floor(Math.random() * 1000);
+        const fv = new Date(); fv.setDate(fv.getDate() + 30);
+        const usd = (parseFloat(tasaUSD) > 0) ? parseFloat(tasaUSD) : 25;
+        const eur = (parseFloat(tasaEUR) > 0) ? parseFloat(tasaEUR) : 27;
+        let cats = ['otros'];
+        if (Array.isArray(categorias) && categorias.length) cats = categorias;
+        else if (typeof categorias === 'string' && categorias.trim()) cats = categorias.split(',').map(c => c.trim()).filter(Boolean);
+        const maxProd = plan === 'premium' ? 100 : (plan === 'pro' ? 20 : (plan === 'basico' ? 10 : 5));
+        const diasFinales = dias_laborables !== undefined ? normalizeDias(dias_laborables) : [1,2,3,4,5,6];
+        const modoNotif = ['admin', 'whatsapp', 'ambos'].includes(notificaciones_modo) ? notificaciones_modo : 'admin';
+
+        await supabase.from('stores').insert({
+            id: slug, nombre: finalNombre, descripcion: (descripcion || '').trim() || ('Bienvenido a ' + finalNombre),
+            icono: (icono || '🛒').slice(0, 4), categorias: cats,
+            configuracion: {
+                tipo: tipo || 'tienda',
+                whatsapp_por_producto: false,
+                notificaciones_modo: modoNotif,
+                contacto: { telefono: telefono || '', email: email_contacto || email, ubicacion: ubicacion || '' },
+                horario: { apertura: apertura || '09:00', cierre: cierre || '18:00', dias: diasFinales, intervalo: 60 },
+                envio: { disponible: true, costo: 0, tiempo_estimado: '24-48h' },
+                garantia: { disponible: true, duracion: '12 meses', descripcion: 'Garantía del vendedor' },
+                metodos_pago: ['Efectivo', 'Transferencia'],
+                datos_bancarios: { numero_tarjeta: tarjeta || '', whatsapp_confirmacion: whatsapp || telefono || '' },
+                tasas: { CUP: 1, USD: 1 / usd, EUR: 1 / eur }
+            },
+            owner_id: user.id, plan: plan || 'basico', fecha_vencimiento: permanente ? '9999-12-31T23:59:59.000Z' : fv.toISOString(),
+            estado_pago: 'activo', max_productos: maxProd, activa: true, pausada: false, es_superadmin: true, created_at: new Date(), updated_at: new Date()
+        });
+        res.json({ success: true, slug });
+    } catch (error) { res.status(500).json({ success: false, error: error.message }); }
+});
+
+app.post('/api/superadmin/crear-producto', async (req, res) => {
+    try {
+        const { tienda, nombre, descripcion, precio, descuento, categoria, imagen, disponible, garantia, transporte, whatsapp_proveedor, contacto_nombre, requiere_carnet } = req.body;
+        if (!tienda || !nombre || !precio) return res.status(400).json({ success: false, error: 'Faltan datos' });
+        let descFinal = descripcion || '';
+        if (garantia || transporte) {
+            descFinal += `\n\n--- Detalles ---\n`;
+            if (garantia) descFinal += `🛡️ Garantía: ${garantia}\n`;
+            if (transporte) descFinal += `🚚 Transporte: ${transporte}\n`;
+        }
+        const { data, error } = await supabase.from('products').insert({
+            tienda, nombre, descripcion: descFinal.trim(), precio: parseFloat(precio), descuento: parseInt(descuento) || 0,
+            categoria: categoria || 'otros', imagen: imagen || 'https://via.placeholder.com/300',
+            disponible: disponible === true || disponible === 'true', tamanio: 'pequeno',
+            whatsapp_proveedor: (whatsapp_proveedor || '').trim() || null,
+            contacto_nombre: (contacto_nombre || '').trim() || null,
+            requiere_carnet: requiere_carnet === true || requiere_carnet === 'true',
+            created_at: new Date(), updated_at: new Date()
+        }).select();
+        if (error) throw error;
+        res.json({ success: true, product: data[0] });
+    } catch (error) { res.status(500).json({ success: false, error: error.message }); }
+});
+
+app.put('/api/superadmin/tiendas/:id/contexto', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { tipo, whatsapp_por_producto, notificaciones_modo } = req.body;
+
+        const { data: tienda } = await supabase.from('stores').select('configuracion').eq('id', id).single();
+        if (!tienda) return res.status(404).json({ success: false, error: 'Tienda no encontrada' });
+
+        const cfg = tienda.configuracion || {};
+        cfg.tipo = tipo === 'reserva' ? 'reserva' : 'tienda';
+        cfg.whatsapp_por_producto = whatsapp_por_producto === true;
+        if (notificaciones_modo && ['admin', 'whatsapp', 'ambos'].includes(notificaciones_modo)) {
+            cfg.notificaciones_modo = notificaciones_modo;
+        }
+
+        const { error } = await supabase.from('stores').update({
+            configuracion: cfg,
+            updated_at: new Date()
+        }).eq('id', id);
+
+        if (error) throw error;
+        res.json({ success: true, configuracion: cfg });
+    } catch (error) {
+        console.error('❌ [cambiar contexto]', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// ============ PLANES (Oficiales y Admin) ============
+app.get('/api/planes', async (req, res) => {
+    try {
+        const { data } = await supabase.from('plans').select('*').eq('activo', true).order('precio', { ascending: true });
+        if (!data || data.length === 0) {
+            return res.json([
+                { id: 'prueba', nombre: 'Prueba', precio: 0, max_productos: 5, duracion_dias: 7, activo: true, caracteristicas: ['5 productos', '7 días', 'Soporte básico'] },
+                { id: 'basico', nombre: 'Básico', precio: 5, max_productos: 10, duracion_dias: 30, activo: true, caracteristicas: ['10 productos', '30 días', 'Notificaciones push'] },
+                { id: 'pro', nombre: 'Pro', precio: 10, max_productos: 20, duracion_dias: 30, activo: true, caracteristicas: ['20 productos', '30 días', 'Notificaciones push', 'Soporte prioritario'] },
+                { id: 'premium', nombre: 'Premium', precio: 20, max_productos: 100, duracion_dias: 30, activo: true, caracteristicas: ['100 productos', '30 días', 'Notificaciones push', 'Soporte prioritario', 'Tienda destacada'] }
+            ]);
+        }
+        res.json(data);
+    } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.get('/api/superadmin/planes', async (req, res) => {
+    try {
+        const { data } = await supabase.from('plans').select('*').order('precio', { ascending: true });
+        if (!data || data.length === 0) {
+            return res.json([
+                { id: 'prueba', nombre: 'Prueba', precio: 0, max_productos: 5, duracion_dias: 7, activo: true, caracteristicas: ['5 productos', '7 días', 'Soporte básico'] },
+                { id: 'basico', nombre: 'Básico', precio: 5, max_productos: 10, duracion_dias: 30, activo: true, caracteristicas: ['10 productos', '30 días', 'Notificaciones push'] },
+                { id: 'pro', nombre: 'Pro', precio: 10, max_productos: 20, duracion_dias: 30, activo: true, caracteristicas: ['20 productos', '30 días', 'Notificaciones push', 'Soporte prioritario'] },
+                { id: 'premium', nombre: 'Premium', precio: 20, max_productos: 100, duracion_dias: 30, activo: true, caracteristicas: ['100 productos', '30 días', 'Notificaciones push', 'Soporte prioritario', 'Tienda destacada'] }
+            ]);
+        }
+        res.json(data);
+    } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.put('/api/superadmin/planes/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { nombre, precio, max_productos, duracion_dias, caracteristicas, activo } = req.body;
+        const payload = {
+            nombre: nombre || id,
+            precio: parseFloat(precio) || 0,
+            max_productos: parseInt(max_productos) || 5,
+            duracion_dias: parseInt(duracion_dias) || 30,
+            caracteristicas: Array.isArray(caracteristicas) ? caracteristicas : [],
+            activo: activo !== false,
+            updated_at: new Date()
+        };
+        const { error } = await supabase.from('plans').upsert({ id, ...payload });
+        if (error) throw error;
+        res.json({ success: true });
+    } catch (e) { res.status(500).json({ success: false, error: e.message }); }
+});
+
+// ============ PRIVACIDAD (Oficial y Admin) ============
+app.get('/api/privacidad', async (req, res) => {
+    try {
+        const { data } = await supabase.from('config').select('*').eq('id', 1).maybeSingle();
+        
+        const privacidadOficial = {
+            titulo: 'Política de Privacidad y Términos de Uso',
+            contenido: `Bienvenido a Tienda-FG. Nos tomamos muy en serio la privacidad de nuestros usuarios y dueños de tiendas.
+
+1. INFORMACIÓN QUE RECOPILAMOS
+Recopilamos únicamente los datos necesarios para procesar tus pedidos: nombre, número de teléfono, dirección de entrega y, en algunos casos, número de carnet de identidad (si el vendedor lo requiere explícitamente). Esta información es compartida directamente con el dueño de la tienda para gestionar la venta.
+
+2. USO DE LA INFORMACIÓN
+Los datos proporcionados se utilizan exclusivamente para la comunicación entre el cliente y el vendedor, procesar el envío y mejorar la experiencia de compra. No vendemos ni compartimos tu información con terceros ajenos a la transacción.
+
+3. PAGOS
+Tienda-FG no procesa pagos directamente. Las transacciones se realizan a través de los métodos de pago acordados con el vendedor (Efectivo, Transferencia, etc.). No almacenamos datos bancarios sensibles.
+
+4. NOTIFICACIONES PUSH
+Si activas las notificaciones, utilizaremos tu navegador para enviarte alertas sobre el estado de tus pedidos y nuevas ofertas de tus tiendas favoritas. Puedes desactivar esto en cualquier momento desde la configuración de tu navegador.
+
+5. CONTACTO
+Si tienes dudas sobre esta política, puedes contactar al administrador del sistema a través del soporte técnico.
+
+Al utilizar esta plataforma, aceptas los términos aquí descritos.`,
+            actualizado: new Date().toISOString()
+        };
+
+        res.json(data?.privacidad || privacidadOficial);
+    } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.put('/api/superadmin/privacidad', async (req, res) => {
+    try {
+        const { titulo, contenido } = req.body;
+        const { data: current } = await supabase.from('config').select('*').eq('id', 1).maybeSingle();
+        const privacidad = { titulo: titulo || 'Política de Privacidad', contenido: contenido || '', actualizado: new Date().toISOString() };
+        if (current) {
+            await supabase.from('config').update({ privacidad }).eq('id', 1);
+        } else {
+            await supabase.from('config').insert({ id: 1, moneda_base: 'CUP', tasas: { CUP: 1, USD: 0.04, EUR: 0.037 }, privacidad });
+        }
+        res.json({ success: true, privacidad });
+    } catch (e) { res.status(500).json({ success: false, error: e.message }); }
+});
+
+// ============ FUNCIÓN AUXILIAR BORRAR TIENDA ============
+async function borrarTodoDeTienda(slug) {
+    try {
+        await supabase.from('products').delete().eq('tienda', slug);
+        await supabase.from('bookings').delete().eq('tienda', slug);
+        await supabase.from('orders').delete().eq('tienda', slug);
+        await supabase.from('push_subscriptions').delete().eq('tienda_id', slug);
+        await supabase.from('stores').delete().eq('id', slug);
+        return true;
+    } catch (e) { console.error('Error borrando tienda:', e); return false; }
+}
+
+// ============ ROUTES & HTML ============
+app.use('/api', apiRoutes);
+app.use('/api/admin', adminRoutes);
+
+app.get('/admin-cliente', (req, res) => sendHtml(res, 'admin-cliente.html'));
+app.get('/admin', (req, res) => sendHtml(res, 'admin.html'));
+app.get('/', (req, res) => sendHtml(res, 'index.html'));
+
+app.use((req, res) => {
+    if (req.path.startsWith('/api/')) return res.status(404).json({ success: false, error: 'Endpoint no encontrado' });
+    sendHtml(res, 'offline.html');
+});
+
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`🚀 Puerto ${PORT}`);
+    console.log(`🌐 URL Pública: ${APP_URL}`);
+    console.log(`👑 Superadmins: ${SUPERADMIN_EMAILS.join(', ') || '⚠️ NINGUNO'}`);
+});
