@@ -1,5 +1,5 @@
 // ============================================================
-// src/controllers/orderController.js — CORREGIDO v3 (FIX COMPRA)
+// src/controllers/orderController.js — CORREGIDO v4 (BLINDADO)
 // ============================================================
 
 import { supabase } from '../config/supabase.js';
@@ -8,10 +8,6 @@ import { rateLimitStore } from '../middlewares/rateLimit.js';
 import { sendPushToAll } from '../utils/pushNotifications.js';
 
 // 🚨 Resuelve el WhatsApp al que debe ir el pedido.
-//    - Si la tienda está en modo RESERVA → siempre el WhatsApp de la tienda (confirmación).
-//    - Si la tienda tiene multi-contacto activo → usa el whatsapp_proveedor del PRIMER ítem que lo tenga.
-//    - Si no → el WhatsApp de la tienda (datos_bancarios.whatsapp_confirmacion || contacto.telefono).
-//    - Siempre devuelve también el nombre del contacto, para mostrarlo en el admin.
 async function resolverContacto(tienda, items) {
     try {
         const { data: store } = await supabase
@@ -74,12 +70,11 @@ export const createOrder = async (req, res) => {
 
         const items = req.body.items || [];
 
-        // 🚨 Resolver contacto (multi-contacto o tienda, NUNCA proveedor en reserva)
+        // 🚨 Resolver contacto (multi-contacto o tienda)
         const contacto = await resolverContacto(tienda, items);
 
-        // 🚨 FIX 1: Se eliminó "id: nextId" (Supabase lo genera solo)
-        // 🚨 FIX 2: Se eliminó "contacto_origen" (la columna no existe en la BD)
-        const { data: orderData, error: insertError } = await supabase.from('orders').insert({
+        // 1. Preparamos los datos base
+        const orderDataToInsert = {
             codigo_cliente: codigoCliente,
             tienda,
             nombre: req.body.nombre?.slice(0, 60),
@@ -90,19 +85,52 @@ export const createOrder = async (req, res) => {
             total: req.body.total || 0,
             moneda: req.body.moneda || 'CUP',
             metodo_pago: req.body.metodoPago || 'Efectivo',
-            
-            // 🚨 El pedido SIEMPRE pertenece a la tienda del admin.
             whatsapp_destino: contacto.whatsapp || null,
             contacto_nombre: contacto.contacto_nombre || null,
-            
             estado: 'pendiente',
             created_at: new Date(),
             updated_at: new Date()
-        }).select().single();
+        };
+
+        // 2. Intentamos insertar. Si falla porque falta una columna, la borramos y reintentamos.
+        let insertError = null;
+        let orderData = null;
+        let intentos = 0;
+        const maxIntentos = 4; // Evita un bucle infinito
+
+        while (intentos < maxIntentos) {
+            const { data, error } = await supabase.from('orders').insert(orderDataToInsert).select().single();
+            
+            if (error) {
+                // Detectamos si el error es por falta de columna
+                if (error.message.includes('Could not find the') && error.message.includes('column')) {
+                    const match = error.message.match(/the '([^']+)' column/);
+                    if (match && match[1]) {
+                        const missingColumn = match[1];
+                        console.warn(`⚠️ [Supabase] Falta la columna "${missingColumn}". Eliminándola y reintentando...`);
+                        delete orderDataToInsert[missingColumn];
+                        intentos++;
+                        continue; // Reintentamos el bucle sin esa columna
+                    }
+                }
+                // Si es otro tipo de error, guardamos y salimos
+                insertError = error;
+                break;
+            } else {
+                // ¡Éxito!
+                orderData = data;
+                insertError = null;
+                break;
+            }
+        }
 
         if (insertError) {
-            console.error('❌ [Supabase Insert Error]:', insertError);
+            console.error('❌ [Supabase Insert Error Fatal]:', insertError);
             throw insertError;
+        }
+
+        if (!orderData) {
+            throw new Error("No se pudo guardar el pedido después de varios intentos.");
         }
 
         if (record) {
@@ -110,7 +138,7 @@ export const createOrder = async (req, res) => {
             rateLimitStore.set(ip, record);
         }
 
-        // Push SOLO al admin de la tienda (nunca al proveedor)
+        // Push SOLO al admin de la tienda
         sendPushToAll({
             title: `🛒 ¡Nuevo Pedido en ${tienda.toUpperCase()}!`,
             body: `${req.body.nombre} - Total: $${parseFloat(req.body.total).toFixed(2)}`,
