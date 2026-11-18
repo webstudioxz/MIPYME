@@ -1,0 +1,30 @@
+{
+  "name": "tienda-fg",
+  "version": "6.0.0",
+  "description": "Tienda-FG — Plataforma de comercio electrónico multi-tienda con Supabase",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.0",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "multer": "^1.4.5-lts.1",
+    "web-push": "^3.6.7"
+  },
+  "keywords": [
+    "ecommerce",
+    "supabase",
+    "multi-tienda",
+    "express"
+  ],
+  "author": "Francisco García",
+  "license": "UNLICENSED",
+  "private": true
+}
