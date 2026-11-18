@@ -1,0 +1,1467 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+    <title id="dynamicTitle">Tienda-fg - Calidad y Confianza</title>
+    <meta name="description" id="metaDescription" content="Compra los mejores productos con calma y consciencia.">
+    <meta name="theme-color" content="#0A1128">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Tienda-fg - Calidad y Confianza">
+    <meta property="og:description" content="Compra los mejores productos con calma y consciencia.">
+    <meta property="og:image" content="https://i.ibb.co/LDG7Gf2d/fotor-ai-2025020222510.jpg">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="apple-touch-icon" href="https://i.ibb.co/LDG7Gf2d/fotor-ai-2025020222510.jpg">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="/css/global.css?v=28">
+    <link rel="stylesheet" href="/css/store.css?v=28">
+
+    <!-- FIX: Oculta la tienda mientras el usuario está en modo registro (?registro=1) -->
+    <style id="registroModeStyle">
+        html.registro-mode .site-header,
+        html.registro-mode .sticky-nav,
+        html.registro-mode #main-content,
+        html.registro-mode .site-footer,
+        html.registro-mode .bottom-nav,
+        html.registro-mode #overlayPlans,
+        html.registro-mode #overlayAbout,
+        html.registro-mode #resumePaymentBanner { display: none !important; }
+        html.registro-mode body { background: #F6F8FB !important; }
+        html.registro-mode::before {
+            content: 'Preparando tu formulario...';
+            position: fixed; inset: 0;
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 700; font-size: 1.1rem; color: #1E64FF;
+            background: #F6F8FB;
+            z-index: 999;
+        }
+    </style>
+    <script>
+        // FIX: Detectar ?registro=1 lo antes posible para ocultar la tienda y mostrar solo el formulario
+        (function() {
+            try {
+                var urlParams = new URLSearchParams(window.location.search);
+                if (urlParams.get('registro') === '1') {
+                    document.documentElement.classList.add('registro-mode');
+                }
+            } catch (e) {}
+        })();
+    </script>
+
+    <style id="premiumSystem">
+        :root { --ink: #0A1128; --ink-2: #1A2B4C; --brand: #1E64FF; --brand-deep: #1248C7; --brand-tint: #EAF1FF; --gold: #B8914A; --bg: #F6F8FB; --card: #FFFFFF; --line: #E3E8F0; --line-soft: #EEF2F7; --text: #0F172A; --muted: #5B6B85; --ok: #0F9D6E; --danger: #D93A3A; --r-sm: 8px; --r-md: 12px; --r-lg: 16px; --r-xl: 24px; --sh-1: 0 1px 2px rgba(10,17,40,.05); --sh-2: 0 6px 16px -6px rgba(10,17,40,.12); --sh-3: 0 24px 48px -16px rgba(10,17,40,.22); --sh-brand: 0 10px 24px -10px rgba(30,100,255,.55); --header-h: 68px; --font-display: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif; --font-body: 'Inter', -apple-system, sans-serif; --ease: cubic-bezier(.22,.61,.36,1); }
+        *, *::before, *::after { box-sizing: border-box; }
+        html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; overflow-x: hidden; scroll-padding-top: 130px; }
+        body { font-family: var(--font-body) !important; background: var(--bg) !important; color: var(--text) !important; -webkit-font-smoothing: antialiased; line-height: 1.6; margin: 0; overflow-x: hidden; max-width: 100vw; }
+        a { text-decoration: none; } button { font-family: inherit; } img { max-width: 100%; }
+        :focus-visible { outline: 3px solid var(--brand); outline-offset: 2px; border-radius: 6px; }
+        .site-header { position: sticky !important; top: 0; z-index: 1000; background: rgba(255,255,255,.86) !important; backdrop-filter: blur(18px) saturate(170%); border-bottom: 1px solid var(--line) !important; box-shadow: none !important; }
+        .header-inner { max-width: 1320px; margin: 0 auto; padding: 12px 28px !important; display: flex !important; align-items: center; gap: 18px; min-height: var(--header-h); }
+        .logo-container { display: flex !important; align-items: center; gap: 12px; flex-shrink: 0; }
+        .logo-img { width: 40px !important; height: 40px !important; border-radius: var(--r-md) !important; object-fit: cover; box-shadow: 0 0 0 1px var(--line) !important; }
+        .brand-name { font-family: var(--font-display) !important; font-weight: 800 !important; font-size: 1.25rem !important; color: var(--ink) !important; white-space: nowrap; }
+        .header-search { flex: 1; max-width: 520px; display: flex !important; align-items: center; background: #EEF2F7 !important; border-radius: var(--r-md) !important; padding: 10px 16px !important; border: 1.5px solid transparent !important; transition: background .2s, border-color .2s; }
+        .header-search:focus-within { background: #fff !important; border-color: var(--brand) !important; box-shadow: 0 0 0 4px rgba(30,100,255,.12) !important; }
+        .header-search > i { color: #8393AD; margin-right: 12px; } .header-search input { border: 0; background: transparent; outline: 0; flex: 1; font-size: .92rem; color: var(--text); font-weight: 500; }
+        .header-right { display: flex !important; align-items: center; gap: 10px; margin-left: auto; }
+        .currency-dropdown { position: relative; }
+        .currency-btn { display: flex !important; align-items: center; gap: 8px; background: #EEF2F7; border: 1.5px solid transparent; border-radius: var(--r-md); padding: 9px 14px; font-weight: 600; font-size: .85rem; color: var(--text); cursor: pointer; }
+        .currency-menu { position: absolute; top: calc(100% + 8px); right: 0; min-width: 210px; background: #fff; border: 1px solid var(--line); border-radius: var(--r-md); box-shadow: var(--sh-3); padding: 6px; opacity: 0; visibility: hidden; transform: translateY(-6px); transition: all .18s; z-index: 1100; }
+        .currency-dropdown:hover .currency-menu, .currency-dropdown.open .currency-menu { opacity: 1; visibility: visible; transform: none; }
+        .currency-option { display: flex !important; align-items: center; gap: 10px; padding: 10px 12px; border-radius: var(--r-sm); font-size: .88rem; cursor: pointer; }
+        .currency-option:hover { background: #F1F5F9; } .currency-option.active { background: var(--brand-tint); color: var(--brand-deep); font-weight: 700; }
+        .icon-action, .menu-toggle { background: #EEF2F7; border: 1.5px solid transparent; border-radius: var(--r-md); width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: var(--text); cursor: pointer; }
+        .menu-toggle { display: none; }
+        .cart-badge { position: absolute; top: -6px; right: -6px; background: var(--brand); color: #fff; font-size: .62rem; font-weight: 800; min-width: 19px; height: 19px; border-radius: 10px; display: flex; align-items: center; justify-content: center; padding: 0 5px; box-shadow: 0 0 0 2px #fff; }
+        .sticky-nav { position: sticky; top: var(--header-h); z-index: 900; background: rgba(246,248,251,.92) !important; backdrop-filter: blur(12px); border-bottom: 1px solid var(--line-soft) !important; padding: 12px 28px !important; display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; }
+        .sticky-nav::-webkit-scrollbar { display: none; }
+        .sticky-nav > * { flex-shrink: 0; background: #fff; border: 1px solid var(--line) !important; border-radius: 999px !important; padding: 8px 18px !important; font-weight: 600; font-size: .85rem; color: var(--muted) !important; cursor: pointer; }
+        .sticky-nav > *.active { background: var(--ink) !important; border-color: var(--ink) !important; color: #fff !important; }
+        #main-content { max-width: 1320px; margin: 0 auto; padding: 0 28px; }
+        .hero { position: relative !important; margin: 32px 0 28px !important; padding: 88px 56px !important; border-radius: var(--r-xl) !important; background: var(--ink) !important; overflow: hidden; text-align: left; }
+        .hero::after { content: ''; position: absolute; right: 0; top: 0; bottom: 0; width: 38%; background: linear-gradient(120deg, transparent, rgba(30,100,255,.38)); }
+        .hero-content { position: relative; z-index: 2; max-width: 680px; }
+        .hero h1 { font-family: var(--font-display) !important; font-weight: 800 !important; font-size: clamp(2.2rem, 5.2vw, 3.7rem) !important; color: #fff !important; line-height: 1.06 !important; margin-bottom: 18px !important; }
+        .hero p { color: rgba(255,255,255,.74) !important; font-size: 1.06rem !important; margin-bottom: 34px !important; }
+        .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+        .btn-hero { background: var(--brand) !important; color: #fff !important; border: 0 !important; padding: 14px 26px !important; border-radius: var(--r-md) !important; font-family: var(--font-display); font-weight: 700 !important; cursor: pointer; }
+        .btn-hero-ghost { background: transparent !important; color: #fff !important; border: 1px solid rgba(255,255,255,.28) !important; padding: 14px 26px !important; border-radius: var(--r-md) !important; font-family: var(--font-display); font-weight: 700 !important; cursor: pointer; }
+        #productosSection { padding: 16px 0 40px; }
+        .section-head { text-align: left; margin: 40px 0 28px !important; }
+        .section-title { display: inline-flex !important; align-items: center; gap: 14px; font-family: var(--font-display) !important; font-weight: 800 !important; font-size: clamp(1.5rem, 3vw, 2rem) !important; color: var(--ink) !important; }
+        .section-icon { width: 42px !important; height: 42px !important; border-radius: var(--r-md) !important; background: var(--ink) !important; color: #fff !important; display: flex; align-items: center; justify-content: center; }
+        .category-carousel-container { border-radius: var(--r-xl) !important; overflow: hidden; margin-bottom: 24px; position: relative; aspect-ratio: 16 / 9; background: #F1F5F9; box-shadow: var(--sh-2); width: 100%; }
+        .category-carousel-slides { display: flex; height: 100%; width: 100%; transition: transform 0.7s var(--ease); }
+        .category-carousel-slide { min-width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+        .category-carousel-slide img { width: 100%; height: 100%; object-fit: cover !important; display: block; }
+        .grid-productos { display: grid !important; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)) !important; gap: 16px !important; }
+        @media (max-width: 768px) { .grid-productos { grid-template-columns: repeat(2, 1fr) !important; gap: 12px !important; } }
+        .producto-card { background: #fff !important; border: 1px solid var(--line) !important; border-radius: var(--r-lg) !important; overflow: hidden; box-shadow: var(--sh-1) !important; transition: transform .25s var(--ease), box-shadow .25s !important; position: relative; display: flex; flex-direction: column; }
+        .producto-card:hover { transform: translateY(-5px) !important; box-shadow: var(--sh-3) !important; border-color: #CBD5E1 !important; }
+        .card-img-wrapper { position: relative; width: 100%; aspect-ratio: 1 / 1; background: #F8FAFC; display: flex; align-items: center; justify-content: center; cursor: pointer; overflow: hidden; padding: 0 !important; }
+        .card-img-wrapper img { width: 100%; height: 100%; object-fit: cover !important; border-radius: 0 !important; transition: transform .4s var(--ease); }
+        .producto-card:hover .card-img-wrapper img { transform: scale(1.05); }
+        .availability-badge { position: absolute; top: 8px; left: 8px; padding: 4px 8px; border-radius: 999px; font-family: var(--font-display); font-size: .58rem; font-weight: 800; text-transform: uppercase; z-index: 5; backdrop-filter: blur(8px); }
+        .badge-available { background: rgba(230,249,240,.95); color: var(--ok); } .badge-soldout { background: rgba(254,226,226,.95); color: var(--danger); } .badge-offer { background: rgba(255,217,61,.95); color: #B45309; }
+        .card-wishlist { position: absolute; top: 8px; right: 8px; width: 28px; height: 28px; border-radius: 50%; background: rgba(255,255,255,.9); backdrop-filter: blur(8px); color: var(--muted); border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: .2s; z-index: 5; font-size: 0.8rem; }
+        .card-wishlist:hover { background: var(--danger); color: #fff; }
+        .card-wishlist.active { background: var(--danger); color: #fff; }
+        .card-body { padding: 12px; display: flex; flex-direction: column; flex-grow: 1; }
+        .card-category { font-size: 0.6rem; font-weight: 700; color: var(--brand); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px; }
+        .card-title { font-family: var(--font-display) !important; font-size: 0.9rem !important; font-weight: 700 !important; color: var(--ink) !important; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.3; margin-bottom: 4px; }
+        .card-rating { display: flex; align-items: center; gap: 4px; font-size: 0.7rem; color: var(--muted); margin-bottom: 6px; }
+        .card-rating .stars { color: #FFB800; }
+        .price-box { display: flex; align-items: baseline; gap: 6px; margin-top: auto; margin-bottom: 8px; flex-wrap: wrap; }
+        .old-price { text-decoration: line-through; color: var(--muted); font-size: 0.75rem; }
+        .new-price { font-family: var(--font-display); font-weight: 800; font-size: 1.1rem; color: var(--ink); }
+        .card-footer { display: flex; align-items: center; justify-content: space-between; gap: 6px; width: 100%; }
+        .qty-control { display: flex; align-items: center; background: var(--bg); border-radius: 999px; padding: 2px; border: 1px solid var(--line-soft); }
+        .qty-btn { width: 24px; height: 24px; border: none; background: transparent; border-radius: 50%; cursor: pointer; font-weight: 800; color: var(--ink); display: flex; align-items: center; justify-content: center; font-size: 0.8rem; }
+        .qty-val { min-width: 20px; text-align: center; font-weight: 700; font-size: 0.8rem; }
+        .btn-add { background: var(--brand-tint); color: var(--brand); border: none; padding: 6px 10px; border-radius: 999px; font-family: var(--font-display); font-weight: 800; font-size: 0.7rem; display: flex; align-items: center; gap: 4px; cursor: pointer; transition: .2s; flex-grow: 1; justify-content: center; }
+        .btn-add:hover { background: var(--brand); color: #fff; }
+        .overlay { position: fixed; inset: 0; background: rgba(10,17,40,.55); backdrop-filter: blur(5px); z-index: 1050; opacity: 0; visibility: hidden; transition: opacity .3s, visibility .3s; }
+        .overlay.mostrar { opacity: 1; visibility: visible; }
+        .panel-desplegable { position: fixed; top: 0; right: -100%; width: 340px; max-width: 88vw; height: 100vh; background: #fff; z-index: 1060; transition: right .35s var(--ease); box-shadow: -24px 0 60px rgba(10,17,40,.18); display: flex; flex-direction: column; }
+        .panel-desplegable.mostrar { right: 0; }
+        .panel-header { padding: 20px; border-bottom: 1px solid var(--line-soft); display: flex; justify-content: space-between; align-items: center; }
+        .panel-header h3 { font-family: var(--font-display); font-weight: 800; font-size: 1.2rem; color: var(--ink); margin: 0; display: flex; align-items: center; gap: 8px; }
+        .close-panel-btn { width: 36px; height: 36px; border-radius: 50%; background: #F1F5F9; border: none; color: var(--ink); font-size: 1.6rem; display: flex; align-items: center; justify-content: center; cursor: pointer; line-height: 1; transition: background .2s; }
+        .close-panel-btn:hover { background: #E2E8F0; }
+        .panel-body { padding: 20px; overflow-y: auto; flex: 1; }
+        .tiendas-list > p { font-family: var(--font-display); font-weight: 700; font-size: 0.8rem; color: var(--muted); margin: 0 0 12px; text-transform: uppercase; letter-spacing: 0.05em; display: flex; align-items: center; gap: 8px; }
+        .tienda-link { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: var(--r-lg); background: #F8FAFC; border: 1.5px solid transparent; transition: .2s; text-decoration: none; color: var(--ink); margin-bottom: 8px; }
+        .tienda-link:hover, .tienda-link.active { background: #fff; border-color: var(--brand); box-shadow: var(--sh-2); }
+        .tienda-link i { width: 38px; height: 38px; border-radius: var(--r-md); background: var(--brand-tint); color: var(--brand); display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; }
+        .tienda-link div { display: flex; flex-direction: column; overflow: hidden; }
+        .tienda-link strong { font-family: var(--font-display); font-size: 0.95rem; font-weight: 700; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .tienda-link small { font-size: 0.75rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
+        .product-modal { position: fixed; inset: 0; background: rgba(10,17,40,0.65); z-index: 1070; display: none; align-items: flex-end; justify-content: center; overflow-y: auto; backdrop-filter: blur(5px); }
+        .product-modal.active { display: flex; }
+        .product-modal-content { background: #fff; border-radius: var(--r-xl) var(--r-xl) 0 0; width: 100%; height: 95vh; display: flex; flex-direction: column; position: relative; animation: slideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1); overflow: hidden; box-shadow: 0 -10px 40px rgba(0,0,0,0.2); }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        .modal-close { position: absolute; top: 20px; left: 20px; width: 44px; height: 44px; border-radius: 50%; background: #fff; border: none; color: var(--ink); cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 20; box-shadow: 0 4px 12px rgba(0,0,0,0.15); font-size: 1.2rem; transition: .2s; }
+        .modal-close:active { transform: scale(0.9); }
+        /* 🚨 FIX: Imagen del modal sin deformación. Se usa object-fit: contain para respetar
+           la relación de aspecto original de la foto (sin recortes ni estiramientos).
+           Se acota la altura máxima para garantizar que el formulario de venta/reserva quepa. */
+        .modal-product-image { width: 100%; max-height: 50vh; min-height: 220px; background: #F8FAFC; display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden; position: relative; }
+        .modal-product-image img { max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; object-position: center; display: block; }
+        .modal-product-info { padding: 24px; overflow-y: auto; flex: 1; padding-bottom: 40px; min-height: 0; }
+        .modal-product-category { display: inline-block; font-size: .72rem; font-weight: 700; color: var(--brand); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 8px; }
+        .modal-product-name { font-family: var(--font-display); font-weight: 800; font-size: 1.5rem; color: var(--ink); margin: 0 0 12px; }
+        .modal-price-value { font-family: var(--font-display); font-weight: 800; font-size: 1.8rem; color: var(--brand); }
+        .modal-rating-stars { display: inline-flex; gap: 4px; font-size: 1.5rem; color: #E2E8F0; cursor: pointer; }
+        .modal-rating-stars i { transition: color 0.2s; }
+        .modal-rating-stars i.active, .modal-rating-stars i:hover { color: #FFB800; }
+        .modal-product-description { color: var(--muted); line-height: 1.6; margin-bottom: 20px; font-size: .95rem; }
+        .modal-features-list { background: #F8FAFC; border-radius: var(--r-md); padding: 16px; margin-bottom: 24px; border: 1px solid var(--line-soft); }
+        .modal-feature-row { display: flex; align-items: center; gap: 10px; font-size: 0.85rem; color: var(--text); padding: 8px 0; border-bottom: 1px dashed var(--line-soft); }
+        .modal-feature-row:last-child { border-bottom: none; }
+        .modal-feature-row i { color: var(--brand); width: 16px; text-align: center; }
+        .modal-product-actions { display: flex; gap: 10px; align-items: stretch; width: 100%; }
+        .modal-qty-control { display: flex; align-items: center; background: #EEF2F7; border-radius: var(--r-md); padding: 4px; flex-shrink: 0; }
+        .modal-qty-btn { width: 36px; height: 40px; border: 0; background: transparent; border-radius: var(--r-sm); font-weight: 800; font-size: 1.1rem; cursor: pointer; color: var(--ink); }
+        .modal-qty-val { min-width: 30px; text-align: center; font-weight: 700; font-size: 1rem; }
+        .modal-btn-add { flex: 1; padding: 0 16px; height: 48px; background: var(--brand); color: #fff; border: 0; border-radius: var(--r-md); font-family: var(--font-display); font-weight: 700; font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: var(--sh-brand); white-space: nowrap; }
+        .modal-btn-wa { width: 48px; height: 48px; flex-shrink: 0; background: #25D366; color: #fff; border: 0; border-radius: var(--r-md); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; cursor: pointer; text-decoration: none; }
+        @media (min-width: 769px) { .product-modal { align-items: center; padding: 20px; } .product-modal-content { max-width: 850px; height: 90vh; border-radius: var(--r-xl); flex-direction: row; } .modal-product-image { width: 50%; height: 100%; max-height: none; aspect-ratio: auto; } .modal-product-image img { max-width: 100%; max-height: 100%; object-fit: contain; } .modal-product-info { width: 50%; padding: 32px; } .modal-close { background: #F1F5F9; } }
+        .site-footer { background: var(--ink) !important; color: rgba(255,255,255,.7); padding: 60px 20px 100px; margin-top: 80px; position: relative; border-radius: 32px 32px 0 0; text-align: center; }
+        .site-footer::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(184,145,74,.55), transparent); }
+        .footer-container { max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: 32px; }
+        .footer-brand-box { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+        .footer-logo { display: flex; align-items: center; justify-content: center; gap: 10px; font-family: var(--font-display); font-weight: 800; font-size: 1.5rem; color: #fff; letter-spacing: -.02em; }
+        .footer-logo img { width: 44px; height: 44px; border-radius: var(--r-md); }
+        .footer-tagline { color: rgba(255,255,255,.62); font-size: .95rem; margin: 0; }
+        .footer-links-group { display: flex; flex-direction: column; gap: 12px; }
+        .footer-links-group h4 { color: #fff; font-family: var(--font-display); font-size: 1rem; font-weight: 700; margin: 0 0 4px; }
+        .footer-links-group a { color: rgba(255,255,255,.68); font-size: .92rem; transition: color .2s; text-decoration: none; display: block; }
+        .footer-links-group a:hover { color: #E7D3A6; }
+        .footer-contact-info { display: flex; flex-direction: column; gap: 8px; align-items: center; color: rgba(255,255,255,.72); font-size: .92rem; }
+        .footer-contact-info p { margin: 0; display: flex; align-items: center; gap: 8px; }
+        .footer-contact-info i { color: var(--gold); font-size: 1rem; }
+        .footer-socials { display: flex; gap: 12px; }
+        .footer-socials a { width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,.08); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; transition: background .2s, transform .2s; }
+        .footer-socials a:hover { background: var(--brand); transform: translateY(-3px); }
+        .footer-bottom { margin-top: 40px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,.09); width: 100%; max-width: 800px; margin-left: auto; margin-right: auto; display: flex; flex-direction: column; align-items: center; gap: 12px; }
+        .footer-status { display: inline-flex; align-items: center; gap: 8px; font-size: .85rem; color: rgba(255,255,255,.72); }
+        .footer-status i { color: #34D399; font-size: .6rem; animation: pulse 2s ease-in-out infinite; }
+        .footer-copy { color: rgba(255,255,255,.5); font-size: .85rem; margin: 0; }
+        .cart-panel { position: fixed; top: 0; right: -420px; width: 400px; max-width: 92vw; height: 100vh; background: #fff; z-index: 1060; transition: right .35s var(--ease); box-shadow: -24px 0 60px rgba(10,17,40,.18); display: flex; flex-direction: column; }
+        .cart-panel.mostrar { right: 0; }
+        .cart-header { padding: 22px 24px; border-bottom: 1px solid var(--line-soft); display: flex; justify-content: space-between; align-items: center; }
+        .cart-header h3 { font-family: var(--font-display); font-weight: 800; font-size: 1.12rem; color: var(--ink); margin: 0; display: flex; align-items: center; gap: 10px; }
+        .close-cart { width: 36px; height: 36px; border-radius: var(--r-sm); background: #EEF2F7; border: 0; color: var(--muted); cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .toast-notification { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(16px); background: var(--ink); color: #fff; padding: 13px 20px; border-radius: var(--r-md); font-weight: 600; font-size: .88rem; display: flex; align-items: center; gap: 10px; z-index: 1080; opacity: 0; visibility: hidden; transition: all .3s; box-shadow: var(--sh-3); }
+        .toast-notification.mostrar { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(255,255,255,.94); backdrop-filter: blur(18px); border-top: 1px solid var(--line); display: flex; justify-content: space-around; padding: 6px 12px calc(6px + env(safe-area-inset-bottom, 0px)); z-index: 800; }
+        .bottom-nav-item { flex: 1; background: none; border: 0; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 8px 4px; color: var(--muted); cursor: pointer; font-size: .68rem; font-weight: 600; position: relative; }
+        .bottom-nav-item.active { color: var(--brand); }
+        .nav-badge { position: absolute; top: 4px; right: calc(50% - 16px); width: 10px; height: 10px; background: var(--danger); border-radius: 50%; border: 2px solid #fff; display: none; }
+        .nav-badge-inline { width: 8px; height: 8px; background: var(--danger); border-radius: 50%; display: none; margin-left: auto; }
+        .fullscreen-overlay { position: fixed; inset: 0; background: var(--bg); z-index: 2000; display: none; flex-direction: column; overflow-y: auto; opacity: 0; transition: opacity 0.3s ease; }
+        .fullscreen-overlay.active { display: flex; opacity: 1; }
+        .overlay-header { position: sticky; top: 0; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); padding: 16px 24px; display: flex; align-items: center; gap: 16px; border-bottom: 1px solid var(--line); z-index: 10; }
+        .overlay-back-btn { width: 40px; height: 40px; border-radius: 50%; background: #EEF2F7; border: none; color: var(--ink); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.1rem; }
+        .overlay-title { font-family: var(--font-display); font-weight: 800; font-size: 1.2rem; color: var(--ink); margin: 0; }
+        .overlay-body { padding: 24px; max-width: 1200px; margin: 0 auto; width: 100%; }
+        .info-section { background: #fff; border-radius: var(--r-xl); padding: 24px; margin-bottom: 20px; border: 1px solid var(--line-soft); box-shadow: var(--sh-1); }
+        .info-section h2 { font-family: var(--font-display); font-weight: 800; font-size: 1.25rem; color: var(--ink); margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
+        .info-section h2 i { color: var(--brand); }
+        .info-section p { color: var(--muted); font-size: 0.95rem; line-height: 1.7; margin-bottom: 12px; }
+        .info-section ul { padding-left: 20px; color: var(--muted); font-size: 0.95rem; line-height: 1.7; margin-bottom: 12px; }
+        .info-section li { margin-bottom: 8px; }
+        .plans-grid { display: grid; grid-template-columns: 1fr; gap: 20px; margin-top: 20px; }
+        @media (min-width: 768px) { .plans-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (min-width: 1024px) { .plans-grid { grid-template-columns: repeat(4, 1fr); } }
+        .plan-card { background: #FFFFFF !important; border-radius: var(--r-xl) !important; padding: 30px 24px !important; border: 1.5px solid var(--line) !important; box-shadow: var(--sh-2) !important; display: flex; flex-direction: column; height: 100%; position: relative; transition: transform 0.3s ease; }
+        .plan-card:hover { transform: translateY(-5px); }
+        .plan-card h4 { font-family: var(--font-display) !important; font-weight: 800 !important; color: #1A2B4C !important; font-size: 1.3rem; text-transform: uppercase; margin-bottom: 8px;}
+        .plan-price { font-family: var(--font-display) !important; font-size: 1.8rem !important; font-weight: 800 !important; color: #1A2B4C !important; line-height: 1; margin-bottom: 4px;}
+        .plan-price small { font-size: .84rem !important; color: var(--muted) !important; font-weight: 600; }
+        .plan-features { list-style: none; padding: 0; margin: 20px 0 !important; flex-grow: 1; }
+        .plan-features li { padding: 8px 0 !important; font-size: .82rem !important; color: #1A2B4C !important; display: flex; align-items: flex-start; gap: 10px; border-bottom: 1px solid var(--line-soft); }
+        .plan-features li:last-child { border-bottom: 0; }
+        .plan-features li i { color: #10B981 !important; font-size: .72rem; flex-shrink: 0; width: 20px; height: 20px; background: #ECFDF5; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-top: 2px; }
+        .plan-features li.feature-title { font-weight: 700; border-bottom: none; padding-top: 12px !important; padding-bottom: 4px !important; color: var(--brand) !important;}
+        .plan-card.featured { background: var(--ink) !important; border-color: var(--ink) !important; box-shadow: var(--sh-3) !important; }
+        .plan-card.featured h4, .plan-card.featured .plan-price { color: #FFFFFF !important; }
+        .plan-card.featured .plan-price small { color: rgba(255,255,255,.65) !important; }
+        .plan-card.featured .plan-features li { color: rgba(255,255,255,.88) !important; border-color: rgba(255,255,255,.1); }
+        .plan-card.featured .plan-features li i { background: rgba(255,255,255,.12); color: #7CE3BD !important; }
+        .plan-card.featured .plan-features li.feature-title { color: #7CE3BD !important; }
+        .plan-card.featured::before { content: 'MÁS POPULAR'; position: absolute; top: -13px; left: 50%; transform: translateX(-50%); background: var(--gold); color: #fff; padding: 5px 16px; border-radius: 999px; font-size: .66rem; font-weight: 800; letter-spacing: .06em; white-space: nowrap; }
+        .btn-plan { width: 100%; padding: 14px !important; border-radius: var(--r-md) !important; font-weight: 800 !important; font-size: .92rem !important; border: none !important; cursor: pointer; transition: all 0.2s; font-family: var(--font-display); display: block; text-align: center; -webkit-appearance: none; margin-top: 10px;}
+        .btn-plan-outline { background: #fff !important; color: var(--ink) !important; border: 1.5px solid var(--ink) !important; }
+        .btn-plan-outline:hover { background: var(--ink) !important; color: #fff !important; }
+        .btn-plan-filled { background: var(--brand) !important; color: #fff !important; box-shadow: var(--sh-brand); }
+        .btn-plan-filled:hover { background: #3574FF !important; transform: translateY(-2px); }
+        @media (max-width: 768px) {
+            .header-inner { padding: 10px 16px !important; } .header-search { display: none !important; } .menu-toggle { display: flex; }
+            #main-content { padding: 0 16px !important; }
+            .hero { padding: 52px 24px !important; margin: 16px 0 20px !important; } .hero h1 { font-size: 1.9rem !important; }
+            .hero-actions { flex-direction: column; } .hero-actions button { width: 100%; justify-content: center; }
+            .site-footer { padding: 40px 16px 100px; }
+            .overlay-body { padding: 16px; }
+            .qty-control { display: none; }
+        }
+        @media (min-width: 769px) { .bottom-nav { display: none !important; } }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-inner">
+            <a href="/" class="logo-container" aria-label="Tienda-fg, inicio">
+                <img src="https://i.ibb.co/LDG7Gf2d/fotor-ai-2025020222510.jpg" alt="Logo" class="logo-img">
+                <span class="brand-name" id="headerStoreName">Tienda-fg</span>
+            </a>
+            <div class="header-search" role="search">
+                <i class="fas fa-search" aria-hidden="true"></i>
+                <input type="search" id="headerSearch" placeholder="Buscar productos…" aria-label="Buscar productos">
+            </div>
+            <div class="header-right">
+                <div class="currency-dropdown" id="currencyDropdown">
+                    <button class="currency-btn" id="currencyBtn" aria-haspopup="true">
+                        <i class="fas fa-coins"></i><span id="selectedCurrencyText">CUP</span><i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="currency-menu" id="currencyMenu">
+                        <div class="currency-option active" data-currency="CUP"><i class="fas fa-coins"></i> CUP <small>Peso cubano</small></div>
+                        <div class="currency-option" data-currency="USD"><i class="fas fa-dollar-sign"></i> USD <small>Dólar</small></div>
+                        <div class="currency-option" data-currency="EUR"><i class="fas fa-euro-sign"></i> EUR <small>Euro</small></div>
+                    </div>
+                </div>
+                <button class="icon-action" id="cartBtnDesktop" aria-label="Carrito"><i class="fas fa-shopping-bag"></i><span class="cart-badge" id="cartCountDesktop">0</span></button>
+                <button class="menu-toggle" id="menuToggle" aria-label="Menú"><i class="fas fa-bars"></i></button>
+            </div>
+        </div>
+    </header>
+
+    <nav class="sticky-nav" id="categoryNav" aria-label="Categorías"></nav>
+
+    <main id="main-content">
+        <section class="hero">
+            <div class="hero-content">
+                <h1>Bienvenido a <span class="hero-highlight" id="heroTitle">Tienda-fg</span></h1>
+                <p id="heroDescription">Encuentra los mejores productos con calma y consciencia.</p>
+                <div class="hero-actions">
+                    <button class="btn-hero" onclick="document.getElementById('productosSection').scrollIntoView({behavior:'smooth'})">Ver Catálogo <i class="fas fa-arrow-right"></i></button>
+                </div>
+            </div>
+        </section>
+
+        <section id="productosSection">
+            <div class="section-head">
+                <h2 class="section-title">
+                    <span class="section-icon"><i class="fas fa-leaf"></i></span>
+                    <span id="categoryTitle">Todos los Productos</span>
+                </h2>
+            </div>
+            <div id="skeletonLoader" class="skeleton-grid"></div>
+            <div id="dynamicContent"></div>
+        </section>
+    </main>
+
+    <nav class="bottom-nav" aria-label="Navegación principal">
+        <button class="bottom-nav-item active" onclick="openOverlay('plans')"><i class="fas fa-home"></i><span>Inicio</span></button>
+        <button class="bottom-nav-item" onclick="openOverlay('about')"><i class="fas fa-compass"></i><span>Explorar</span></button>
+        <button class="bottom-nav-item" id="cartBtn"><i class="fas fa-shopping-bag"></i><span>Carrito</span><span class="cart-badge" id="cartCount">0</span></button>
+        <button class="bottom-nav-item" id="menuToggleBottom">
+            <i class="fas fa-bars"></i><span>Menú</span>
+            <span class="nav-badge" id="menuBadge"></span>
+        </button>
+    </nav>
+
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-brand-box">
+                <div class="footer-logo">
+                    <img src="https://i.ibb.co/LDG7Gf2d/fotor-ai-2025020222510.jpg" alt="Logo"> 
+                    <span id="footerStoreName">Tienda-fg</span>
+                </div>
+                <p class="footer-tagline">Calidad y confianza en cada pedido.</p>
+            </div>
+            <div class="footer-links-group"><h4>Tienda</h4><a href="#productosSection" onclick="closeAllOverlays()">Catálogo</a></div>
+            <div class="footer-links-group"><h4>Ayuda</h4><a href="#" onclick="event.preventDefault(); openOverlay('about')">Cómo comprar</a></div>
+            <div class="footer-links-group"><h4>Contacto</h4><div class="footer-contact-info"><p><i class="fas fa-map-marker-alt"></i> <span id="footerUbicacion">La Habana, Cuba</span></p><p><i class="fas fa-phone"></i> <span id="footerTelefono">+53 5 000 0000</span></p><p><i class="fas fa-envelope"></i> <span id="footerEmail">contacto@tienda-fg.com</span></p></div></div>
+            <div class="footer-socials"><a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a><a href="#" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a><a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a></div>
+        </div>
+        <div class="footer-bottom"><span class="footer-status"><i class="fas fa-circle"></i> Tienda Abierta</span><p class="footer-copy">© 2026 Tienda-fg. Todos los derechos reservados.</p></div>
+    </footer>
+
+    <div class="overlay" id="overlay"></div>
+
+    <aside class="panel-desplegable" id="sideMenu">
+        <div class="panel-header"><h3><i class="fas fa-bars-staggered"></i> Menú</h3><button class="close-panel-btn" id="closeMenu" aria-label="Cerrar menú">&times;</button></div>
+        <div class="panel-body">
+            <div class="tiendas-list"><p><i class="fas fa-store"></i> Nuestras Tiendas</p><div id="tiendasList"></div></div>
+            <div class="panel-section mt-4">
+                <p><i class="fas fa-shopping-bag"></i> Mis Compras</p>
+                <button class="panel-link w-100" style="background:#F8FAFC; border:1px solid var(--line-soft); margin-bottom:8px; font-weight:700; color:var(--ink); text-align:left; padding:12px 16px; border-radius:12px; display:flex; align-items:center; gap:10px; cursor:pointer;" onclick="StoreApp.abrirMisPedidos()"><i class="fas fa-receipt" style="color:var(--brand);"></i> Pedidos Pendientes<span class="nav-badge-inline" id="ordersBadge"></span></button>
+                <button class="panel-link w-100" style="background:#F8FAFC; border:1px solid var(--line-soft); font-weight:700; color:var(--ink); text-align:left; padding:12px 16px; border-radius:12px; display:flex; align-items:center; gap:10px; cursor:pointer;" onclick="StoreApp.abrirMiPerfil()"><i class="fas fa-user-circle" style="color:var(--brand);"></i> Mi Perfil</button>
+            </div>
+            <div class="panel-section mt-4">
+                <p><i class="fas fa-briefcase"></i> Tu Negocio</p>
+                <a class="panel-link" href="#" onclick="event.preventDefault(); document.getElementById('sideMenu').classList.remove('mostrar'); document.getElementById('overlay').classList.remove('mostrar'); openOverlay('plans');" style="background: linear-gradient(135deg, #1E64FF, #1248C7); color: white; font-weight: 700; justify-content: center; display:flex; padding: 12px; border-radius: 12px; align-items:center; gap:8px;"><i class="fas fa-rocket"></i> Crear mi Tienda</a>
+            </div>
+        </div>
+    </aside>
+
+    <div class="cart-panel" id="cartPanel">
+        <div class="cart-header"><h3><i class="fas fa-shopping-bag"></i> Tu Carrito</h3><button class="close-cart" id="closeCart" aria-label="Cerrar carrito"><i class="fas fa-times"></i></button></div>
+        <div id="cartItemsView" style="display:flex;flex-direction:column;height:100%;">
+            <div class="cart-items" id="cartItemsContainer" style="flex:1; overflow-y:auto; padding:16px 20px;">
+                <div class="cart-empty-state" style="text-align:center; padding:60px 20px; color:var(--muted);"><div class="empty-icon" style="width:72px;height:72px;margin:0 auto 18px;border-radius:50%;background:#EEF2F7;display:flex;align-items:center;justify-content:center;font-size:1.8rem;"><i class="fas fa-shopping-basket"></i></div><h4>Tu carrito está vacío</h4></div>
+            </div>
+            <div class="cart-footer" style="padding:18px 24px calc(18px + env(safe-area-inset-bottom, 0px)); border-top:1px solid var(--line-soft); background:#FAFBFD;">
+                <div class="cart-total final" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;font-size:.95rem;"><span>Total</span> <span id="cartTotal" style="font-family:var(--font-display);font-weight:800;font-size:1.3rem;color:var(--ink);">0 CUP</span></div>
+                <button class="btn-block btn-checkout" onclick="StoreApp.showCheckoutForm()" style="width:100%;padding:14px;border-radius:12px;font-weight:700;font-size:.92rem;border:0;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;background:var(--brand);color:#fff;box-shadow:var(--sh-brand);"><i class="fas fa-arrow-right"></i> Continuar</button>
+            </div>
+        </div>
+        <div id="checkoutFormView" style="display:none;overflow-y:auto;flex:1; padding: 22px;">
+            <h4 style="font-family:var(--font-display);font-weight:800;margin-bottom:16px;">Datos de Envío</h4>
+            <div class="form-group" style="margin-bottom:14px;"><label style="font-weight:600;font-size:.82rem;">Nombre</label><input type="text" class="form-control" id="cliName" style="width:100%;padding:11px 14px;border:1.5px solid var(--line);border-radius:8px;" required></div>
+            <div class="form-group" style="margin-bottom:14px;"><label style="font-weight:600;font-size:.82rem;">Teléfono</label><input type="tel" class="form-control" id="cliPhone" style="width:100%;padding:11px 14px;border:1.5px solid var(--line);border-radius:8px;" required></div>
+            <div class="form-group" id="cliCarnetGroup" style="display:none; margin-bottom:14px;"><label style="font-weight:600;font-size:.82rem;">Carnet de Identidad <span style="color:var(--danger);">*</span></label><input type="text" class="form-control" id="cliCarnet" placeholder="Ej: 95010112345" style="width:100%;padding:11px 14px;border:1.5px solid var(--line);border-radius:8px;"></div>
+            <div class="form-group" style="margin-bottom:14px;"><label style="font-weight:600;font-size:.82rem;">Dirección</label><textarea class="form-control" id="cliAddress" rows="2" style="width:100%;padding:11px 14px;border:1.5px solid var(--line);border-radius:8px;" required></textarea></div>
+            <div class="form-group" style="margin-bottom:14px;"><label style="font-weight:600;font-size:.82rem;">Método de Pago</label><div id="paymentMethodsContainer" class="payment-methods" style="display:flex; flex-direction:column; gap:8px;"></div></div>
+            <div id="paymentDetailsBox" style="display:none; margin-bottom:16px; background:#F8FAFC; padding:12px; border-radius:8px; border:1px solid var(--line-soft);">
+                <div id="transferInfo" style="display:none; text-align:center;"><p style="font-size:0.85rem; margin-bottom:4px; color:var(--muted);">Transfiera a la siguiente tarjeta:</p><h5 id="transferCardNumber" style="font-family:monospace; font-weight:800; color:var(--brand); font-size:1.2rem; margin:0;"></h5></div>
+                <div id="cardQrInfo" style="display:none; text-align:center;"><p style="font-size:0.85rem; margin-bottom:8px; color:var(--muted);">Escanee el código QR para pagar:</p><img id="qrImage" src="" alt="QR de Pago" style="max-width:150px; border-radius:8px; border:1px solid #ddd;"></div>
+            </div>
+            <button class="btn-block btn-checkout" id="btnConfirmarPedido" onclick="StoreApp.enviarPedido()" style="width:100%;padding:14px;border-radius:12px;font-weight:700;font-size:.92rem;border:0;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;background:var(--brand);color:#fff;box-shadow:var(--sh-brand); margin-bottom:10px;">Confirmar</button>
+            <button class="btn-block btn-ghost" onclick="StoreApp.cancelarCheckout()" style="width:100%;padding:14px;border-radius:12px;font-weight:700;font-size:.92rem;border:1px solid var(--line);cursor:pointer;background:transparent;color:var(--muted);">Volver</button>
+        </div>
+    </div>
+
+    <div class="product-modal" id="productModal">
+        <div class="product-modal-content">
+            <button class="modal-close" onclick="StoreApp.closeProductModal()" aria-label="Cerrar"><i class="fas fa-arrow-left"></i></button>
+            <div class="product-modal-body" id="modalBody" style="width:100%; height:100%; display:flex; flex-direction:inherit; overflow-y:auto;"></div>
+        </div>
+    </div>
+
+    <div class="toast-notification" id="toast" role="status" aria-live="polite"><i class="fas fa-check-circle"></i><span id="toastMsg">Operación exitosa</span></div>
+
+
+
+
+
+<!-- OVERLAY: PLANES -->
+<div id="overlayPlans" class="fullscreen-overlay">
+    <div class="overlay-header"><button class="overlay-back-btn" onclick="closeOverlay('plans')"><i class="fas fa-arrow-left"></i></button><h2 class="overlay-title">Nuestros Planes</h2></div>
+    <div class="overlay-body">
+        <div class="text-center mb-4"><h2 style="font-family: var(--font-display); font-weight: 800; font-size: 1.8rem; color: var(--ink);">Elige el plan perfecto para tu negocio</h2><p class="text-muted mt-2" style="max-width: 500px; margin: 0 auto;">Potencia tus ventas con las herramientas que necesitas.</p></div>
+        <div class="plans-grid">
+            <div class="plan-card">
+                <div class="mb-3"><h4 style="font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; color: #1A2B4C; text-transform: uppercase;">Gratis</h4><div class="plan-price mt-2" style="font-size: 1.2rem; color: var(--brand);">Válido Gratis por 1 mes</div></div>
+                <ul class="plan-features"><li><i class="fas fa-check"></i> 5 Productos registrados</li><li><i class="fas fa-check"></i> Notificación del nuevo pedido</li><li class="feature-title">Admin acceso a:</li><li><i class="fas fa-check"></i> Agregar productos</li><li><i class="fas fa-check"></i> Editar productos</li><li><i class="fas fa-check"></i> Modificar formas de pago</li><li><i class="fas fa-check"></i> Modificar precio de monedas</li><li><i class="fas fa-check"></i> Opción de envío de pedido al proveedor con info del gestor y del cliente del pedido</li><li><i class="fas fa-check"></i> Opción de promoción y publicidad de la tienda</li><li><i class="fas fa-check"></i> URL Admin y notificaciones</li><li><i class="fas fa-check"></i> URL Tienda individual</li></ul>
+                <button class="btn-plan btn-plan-outline" onclick="elegirPlan('prueba')">Empezar Prueba</button>
+            </div>
+            <div class="plan-card featured">
+                <div class="mb-3"><h4 style="font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; color: #1A2B4C; text-transform: uppercase;">Básico</h4><div class="plan-price mt-2">1000 <small>CUP/mes</small></div><small class="text-muted d-block mt-1">Pago 1000 pesos al mes</small></div>
+                <ul class="plan-features"><li><i class="fas fa-check"></i> Por 1 mes</li><li><i class="fas fa-check"></i> 5 Productos registrados</li><li><i class="fas fa-check"></i> Notificación del nuevo pedido</li><li class="feature-title">Admin acceso a:</li><li><i class="fas fa-check"></i> Agregar productos</li><li><i class="fas fa-check"></i> Editar productos</li><li><i class="fas fa-check"></i> Modificar formas de pago</li><li><i class="fas fa-check"></i> Modificar precio de monedas</li><li><i class="fas fa-check"></i> URL Admin y notificaciones</li><li><i class="fas fa-check"></i> URL Tienda individual</li></ul>
+                <button class="btn-plan btn-plan-filled" onclick="elegirPlan('basico')">Elegir Básico</button>
+            </div>
+            <div class="plan-card">
+                <div class="mb-3"><h4 style="font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; color: #1A2B4C; text-transform: uppercase;">Pro</h4><div class="plan-price mt-2">2500 <small>CUP/mes</small></div><small class="text-muted d-block mt-1">Pago 2500 pesos al mes</small></div>
+                <ul class="plan-features"><li><i class="fas fa-check"></i> 10 Productos registrados</li><li><i class="fas fa-check"></i> Notificación del nuevo pedido</li><li class="feature-title">Admin acceso a:</li><li><i class="fas fa-check"></i> Agregar productos</li><li><i class="fas fa-check"></i> Editar productos</li><li><i class="fas fa-check"></i> Modificar formas de pago</li><li><i class="fas fa-check"></i> Modificar precio de monedas</li><li><i class="fas fa-check"></i> Opción de envío de pedido al proveedor con info del gestor y del cliente del pedido</li><li><i class="fas fa-check"></i> Opción de promoción y publicidad de la tienda</li><li><i class="fas fa-check"></i> URL Admin y notificaciones</li><li><i class="fas fa-check"></i> URL Tienda individual</li><li class="feature-title">Información de gráfica:</li><li><i class="fas fa-check"></i> Productos más visitados en el mes</li><li><i class="fas fa-check"></i> Productos más vendidos</li></ul>
+                <button class="btn-plan btn-plan-outline" onclick="elegirPlan('pro')">Elegir Pro</button>
+            </div>
+            <div class="plan-card">
+                <div class="mb-3"><h4 style="font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; color: #1A2B4C; text-transform: uppercase;">Premium</h4><div class="plan-price mt-2">5000 <small>CUP/mes</small></div><small class="text-muted d-block mt-1">Pago 5000 pesos al mes</small></div>
+                <ul class="plan-features"><li><i class="fas fa-check"></i> 50+ Productos registrados</li><li><i class="fas fa-check"></i> Notificación del nuevo pedido</li><li class="feature-title">Admin acceso a:</li><li><i class="fas fa-check"></i> Agregar productos</li><li><i class="fas fa-check"></i> Editar productos</li><li><i class="fas fa-check"></i> Modificar formas de pago</li><li><i class="fas fa-check"></i> Modificar precio de monedas</li><li><i class="fas fa-check"></i> Opción de envío de pedido al proveedor con info del gestor y del cliente del pedido</li><li><i class="fas fa-check"></i> Opción de promoción y publicidad de la tienda</li><li><i class="fas fa-check"></i> URL Admin y notificaciones</li><li><i class="fas fa-check"></i> URL Tienda individual</li><li class="feature-title">Información de gráfica:</li><li><i class="fas fa-check"></i> Productos más visitados en el mes</li><li><i class="fas fa-check"></i> Productos más vendidos</li><li><i class="fas fa-check"></i> Notificación por WhatsApp a los clientes que han comprado</li></ul>
+                <button class="btn-plan btn-plan-outline" onclick="elegirPlan('premium')">Elegir Premium</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+    <!-- OVERLAY: ACERCA DE -->
+    <div id="overlayAbout" class="fullscreen-overlay">
+        <div class="overlay-header"><button class="overlay-back-btn" onclick="closeOverlay('about')"><i class="fas fa-arrow-left"></i></button><h2 class="overlay-title">Acerca de Tienda-fg</h2></div>
+        <div class="overlay-body">
+            <div class="info-section"><h2><i class="fas fa-store"></i> ¿Qué es Tienda-fg?</h2><p>Tienda-fg es una plataforma de comercio electrónico diseñada específicamente para <strong>principiantes y negocios en crecimiento</strong>. Nuestro objetivo es facilitar a todos los pequeños negocios el alcance de sus productos a la mayor cantidad de personas posible, eliminando las barreras técnicas y económicas que suelen existir al querer digitalizarse.</p></div>
+            <div class="info-section"><h2><i class="fas fa-chart-line"></i> Beneficios de tener tu Tienda Online</h2><ul><li><strong>Visibilidad 24/7:</strong> Tu tienda nunca duerme. Los clientes pueden ver y comprar tus productos a cualquier hora.</li><li><strong>Sin límites geográficos:</strong> No dependes de un local físico; puedes vender a cualquier persona que tenga el enlace.</li><li><strong>Gestión total:</strong> Controla tus productos, precios y pedidos desde un panel privado muy fácil de usar.</li></ul></div>
+            <div class="info-section"><h2><i class="fas fa-gift"></i> ¿Qué gano con el Servicio Gratuito?</h2><ul><li>Publicación de hasta <strong>5 productos</strong>.</li><li><strong>Notificaciones push</strong> para avisarte en tiempo real cuando llegue un pedido.</li><li>Tu <strong>URL pública</strong> para compartir en redes sociales.</li><li>Tu <strong>URL de administrador</strong> para gestionar tu negocio.</li></ul></div>
+            <div class="info-section"><h2><i class="fab fa-google"></i> Registro Seguro con Google</h2><p>Para garantizar la seguridad de tu cuenta, el registro en Tienda-fg se realiza <strong>estrictamente a través de una cuenta oficial de Google (OFC)</strong>. Esto evita fraudes y asegura que solo tú puedas acceder a tu tienda y a tus ventas.</p></div>
+            <div class="info-section"><h2><i class="fas fa-link"></i> Tus URLs (Pública y Admin)</h2><ul><li><strong>URL de la Tienda (Pública):</strong> Este es el enlace que compartes con tus clientes.</li><li><strong>URL de Administrador (Privada):</strong> Tu panel de control para agregar productos y ver pedidos.</li></ul></div>
+            <div class="info-section"><h2><i class="fas fa-credit-card"></i> Pagos y Ajustes</h2><p>Los pagos por suscripciones y cualquier ajuste relacionado con el servicio se realizan directamente con el dueño de la plataforma, <strong>Francisco García</strong>.</p></div>
+            <div class="info-section"><h2><i class="fas fa-shield-alt"></i> Política de Privacidad</h2><p>Tus datos personales son utilizados exclusivamente para el funcionamiento de tu tienda. <strong>No compartimos, vendemos ni exponemos tu información</strong> a terceros.</p></div>
+        </div>
+    </div>
+
+    <!-- MODALES DE REGISTRO Y PAGO -->
+    <div class="modal fade" id="pagoPlanModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content" style="border-radius: 24px; border: none;">
+                <div class="modal-body" style="padding: 30px; text-align: center;" id="pagoModalBody">
+                    <!-- Contenido dinámico generado por JS -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="registroModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+            <div class="modal-content" style="border-radius: 24px; border: none; overflow: hidden;">
+                <div class="modal-body" style="padding: 40px 30px; position: relative;">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar" style="position: absolute; top: 16px; right: 16px; z-index: 10;"></button>
+                    <div id="regStep1" class="text-center">
+                        <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #1E64FF, #1248C7); border-radius: 24px; margin: 0 auto 24px; display: flex; align-items: center; justify-content: center; color: white; font-size: 2.2rem;"><i class="fas fa-store"></i></div>
+                        <h2 style="font-weight: 800; color: #1A2B4C; margin-bottom: 8px;">Crea tu tienda</h2>
+                        <p style="color: #6B7A99; margin-bottom: 24px;">Plan: <strong id="planSeleccionadoTexto">Prueba Gratis</strong></p>
+                        <button onclick="loginConGoogle()" style="display: flex; align-items: center; justify-content: center; gap: 12px; background: white; border: 2px solid #E2E8F0; padding: 14px; border-radius: 12px; width: 100%; font-weight: 700; color: #1A2B4C; cursor: pointer;"><img src="https://www.google.com/favicon.ico" alt="Google" style="width: 22px;"> Continuar con Google</button>
+                    </div>
+                    <div id="regStep2" style="display: none; text-align: left;">
+                        <h2 style="font-weight: 800; color: #1A2B4C; margin-bottom: 20px; text-align: center;">Datos de tu Negocio</h2>
+                        <input type="hidden" id="regPlan" value="prueba">
+                        <div class="modal-body-scroll">
+                            <div class="row">
+                                <div class="col-md-6 mb-3"><label class="form-label fw-bold">Nombre del Negocio *</label><input type="text" id="regNombreNegocio" class="form-control" placeholder="Ej: Barbería Pacho" required></div>
+                                <div class="col-md-6 mb-3"><label class="form-label fw-bold">Tipo de Negocio *</label><select id="regTipoNegocio" class="form-select"><option value="tienda">🛒 Tienda de Ventas</option><option value="reserva">📅 Sistema de Reservas</option></select></div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3"><label class="form-label fw-bold">WhatsApp / Teléfono *</label><input type="tel" id="regTelefono" class="form-control" placeholder="+53 5XXXXXXX" required></div>
+                                <div class="col-md-6 mb-3"><label class="form-label fw-bold">Dirección de la Tienda</label><input type="text" id="regDireccion" class="form-control" placeholder="Calle, número, municipio..."></div>
+                            </div>
+                            <hr class="my-3">
+                            <h6 class="fw-bold text-primary mb-3">Configuración Adicional</h6>
+                            <div class="row">
+                                <div class="col-md-6 mb-3"><label class="form-label fw-bold">Horario de Atención</label><div class="d-flex align-items-center gap-2"><input type="time" id="regHoraApertura" class="form-control" value="09:00"><span>a</span><input type="time" id="regHoraCierre" class="form-control" value="18:00"></div></div>
+                                <div class="col-md-6 mb-3"><label class="form-label fw-bold">Tasa de Moneda (1 USD = CUP)</label><input type="number" id="regTasaUSD" class="form-control" value="25" step="0.01"></div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3"><label class="form-label fw-bold">Forma de Pago</label><div class="d-flex flex-column gap-1 mt-1"><label class="form-check"><input type="checkbox" id="pagoFisico" checked> 💵 Físico / Efectivo</label><label class="form-check"><input type="checkbox" id="pagoTransferencia"> 🏦 Transferencia</label></div></div>
+                                <div class="col-md-6 mb-3"><label class="form-label fw-bold">Garantía</label><select id="regGarantia" class="form-select"><option value="true">✅ Sí, ofrecer garantía</option><option value="false">❌ No ofrecer garantía</option></select></div>
+                            </div>
+                            <div class="mb-3"><label class="form-label fw-bold">Transporte / Envío a Domicilio</label><select id="regTransporte" class="form-select"><option value="true">✅ Sí, ofrezco envío a domicilio</option><option value="false">❌ No, solo retiro en tienda</option></select></div>
+                        </div>
+                        <!-- 🛡️ Honeypot anti-bot: campo oculto que los bots rellenan automáticamente. Los humanos no lo ven. -->
+                        <div aria-hidden="true" style="position:absolute;left:-9999px;top:-9999px;width:1px;height:1px;overflow:hidden;">
+                            <label>No llenar este campo<input type="text" id="honeypotReg" tabindex="-1" autocomplete="off"></label>
+                        </div>
+                        <input type="hidden" id="formTsReg" value="">
+                        <button onclick="crearTiendaCliente()" id="btnCrearTienda" style="background: linear-gradient(135deg, #1E64FF, #1248C7); color: white; border: none; padding: 14px; border-radius: 12px; width: 100%; font-weight: 700; margin-top: 15px;">Crear mi Tienda</button>
+                    </div>
+                    <div id="regStep3" style="display: none; text-align: center;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="limiteModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border-radius: 24px; border: none; overflow: hidden;">
+                <div class="modal-body" style="padding: 40px 30px; text-align: center;">
+                    <div style="width: 80px; height: 80px; background: #FEF3C7; color: #F59E0B; border-radius: 50%; margin: 0 auto 24px; display: flex; align-items: center; justify-content: center; font-size: 2.5rem;"><i class="fas fa-exclamation-triangle"></i></div>
+                    <h2 style="font-weight: 800; color: #1A2B4C; margin-bottom: 8px;">Ya tienes una tienda</h2>
+                    <p style="color: #6B7A99; margin-bottom: 24px;">Solo se permite una tienda por usuario. Solicita permiso al administrador para crear una tienda adicional.</p>
+                    <button onclick="solicitarPermisoMultiTienda()" class="btn btn-primary w-100" style="padding: 14px; border-radius: 12px; font-weight: 700; margin-bottom: 8px; background: linear-gradient(135deg, #1E64FF, #1248C7); border: none;"><i class="fas fa-paper-plane me-2"></i> Solicitar permiso al admin</button>
+                    <a href="https://wa.me/5353571569?text=Hola,%20quiero%20crear%20una%20tienda%20adicional%20en%20Tienda-fg" target="_blank" rel="noopener" class="btn btn-outline-primary w-100" style="padding: 14px; border-radius: 12px; font-weight: 700; margin-bottom: 8px;"><i class="fab fa-whatsapp me-2"></i> Contactar por WhatsApp</a>
+                    <button class="btn btn-outline-secondary w-100" data-bs-dismiss="modal" style="padding: 14px; border-radius: 12px; font-weight: 700;">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para solicitar upgrade de plan -->
+    <div class="modal fade" id="upgradePlanModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border-radius: 24px; border: none; overflow: hidden;">
+                <div class="modal-body" style="padding: 40px 30px; text-align: center;">
+                    <div style="width: 80px; height: 80px; background: #E8F0FE; color: #1E64FF; border-radius: 50%; margin: 0 auto 24px; display: flex; align-items: center; justify-content: center; font-size: 2.5rem;"><i class="fas fa-crown"></i></div>
+                    <h2 style="font-weight: 800; color: #1A2B4C; margin-bottom: 8px;">Upgrade de plan</h2>
+                    <p style="color: #6B7A99; margin-bottom: 24px;">Tu solicitud será enviada al administrador. Cuando la apruebe, tu plan se actualizará.</p>
+                    <input type="hidden" id="upgradePlanDeseado">
+                    <div class="mb-3 text-start">
+                        <label class="form-label fw-bold">Plan deseado</label>
+                        <select id="upgradePlanSelect" class="form-select" onchange="document.getElementById('upgradePlanDeseado').value = this.value;">
+                            <option value="basico">Básico — 1000 CUP/mes (10 productos)</option>
+                            <option value="pro">Pro — 1500 CUP/mes (20 productos)</option>
+                            <option value="premium">Premium — 2500 CUP/mes (100 productos)</option>
+                        </select>
+                    </div>
+                    <div class="mb-3 text-start">
+                        <label class="form-label fw-bold">Meses a pagar</label>
+                        <select id="upgradeMesesSelect" class="form-select">
+                            <option value="1">1 mes</option>
+                            <option value="3">3 meses</option>
+                            <option value="6">6 meses</option>
+                            <option value="12">12 meses</option>
+                        </select>
+                    </div>
+                    <div class="mb-3 text-start">
+                        <label class="form-label fw-bold">Código de pago (opcional)</label>
+                        <input type="text" id="upgradeCodigoPago" class="form-control" placeholder="PAY-XXXX">
+                        <small class="text-muted">Si ya generaste un ticket, pégalo aquí.</small>
+                    </div>
+                    <button onclick="enviarSolicitudUpgrade()" class="btn btn-primary w-100" style="padding: 14px; border-radius: 12px; font-weight: 700; margin-bottom: 8px; background: linear-gradient(135deg, #1E64FF, #1248C7); border: none;"><i class="fas fa-paper-plane me-2"></i> Enviar solicitud</button>
+                    <button class="btn btn-outline-secondary w-100" data-bs-dismiss="modal" style="padding: 14px; border-radius: 12px; font-weight: 700;">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- BOTÓN FLOTANTE PARA RETOMAR PAGO -->
+    <div id="resumePaymentBanner" style="display:none; position:fixed; bottom:20px; left:50%; transform:translateX(-50%); z-index:1040; width:90%; max-width:400px; background:#1E64FF; color:#fff; padding:16px 20px; border-radius:16px; box-shadow:0 10px 30px rgba(30,100,255,0.4); align-items:center; justify-content:space-between; gap:12px; animation:slideUp 0.5s ease;">
+        <div style="flex:1;">
+            <div style="font-weight:800; font-size:0.95rem;"><i class="fas fa-clock me-2"></i> Pago pendiente</div>
+            <div style="font-size:0.8rem; opacity:0.9;">Tienes un ticket sin completar.</div>
+        </div>
+        <div class="d-flex gap-2">
+            <button onclick="discardPendingPayment()" style="background:transparent; border:1px solid rgba(255,255,255,0.5); color:#fff; padding:10px 12px; border-radius:10px; font-weight:800; font-size:0.8rem; cursor:pointer; white-space:nowrap;">Descartar</button>
+            <button onclick="resumePayment()" style="background:#fff; color:#1E64FF; border:none; padding:10px 16px; border-radius:10px; font-weight:800; font-size:0.85rem; cursor:pointer; white-space:nowrap;">Continuar</button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- 🛡️ CAPA 1: Filtro anti-profanidad en tiempo real (keypress) -->
+    <script src="/cliente-profanity-filter.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <script>
+        document.write(`<script src="/js/store/utils.js?v=${Date.now()}"><\/script>`);
+        document.write(`<script src="/js/store/api.js?v=${Date.now()}"><\/script>`);
+        document.write(`<script src="/js/store/cart.js?v=${Date.now()}"><\/script>`);
+        document.write(`<script src="/js/store/ui.js?v=${Date.now()}"><\/script>`);
+        document.write(`<script src="/js/store/app.js?v=${Date.now()}"><\/script>`);
+    </script>
+
+    <script>
+        window.supabaseClient = null;
+        let globalConfig = null;
+        let pagoDataTemporal = null;
+        let metodosAdminGlobal = {};
+
+        async function initSupabase() {
+            if(window.supabaseClient) return;
+            const res = await fetch('/api/public-config');
+            globalConfig = await res.json();
+            window.supabaseClient = window.supabase.createClient(globalConfig.supabaseUrl, globalConfig.supabaseAnonKey);
+        }
+
+        function openOverlay(type) { const id = 'overlay' + type.charAt(0).toUpperCase() + type.slice(1); const el = document.getElementById(id); if (el) { el.classList.add('active'); document.body.style.overflow = 'hidden'; } }
+        function closeOverlay(type) { const id = 'overlay' + type.charAt(0).toUpperCase() + type.slice(1); const el = document.getElementById(id); if (el) { el.classList.remove('active'); document.body.style.overflow = ''; } }
+        function closeAllOverlays() { document.querySelectorAll('.fullscreen-overlay').forEach(el => el.classList.remove('active')); document.body.style.overflow = ''; }
+
+        let currentUser;
+        let planElegido = 'prueba';
+        let planTexto = 'Prueba Gratis';
+        let totalPago = 0;
+        let codigoPago = null;
+
+        const preciosPlanes = { 'basico': 1000, 'pro': 1500, 'premium': 2500 };
+
+        // FIX: Cachear los métodos de pago en localStorage para que no se "borren" al recargar.
+        // Si la API falla o tarda, usamos el caché. Si la API responde, actualizamos el caché.
+        function obtenerMetodosCacheados() {
+            try {
+                const cached = localStorage.getItem('fg_metodos_pago_cache');
+                if (cached) return JSON.parse(cached);
+            } catch (e) {}
+            return {};
+        }
+        function guardarMetodosCacheados(data) {
+            try {
+                if (data && (data.bank || data.whatsapp)) {
+                    localStorage.setItem('fg_metodos_pago_cache', JSON.stringify(data));
+                }
+            } catch (e) {}
+        }
+
+        // FIX: Cargar los métodos de pago del admin de forma robusta.
+        // Siempre intenta fetch fresco; si falla, usa caché de localStorage.
+        async function asegurarMetodosPagoCargados() {
+            // 1. Si ya tenemos datos en memoria con bank, usarlos
+            if (metodosAdminGlobal && metodosAdminGlobal.bank) {
+                return metodosAdminGlobal;
+            }
+            // 2. Si no, intentar cargar desde la caché primero (para mostrar algo inmediatamente)
+            const cached = obtenerMetodosCacheados();
+            if (cached && cached.bank) {
+                metodosAdminGlobal = cached;
+            }
+            // 3. Siempre hacer fetch fresco para tener los datos más recientes del admin
+            try {
+                const res = await fetch('/api/payment-methods');
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data && (data.bank || data.whatsapp)) {
+                        metodosAdminGlobal = data;
+                        guardarMetodosCacheados(data);
+                    }
+                }
+            } catch (e) {
+                // Si falla el fetch, mantener lo que tengamos (caché o vacío)
+                console.error('Error cargando métodos de pago:', e);
+            }
+            return metodosAdminGlobal;
+        }
+
+        // FIX: Generar/recuperar un ID único por dispositivo para evitar múltiples registros.
+        function getDeviceId() {
+            let deviceId = localStorage.getItem('fg_device_id');
+            if (!deviceId) {
+                // Generar un ID único basado en timestamp + random
+                deviceId = 'DEV-' + Date.now().toString(36) + '-' + Math.random().toString(36).substring(2, 10).toUpperCase();
+                localStorage.setItem('fg_device_id', deviceId);
+            }
+            return deviceId;
+        }
+
+        // FIX: Verificar si este dispositivo ya tiene una tienda registrada.
+        // Devuelve { hasStore: bool, blocked: bool, reason: string }
+        // PRIORIDAD: consultar el server (autoridad única). Si el server dice "no bloqueado",
+        // limpiar el localStorage (pudo haber sido bloqueado por error o ya desbloqueado por el admin).
+        async function verificarDispositivoBloqueado() {
+            const deviceId = getDeviceId();
+            // 1. Consultar el server PRIMERO — su veredicto tiene prioridad sobre el localStorage
+            try {
+                const res = await fetch(`/api/check-device-block/${encodeURIComponent(deviceId)}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.blocked) {
+                        // El server confirma bloqueo → mostrar modal con motivo real
+                        localStorage.setItem('fg_dispositivo_bloqueado', '1');
+                        return { hasStore: !!data.tienda_existente, blocked: true, reason: data.reason, permanent: data.permanent === true };
+                    } else {
+                        // El server dice NO bloqueado → limpiar flags locales obsoletos
+                        localStorage.removeItem('fg_dispositivo_bloqueado');
+                        localStorage.removeItem('fg_registro_abandonado');
+                        return { hasStore: false, blocked: false, reason: '' };
+                    }
+                }
+            } catch (e) { console.error('Error consultando bloqueo en server:', e); /* continuar con lógica local */ }
+
+            // 2. Fallback local si el server no responde
+            const abandonado = localStorage.getItem('fg_registro_abandonado');
+            if (abandonado) {
+                const timestamp = parseInt(abandonado);
+                const horasPasadas = (Date.now() - timestamp) / (1000 * 60 * 60);
+                if (horasPasadas >= 24) {
+                    localStorage.setItem('fg_dispositivo_bloqueado', '1');
+                    return { hasStore: false, blocked: true, reason: 'El plazo de 24 horas ha expirado. La opción de crear una tienda ha sido desactivada para este dispositivo.' };
+                }
+            }
+            if (localStorage.getItem('fg_dispositivo_bloqueado') === '1') {
+                return { hasStore: false, blocked: true, reason: 'Este dispositivo ha sido bloqueado para crear nuevas tiendas.' };
+            }
+            return { hasStore: false, blocked: false, reason: '' };
+        }
+
+        // FIX: Mostrar modal de bloqueo cuando el dispositivo no puede crear tiendas
+        // Ahora incluye botón "Solicitar desbloqueo al admin" que envía solicitud directa
+        function mostrarModalBloqueo(motivo) {
+            const deviceId = getDeviceId();
+            const modalHtml = `
+                <div class="modal fade" id="bloqueoModal" tabindex="-1" data-bs-backdrop="static">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content" style="border-radius: 24px; border: none; overflow: hidden;">
+                            <div class="modal-body" style="padding: 40px 30px; text-align: center;">
+                                <div style="width: 80px; height: 80px; background: #FEE2E2; color: #EF4444; border-radius: 50%; margin: 0 auto 24px; display: flex; align-items: center; justify-content: center; font-size: 2.5rem;"><i class="fas fa-ban"></i></div>
+                                <h2 style="font-weight: 800; color: #1A2B4C; margin-bottom: 12px;">Acceso restringido</h2>
+                                <p style="color: #6B7A99; margin-bottom: 16px; line-height: 1.6;">${motivo}</p>
+                                <p style="font-size: 0.78rem; color: #9CA3AF; margin-bottom: 20px;">Dispositivo: <code style="background:#F1F5F9;padding:2px 6px;border-radius:4px;font-size:0.7rem;">${deviceId}</code></p>
+                                <button onclick="solicitarDesbloqueoDispositivo('${deviceId}')" class="btn btn-primary w-100" style="padding: 14px; border-radius: 12px; font-weight: 700; margin-bottom: 8px; background: linear-gradient(135deg, #1E64FF, #1248C7); border: none;"><i class="fas fa-paper-plane me-2"></i> Solicitar desbloqueo al admin</button>
+                                <a href="https://wa.me/5353571569?text=Hola,%20mi%20dispositivo%20${encodeURIComponent(deviceId)}%20fue%20bloqueado%20al%20intentar%20crear%20una%20tienda" target="_blank" rel="noopener" class="btn btn-outline-primary w-100" style="padding: 14px; border-radius: 12px; font-weight: 700; margin-bottom: 8px;"><i class="fab fa-whatsapp me-2"></i> Contactar por WhatsApp</a>
+                                <button class="btn btn-outline-secondary w-100" onclick="cerrarModalBloqueo()" style="padding: 14px; border-radius: 12px; font-weight: 700;">Entendido</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            const old = document.getElementById('bloqueoModal');
+            if (old) old.remove();
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+            new bootstrap.Modal(document.getElementById('bloqueoModal')).show();
+        }
+
+        // Solicitar desbloqueo: envía la solicitud al admin central
+        async function solicitarDesbloqueoDispositivo(deviceId) {
+            if (!deviceId) return;
+            const motivo = prompt('Explica brevemente por qué necesitas desbloqueo (opcional):') || '';
+            try {
+                const res = await fetch('/api/solicitar-desbloqueo', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ device_id: deviceId, motivo })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    alert('✅ Solicitud enviada al administrador.\n\nTe contactará para procesar tu desbloqueo.');
+                    cerrarModalBloqueo();
+                } else {
+                    alert('❌ ' + (data.error || 'Error al enviar la solicitud'));
+                }
+            } catch (e) { alert('❌ Error de conexión'); }
+        }
+        function cerrarModalBloqueo() {
+            const modalEl = document.getElementById('bloqueoModal');
+            if (modalEl) {
+                const inst = bootstrap.Modal.getInstance(modalEl);
+                if (inst) inst.hide();
+                setTimeout(() => modalEl.remove(), 300);
+            }
+        }
+
+        // FIX: Modal de "Ya se registró, ¿desea continuar?"
+        function mostrarModalContinuarRegistro(onSi, onNo) {
+            const modalHtml = `
+                <div class="modal fade" id="continuarRegistroModal" tabindex="-1" data-bs-backdrop="static">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content" style="border-radius: 24px; border: none; overflow: hidden;">
+                            <div class="modal-body" style="padding: 40px 30px; text-align: center;">
+                                <div style="width: 80px; height: 80px; background: #FEF3C7; color: #F59E0B; border-radius: 50%; margin: 0 auto 24px; display: flex; align-items: center; justify-content: center; font-size: 2.5rem;"><i class="fas fa-user-check"></i></div>
+                                <h2 style="font-weight: 800; color: #1A2B4C; margin-bottom: 12px;">Ya se registró</h2>
+                                <p style="color: #6B7A99; margin-bottom: 24px; line-height: 1.6;">Detectamos que ya inició sesión con Google pero aún no crea su tienda. ¿Desea continuar con la creación de su proyecto?</p>
+                                <button id="btnContinuarSi" class="btn btn-primary w-100" style="padding: 14px; border-radius: 12px; font-weight: 700; margin-bottom: 8px; background: linear-gradient(135deg, #1E64FF, #1248C7); border: none;"><i class="fas fa-arrow-right me-2"></i> Sí, continuar</button>
+                                <button id="btnContinuarNo" class="btn btn-outline-secondary w-100" style="padding: 14px; border-radius: 12px; font-weight: 700;">No, más tarde</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            const old = document.getElementById('continuarRegistroModal');
+            if (old) old.remove();
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+            const modalEl = document.getElementById('continuarRegistroModal');
+            const modal = new bootstrap.Modal(modalEl);
+            document.getElementById('btnContinuarSi').onclick = function() {
+                modal.hide();
+                setTimeout(() => modalEl.remove(), 300);
+                if (onSi) onSi();
+            };
+            document.getElementById('btnContinuarNo').onclick = function() {
+                modal.hide();
+                setTimeout(() => modalEl.remove(), 300);
+                if (onNo) onNo();
+            };
+            modal.show();
+        }
+
+        // FIX: Iniciar cuenta regresiva de 24h tras rechazar continuar el registro
+        function iniciarCuentaRegresivaAbandono() {
+            localStorage.setItem('fg_registro_abandonado', Date.now().toString());
+        }
+
+        // FIX: Mostrar advertencia de cuenta regresiva si hay un abandono reciente (< 24h)
+        function mostrarAdvertenciaCuentaRegresivaSiAplica() {
+            const abandonado = localStorage.getItem('fg_registro_abandonado');
+            if (!abandonado) return false;
+            const timestamp = parseInt(abandonado);
+            const horasPasadas = (Date.now() - timestamp) / (1000 * 60 * 60);
+            if (horasPasadas >= 24) return false; // Ya expiró, lo maneja verificarDispositivoBloqueado
+            const horasRestantes = Math.ceil(24 - horasPasadas);
+            const msg = `Tienes ${horasRestantes} hora(s) restante(s) para crear tu tienda. Si no la creas en 24 horas, la opción de crear será eliminada para este dispositivo.`;
+            // Mostrar como toast o alerta sutil
+            setTimeout(() => {
+                const toast = document.getElementById('toast');
+                if (toast) {
+                    const toastMsg = document.getElementById('toastMsg');
+                    if (toastMsg) toastMsg.innerText = msg;
+                    toast.classList.add('mostrar');
+                    setTimeout(() => toast.classList.remove('mostrar'), 6000);
+                }
+            }, 1500);
+            return true;
+        }
+
+        // FIX: Helpers para mostrar/ocultar el modal de pago usando la API de Bootstrap
+        // (antes se manipulaba style.display directamente, lo que rompía el backdrop y la interacción)
+        function mostrarPagoModal() {
+            var modalEl = document.getElementById('pagoPlanModal');
+            if (!modalEl) return;
+            try {
+                var inst = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl, { backdrop: 'static', keyboard: false });
+                inst.show();
+            } catch (e) {
+                modalEl.style.display = 'block';
+                modalEl.classList.add('show');
+            }
+        }
+        function cerrarPagoModal() {
+            var modalEl = document.getElementById('pagoPlanModal');
+            if (!modalEl) return;
+            try {
+                var inst = bootstrap.Modal.getInstance(modalEl);
+                if (inst) { inst.hide(); }
+                else { modalEl.style.display = 'none'; modalEl.classList.remove('show'); }
+            } catch (e) {
+                modalEl.style.display = 'none';
+                modalEl.classList.remove('show');
+            }
+            // Limpieza del backdrop si quedó colgado
+            document.querySelectorAll('.modal-backdrop').forEach(function(b){ b.remove(); });
+            document.body.classList.remove('modal-open');
+        }
+
+        // FIX: mostrar banner solo cuando hay pago pendiente real, usando display:flex
+        function mostrarBannerPendiente() {
+            var banner = document.getElementById('resumePaymentBanner');
+            if (banner) banner.style.display = 'flex';
+        }
+        function ocultarBannerPendiente() {
+            var banner = document.getElementById('resumePaymentBanner');
+            if (banner) banner.style.display = 'none';
+        }
+
+        // 🚨 CORRECCIÓN CRÍTICA: Verificar en la BD si el ticket existe antes de mostrar banner
+        // FIX: Solo mostrar el banner si existe un pago GENUINAMENTE pendiente en el servidor.
+        // Si el ticket no existe, ya fue completado, o la API falla, NO se muestra el banner.
+        async function checkPendingPaymentValidity() {
+            // Primero asegurarnos de que el banner esté oculto por defecto
+            ocultarBannerPendiente();
+
+            const savedPayment = localStorage.getItem('fg_pago_pendiente');
+            if (!savedPayment || savedPayment === 'null' || savedPayment === 'undefined') {
+                pagoDataTemporal = null;
+                return;
+            }
+
+            let data;
+            try {
+                data = JSON.parse(savedPayment);
+            } catch (e) {
+                localStorage.removeItem('fg_pago_pendiente');
+                pagoDataTemporal = null;
+                return;
+            }
+
+            // Validar que el objeto tenga los campos mínimos requeridos
+            if (!data || !data.codigo || !data.plan) {
+                localStorage.removeItem('fg_pago_pendiente');
+                pagoDataTemporal = null;
+                return;
+            }
+
+            // Si el usuario ya tiene sesión y ya creó su tienda, el pago ya no está pendiente
+            try {
+                const res = await fetch(`/api/pagos/check/${encodeURIComponent(data.codigo)}`);
+                if (!res.ok) { throw new Error('Respuesta no OK'); }
+                const status = await res.json();
+
+                if (status && status.valido === true) {
+                    // El ticket sigue pendiente en el servidor: mostrar banner
+                    pagoDataTemporal = data;
+                    mostrarBannerPendiente();
+                } else {
+                    // El ticket ya fue usado, aprobado o no existe: limpiar TODO
+                    localStorage.removeItem('fg_pago_pendiente');
+                    pagoDataTemporal = null;
+                    codigoPago = null;
+                }
+            } catch (e) {
+                // Si la API no responde o no existe, NO molestar al usuario con el banner.
+                // Solo limpiamos el estado temporal pero conservamos el localStorage por si
+                // la API vuelve a estar disponible después (no mostramos el banner).
+                pagoDataTemporal = null;
+            }
+        }
+
+        window.addEventListener('load', async () => {
+            checkSession();
+
+            // 1. Validar el ticket con la base de datos
+            await checkPendingPaymentValidity();
+
+            // 2. Obtener datos de la tarjeta del admin de forma robusta (con caché en localStorage)
+            // FIX: Usar asegurarMetodosPagoCargados() en vez de fetch directo para que los datos
+            // no se "borren" si la API falla — se mantiene el caché de la última carga exitosa.
+            await asegurarMetodosPagoCargados();
+        });
+
+        function discardPendingPayment() {
+            if (!confirm('¿Estás seguro de que deseas cancelar este pago? Se perderá el ticket generado.')) return;
+            localStorage.removeItem('fg_pago_pendiente');
+            ocultarBannerPendiente();
+            pagoDataTemporal = null;
+            codigoPago = null;
+        }
+
+        async function resumePayment() {
+            if (!pagoDataTemporal) {
+                // Si no hay datos en memoria pero sí en localStorage, intentar recuperar
+                const savedPayment = localStorage.getItem('fg_pago_pendiente');
+                if (savedPayment) {
+                    try { pagoDataTemporal = JSON.parse(savedPayment); } catch (e) { pagoDataTemporal = null; }
+                }
+            }
+            if (!pagoDataTemporal) return;
+            planElegido = pagoDataTemporal.plan;
+            codigoPago = pagoDataTemporal.codigo;
+            totalPago = pagoDataTemporal.total;
+            ocultarBannerPendiente();
+
+            // FIX: Asegurar métodos de pago cargados antes de mostrar instrucciones
+            await asegurarMetodosPagoCargados();
+            mostrarInstruccionesPago();
+        }
+
+        async function elegirPlan(plan) {
+            planElegido = plan;
+            const nombres = { 'prueba': 'Prueba Gratis', 'basico': 'Plan Básico (1000 CUP/mes)', 'pro': 'Plan Pro (1500 CUP/mes)', 'premium': 'Plan Premium (2500 CUP/mes)' };
+            planTexto = nombres[plan] || 'Prueba Gratis';
+
+            // FIX: Verificar si el dispositivo está bloqueado antes de permitir crear tienda
+            const verificacion = await verificarDispositivoBloqueado();
+            if (verificacion.blocked) {
+                mostrarModalBloqueo(verificacion.reason);
+                return;
+            }
+
+            if (plan === 'prueba') {
+                document.getElementById('planSeleccionadoTexto').innerText = planTexto;
+                document.getElementById('regPlan').value = plan;
+                closeAllOverlays();
+                abrirRegistroModal();
+                return;
+            }
+
+            // FIX: Asegurar que los métodos de pago del admin estén cargados
+            await asegurarMetodosPagoCargados();
+
+            const bankNumber = metodosAdminGlobal.bank || '⚠️ Tarjeta no configurada por el Admin';
+            const esTarjetaValida = !bankNumber.includes('no configurada');
+
+            document.getElementById('pagoModalBody').innerHTML = `
+                <div style="width: 70px; height: 70px; background: #FEF3C7; color: #D97706; border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; font-size: 2rem;"><i class="fas fa-credit-card"></i></div>
+                <h3 style="font-weight: 800; color: #1A2B4C; margin-bottom: 8px;">Pago de Suscripción</h3>
+                <p style="color: #6B7A99; margin-bottom: 20px;">Estás a un paso de activar el <strong>${planTexto}</strong>.</p>
+                
+                <div style="background: #F8FAFF; border: 1.5px dashed #1E64FF; border-radius: 12px; padding: 16px; margin-bottom: 20px;">
+                    <p style="font-size: 0.85rem; color: #6B7A99; margin-bottom: 8px;">Transfiere a esta tarjeta:</p>
+                    <div style="display:flex; align-items:center; justify-content:center; gap:10px;">
+                        <div style="font-family: monospace; font-size: 1.2rem; font-weight: 800; color: #1A2B4C;" id="bankCardText">${bankNumber}</div>
+                        ${esTarjetaValida ? `<button onclick="copiarTarjeta('${bankNumber}')" class="btn btn-sm btn-outline-primary" style="border-radius:8px; padding:4px 10px;" title="Copiar tarjeta"><i class="fas fa-copy"></i></button>` : ''}
+                    </div>
+                </div>
+
+                <div class="text-start mb-3">
+                    <label class="form-label fw-bold">Nombre Completo</label>
+                    <input type="text" id="pagoNombre" class="form-control mb-2" placeholder="Tu nombre">
+                    <label class="form-label fw-bold">Teléfono / WhatsApp</label>
+                    <input type="text" id="pagoTelefono" class="form-control mb-2" placeholder="+53 5XXXXXXX">
+                    <label class="form-label fw-bold">Meses a pagar</label>
+                    <select id="pagoMeses" class="form-select mb-2" onchange="actualizarTotalPago()">
+                        <option value="1">1 Mes</option>
+                        <option value="2">2 Meses</option>
+                        <option value="3">3 Meses</option>
+                        <option value="6">6 Meses</option>
+                        <option value="12">12 Meses</option>
+                    </select>
+                </div>
+                
+                <div style="background: #F8FAFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 16px; margin-bottom: 20px;">
+                    <div style="font-size: 0.85rem; color: #6B7A99;">Total a Pagar:</div>
+                    <div style="font-size: 1.8rem; font-weight: 800; color: #1E64FF;" id="pagoTotal">1000 CUP</div>
+                </div>
+                
+                <!-- 🛡️ Honeypot anti-bot -->
+                <div aria-hidden="true" style="position:absolute;left:-9999px;top:-9999px;width:1px;height:1px;overflow:hidden;">
+                    <label>Website (leave empty)<input type="text" id="honeypotPago" tabindex="-1" autocomplete="off"></label>
+                </div>
+                <input type="hidden" id="formTsPago" value="">
+                
+                <button class="btn btn-primary w-100 mb-2" id="btnGenerarPago" onclick="generarPago()" style="padding: 14px; border-radius: 12px; font-weight: 700;">Generar Ticket de Pago</button>
+                <button class="btn btn-outline-secondary w-100" onclick="cerrarPagoModal()" style="padding: 12px; border-radius: 12px;">Cancelar</button>
+            `;
+            
+            closeAllOverlays();
+            mostrarPagoModal();
+            actualizarTotalPago();
+            // 🛡️ Setear timestamp del formulario de pago (anti-bot por timing)
+            const tsPago = document.getElementById('formTsPago');
+            if (tsPago) tsPago.value = Date.now();
+            const hpPago = document.getElementById('honeypotPago');
+            if (hpPago) hpPago.value = '';
+        }
+
+        function actualizarTotalPago() {
+            const meses = parseInt(document.getElementById('pagoMeses').value);
+            const precioMensual = preciosPlanes[planElegido] || 0;
+            totalPago = precioMensual * meses;
+            document.getElementById('pagoTotal').innerText = `${totalPago} CUP`;
+        }
+
+        async function generarPago() {
+            const nombre = document.getElementById('pagoNombre').value.trim();
+            const telefono = document.getElementById('pagoTelefono').value.trim();
+            const meses = parseInt(document.getElementById('pagoMeses').value);
+
+            if (!nombre || !telefono) {
+                alert('Completa tu nombre y teléfono por favor'); return;
+            }
+
+            const btn = document.getElementById('btnGenerarPago');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generando...';
+            btn.disabled = true;
+
+            try {
+                const res = await fetch('/api/pagos/generar', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ nombre, telefono, plan: planElegido, meses,
+                        _website_url: document.getElementById('honeypotPago')?.value || '',
+                        _form_ts: document.getElementById('formTsPago')?.value || Date.now() })
+                });
+                const data = await res.json();
+                
+                if (data.success) {
+                    codigoPago = data.codigo;
+                    
+                    pagoDataTemporal = { plan: planElegido, codigo: codigoPago, total: totalPago };
+                    localStorage.setItem('fg_pago_pendiente', JSON.stringify(pagoDataTemporal));
+
+                    mostrarInstruccionesPago();
+                } else { throw new Error(data.error); }
+            } catch (e) { 
+                alert('Error: ' + e.message); 
+                btn.innerHTML = 'Generar Ticket de Pago'; btn.disabled = false; 
+            }
+        }
+
+        function mostrarInstruccionesPago() {
+            const waAdmin = metodosAdminGlobal.whatsapp || '5353571569';
+            const bankNumber = metodosAdminGlobal.bank || '⚠️ Tarjeta no configurada';
+            const esTarjetaValida = !bankNumber.includes('no configurada');
+
+            const msg = encodeURIComponent(`Hola, he generado el ticket *${codigoPago}* para el plan *${planElegido.toUpperCase()}* por un total de *${totalPago} CUP*. Adjunto mi comprobante.`);
+            const waLink = `https://wa.me/${waAdmin}?text=${msg}`;
+
+            // FIX: Rediseño premium empresarial.
+            // El usuario pidió: solo opción de WhatsApp para enviar la factura de la transferencia,
+            // explicación de que debe enviar la factura para verificar su pago, y botón de continuar.
+            document.getElementById('pagoModalBody').innerHTML = `
+                <div style="width: 72px; height: 72px; background: linear-gradient(135deg, #E6F9F0, #D1FAE5); color: #10B981; border-radius: 50%; margin: 0 auto 18px; display: flex; align-items: center; justify-content: center; font-size: 2.1rem; box-shadow: 0 8px 20px rgba(16,185,129,0.25);"><i class="fas fa-check-circle"></i></div>
+                <h3 style="font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; color: #1A2B4C; margin-bottom: 6px; font-size: 1.5rem;">¡Ticket Generado!</h3>
+                <p style="color: #6B7A99; margin-bottom: 18px; font-size: 0.92rem;">Tu código de pago es:</p>
+                <div style="background: linear-gradient(135deg, #1E64FF, #1248C7); color: #fff; border-radius: 14px; padding: 14px 18px; margin: 0 auto 22px; max-width: 260px; text-align: center; box-shadow: 0 10px 28px rgba(30,100,255,0.35);">
+                    <div style="font-family: monospace; font-size: 1.5rem; font-weight: 800; letter-spacing: 2px;">${codigoPago}</div>
+                </div>
+
+                <div style="background: #F8FAFF; border: 1.5px solid #E2E8F0; border-radius: 14px; padding: 18px; margin-bottom: 18px;">
+                    <div style="font-size: 0.78rem; color: #6B7A99; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; margin-bottom: 10px;">Datos para tu transferencia</div>
+                    <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; background: #fff; border-radius: 10px; padding: 12px 14px; border: 1px solid #E2E8F0;">
+                        <div style="text-align:left;">
+                            <div style="font-size: 0.7rem; color: #6B7A99; margin-bottom: 2px;">Tarjeta / Cuenta</div>
+                            <div style="font-family: monospace; font-size: 1.05rem; font-weight: 800; color: #1A2B4C;">${bankNumber}</div>
+                        </div>
+                        ${esTarjetaValida ? `<button onclick="copiarTarjeta('${bankNumber}')" class="btn btn-sm" style="border-radius:8px; padding:8px 12px; background: var(--brand-tint, #EAF1FF); color: #1E64FF; border: 1px solid #1E64FF; font-weight:700;" title="Copiar tarjeta"><i class="fas fa-copy me-1"></i> Copiar</button>` : ''}
+                    </div>
+                    <div style="margin-top: 10px; font-size: 0.82rem; color: #1A2B4C; font-weight: 700;">Total a transferir: <span style="color: #1E64FF;">${totalPago} CUP</span></div>
+                </div>
+
+                <div style="background: #FFF7ED; border: 1.5px solid #FED7AA; border-radius: 12px; padding: 14px 16px; margin-bottom: 20px; text-align: left;">
+                    <div style="display: flex; gap: 10px; align-items: flex-start;">
+                        <i class="fas fa-info-circle" style="color: #F59E0B; font-size: 1.1rem; margin-top: 2px;"></i>
+                        <div>
+                            <div style="font-weight: 800; color: #92400E; font-size: 0.88rem; margin-bottom: 4px;">Verificación de tu pago</div>
+                            <div style="color: #78350F; font-size: 0.82rem; line-height: 1.5;">Para verificar tu pago y activar tu tienda, debes enviar la <strong>factura o comprobante de tu transferencia</strong> por WhatsApp. Sin el comprobante no podremos activar tu suscripción.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <a href="${waLink}" target="_blank" rel="noopener" id="btnEnviarWhatsApp" class="btn w-100 mb-3" style="padding: 16px; border-radius: 14px; font-weight: 800; background: linear-gradient(135deg, #25D366, #128C7E); border: none; color: #fff; font-size: 1rem; box-shadow: 0 10px 28px rgba(37,211,102,0.4); display: flex; align-items: center; justify-content: center; gap: 10px;"><i class="fab fa-whatsapp" style="font-size: 1.3rem;"></i> Enviar factura por WhatsApp</a>
+
+                <button class="btn w-100" onclick="continuarRegistro()" style="padding: 14px; border-radius: 14px; font-weight: 700; background: transparent; border: 2px solid #E2E8F0; color: #1A2B4C; font-size: 0.95rem; transition: all 0.2s;">Continuar <i class="fas fa-arrow-right ms-1"></i></button>
+
+                <p style="margin-top: 14px; font-size: 0.76rem; color: #9CA3AF; text-align: center;">Al continuar aceptas nuestros términos. Tu tienda se activará cuando verifiquemos tu comprobante.</p>
+            `;
+            mostrarPagoModal();
+        }
+
+        // FIX: Revelar el botón de registro con Google después de que el usuario confirma que envió el comprobante
+        function mostrarBotonGoogleRegistro() {
+            var wsStep = document.getElementById('whatsappStep');
+            var gStep = document.getElementById('googleStep');
+            if (wsStep) wsStep.style.display = 'none';
+            if (gStep) gStep.style.display = 'block';
+        }
+
+        function copiarTarjeta(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('✅ Número de tarjeta copiado al portapapeles');
+            }).catch(() => {
+                alert('❌ No se pudo copiar automáticamente. Por favor, hazlo manualmente.');
+            });
+        }
+
+        function continuarRegistro() {
+            cerrarPagoModal();
+            document.getElementById('planSeleccionadoTexto').innerText = planTexto;
+            document.getElementById('regPlan').value = planElegido;
+            abrirRegistroModal();
+        }
+
+        async function abrirRegistroModal() {
+            if (currentUser) {
+                try {
+                    const res = await fetch(`/api/mi-tienda?owner_id=${currentUser.id}`);
+                    const data = await res.json();
+                    if (data.success && data.store) { new bootstrap.Modal(document.getElementById('limiteModal')).show(); return; }
+                } catch (e) { console.error(e); }
+            }
+            if (!currentUser) {
+                document.getElementById('regStep1').style.display = 'block';
+                document.getElementById('regStep2').style.display = 'none';
+                document.getElementById('regStep3').style.display = 'none';
+            }
+            // 🛡️ Setear timestamp del formulario (anti-bot por timing)
+            const tsReg = document.getElementById('formTsReg');
+            if (tsReg) tsReg.value = Date.now();
+            const hpReg = document.getElementById('honeypotReg');
+            if (hpReg) hpReg.value = '';
+            new bootstrap.Modal(document.getElementById('registroModal')).show();
+        }
+
+        async function loginConGoogle() {
+            try {
+                await initSupabase();
+                const { error } = await window.supabaseClient.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: `${window.location.origin}/?registro=1` } });
+                if (error) throw error;
+            } catch (e) { alert('Error: ' + e.message); }
+        }
+
+        async function checkSession() {
+            try {
+                await initSupabase();
+                const { data: { session } } = await window.supabaseClient.auth.getSession();
+                const urlParams = new URLSearchParams(window.location.search);
+                const vieneDeOAuth = urlParams.get('registro') === '1';
+
+                if (session && session.user) {
+                    currentUser = session.user;
+                    // FIX: Verificar si el usuario ya tiene tienda creada
+                    let tieneTienda = false;
+                    try {
+                        const res = await fetch(`/api/mi-tienda?owner_id=${currentUser.id}`);
+                        const data = await res.json();
+                        if (data.success && data.store) {
+                            tieneTienda = true;
+                        }
+                    } catch (e) { console.error(e); }
+
+                    // 🚨 FIX CRÍTICO DEL BUG:
+                    // Si el usuario YA tiene una tienda creada, NO debemos mostrar el modal de
+                    // "Límite alcanzado" automáticamente al recargar la página. Eso bloqueaba
+                    // toda interacción con el sitio (el cliente no podía navegar ni usar su tienda).
+                    //
+                    // El modal solo debe aparecer si el usuario está intentando CREAR OTRA tienda
+                    // activamente, es decir, viene del flujo de Google OAuth con ?registro=1.
+                    if (tieneTienda) {
+                        if (vieneDeOAuth) {
+                            // Intentó crear otra tienda: aquí sí mostramos el aviso de límite.
+                            new bootstrap.Modal(document.getElementById('limiteModal')).show();
+                            window.history.replaceState({}, document.title, "/");
+                        }
+                        document.documentElement.classList.remove('registro-mode');
+                        return;
+                    }
+
+                    // FIX: Si NO tiene tienda pero ya tiene sesión (se registró con Google pero no creó la tienda)
+                    if (!tieneTienda) {
+                        // Si viene de Google OAuth (?registro=1), abrir el formulario directamente
+                        if (vieneDeOAuth) {
+                            abrirRegistroModal();
+                            document.getElementById('regStep1').style.display = 'none';
+                            document.getElementById('regStep2').style.display = 'block';
+                            document.getElementById('regStep3').style.display = 'none';
+                            window.history.replaceState({}, document.title, "/");
+                            // Cuando el registroModal se cierre sin haber creado la tienda:
+                            var regModalEl = document.getElementById('registroModal');
+                            regModalEl.addEventListener('hidden.bs.modal', function onceHidden() {
+                                regModalEl.removeEventListener('hidden.bs.modal', onceHidden);
+                                var step3 = document.getElementById('regStep3');
+                                if (step3 && step3.style.display !== 'block') {
+                                    document.documentElement.classList.remove('registro-mode');
+                                    // FIX: Si cierra sin crear, iniciar cuenta regresiva de 24h
+                                    iniciarCuentaRegresivaAbandono();
+                                    mostrarAdvertenciaCuentaRegresivaSiAplica();
+                                }
+                            });
+                        } else {
+                            // FIX: No viene de OAuth pero tiene sesión y no tiene tienda.
+                            // Mostrar: "Ya se registró, ¿desea continuar con la creación de su proyecto?"
+                            // Solo si tiene pago pendiente o registro incompleto
+                            const pagoPendiente = localStorage.getItem('fg_pago_pendiente');
+                            const registroAbandonado = localStorage.getItem('fg_registro_abandonado');
+                            if (pagoPendiente || registroAbandonado) {
+                                // Verificar que el dispositivo no esté bloqueado
+                                const verif = await verificarDispositivoBloqueado();
+                                if (verif.blocked) {
+                                    mostrarModalBloqueo(verif.reason);
+                                    document.documentElement.classList.remove('registro-mode');
+                                    return;
+                                }
+                                mostrarModalContinuarRegistro(
+                                    function onSi() {
+                                        // Sí continuar: abrir el formulario directamente (no pedir Google otra vez)
+                                        abrirRegistroModal();
+                                        document.getElementById('regStep1').style.display = 'none';
+                                        document.getElementById('regStep2').style.display = 'block';
+                                        document.getElementById('regStep3').style.display = 'none';
+                                        // Limpiar el flag de abandono si estaba
+                                        localStorage.removeItem('fg_registro_abandonado');
+                                        // Listener para detectar si vuelve a abandonar
+                                        var regModalEl2 = document.getElementById('registroModal');
+                                        regModalEl2.addEventListener('hidden.bs.modal', function onceHidden2() {
+                                            regModalEl2.removeEventListener('hidden.bs.modal', onceHidden2);
+                                            var step3 = document.getElementById('regStep3');
+                                            if (step3 && step3.style.display !== 'block') {
+                                                iniciarCuentaRegresivaAbandono();
+                                                mostrarAdvertenciaCuentaRegresivaSiAplica();
+                                            }
+                                        });
+                                    },
+                                    function onNo() {
+                                        // No continuar: iniciar cuenta regresiva de 24h
+                                        iniciarCuentaRegresivaAbandono();
+                                        mostrarAdvertenciaCuentaRegresivaSiAplica();
+                                        document.documentElement.classList.remove('registro-mode');
+                                    }
+                                );
+                            } else {
+                                document.documentElement.classList.remove('registro-mode');
+                            }
+                        }
+                    }
+                } else {
+                    // No hay sesión: restaurar vista normal
+                    document.documentElement.classList.remove('registro-mode');
+                    // FIX: Mostrar advertencia de cuenta regresiva si aplica
+                    mostrarAdvertenciaCuentaRegresivaSiAplica();
+                }
+            } catch (e) {
+                console.error('Error al verificar sesión:', e);
+                document.documentElement.classList.remove('registro-mode');
+            }
+        }
+
+        async function crearTiendaCliente() {
+            if (!currentUser) { alert('Inicia sesión primero.'); return; }
+            const nombre = document.getElementById('regNombreNegocio').value.trim();
+            const tipo = document.getElementById('regTipoNegocio').value;
+            const telefono = document.getElementById('regTelefono').value.trim();
+            const plan = document.getElementById('regPlan').value;
+            const direccion = document.getElementById('regDireccion').value.trim();
+            const horaApertura = document.getElementById('regHoraApertura').value;
+            const horaCierre = document.getElementById('regHoraCierre').value;
+            const tasaUSD = parseFloat(document.getElementById('regTasaUSD').value) || 25;
+            const pagoFisico = document.getElementById('pagoFisico').checked;
+            const pagoTransferencia = document.getElementById('pagoTransferencia').checked;
+            const garantia = document.getElementById('regGarantia').value === 'true';
+            const transporte = document.getElementById('regTransporte').value === 'true';
+
+            if (!nombre || !telefono) { alert('Completa los campos obligatorios (*)'); return; }
+            if (!pagoFisico && !pagoTransferencia) { alert('Selecciona al menos un método de pago'); return; }
+
+            const btn = document.getElementById('btnCrearTienda');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creando...';
+            btn.disabled = true;
+
+            const slug = nombre.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^a-z0-9\-]/g, '');
+            const metodosPago = []; if (pagoFisico) metodosPago.push('Efectivo'); if (pagoTransferencia) metodosPago.push('Transferencia');
+            
+            const codigo_pago = localStorage.getItem('fg_pago_pendiente') ? JSON.parse(localStorage.getItem('fg_pago_pendiente')).codigo : null;
+            // FIX: Enviar el device_id para que el server valide una tienda por dispositivo
+            const device_id = getDeviceId();
+
+            try {
+                const res = await fetch('/api/crear-tienda-cliente', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        user_id: currentUser.id, email: currentUser.email, nombre_dueno: currentUser.user_metadata?.full_name || 'Sin nombre',
+                        nombre_negocio: nombre, tipo, telefono, plan, fecha_vencimiento: null, direccion, hora_apertura: horaApertura,
+                        hora_cierre: horaCierre, tasa_usd: tasaUSD, metodos_pago: metodosPago, garantia, transporte, codigo_pago, device_id,
+                        _website_url: document.getElementById('honeypotReg')?.value || '',
+                        _form_ts: document.getElementById('formTsReg')?.value || Date.now()
+                    })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    localStorage.removeItem('fg_pago_pendiente');
+                    localStorage.removeItem('fg_registro_abandonado'); // FIX: Limpiar abandono al crear exitosamente
+                    ocultarBannerPendiente();
+                    pagoDataTemporal = null;
+                    codigoPago = null;
+                    
+                    const baseUrl = (globalConfig && globalConfig.appUrl) ? globalConfig.appUrl : window.location.origin;
+                    document.getElementById('regStep2').style.display = 'none';
+                    document.getElementById('regStep3').style.display = 'block';
+                    
+                    let htmlStep3 = '';
+                    if (plan === 'prueba') {
+                        htmlStep3 = `
+                            <div style="width: 80px; height: 80px; background: #E6F9F0; color: #10B981; border-radius: 50%; margin: 0 auto 24px; display: flex; align-items: center; justify-content: center; font-size: 2.5rem;"><i class="fas fa-check-circle"></i></div>
+                            <h2 style="font-weight: 800; color: #1A2B4C; margin-bottom: 8px;">¡Tienda Creada!</h2>
+                            <p style="color: #6B7A99; margin-bottom: 24px;">Tu tienda está activa. Guarda estas URLs.</p>
+                            <div style="background: #F8FAFF; border: 1.5px solid #E2E8F0; border-radius: 12px; padding: 16px; text-align: left; margin-bottom: 12px;"><label style="font-size: 0.75rem; font-weight: 700; color: #1E64FF;">🌐 Tu Tienda</label><div class="d-flex gap-2 mt-1"><input type="text" id="urlTienda" class="form-control" readonly value="${baseUrl}/?tienda=${data.slug}" style="font-size: 0.8rem;"><button class="btn btn-sm btn-outline-primary" onclick="copiarUrl('urlTienda')"><i class="fas fa-copy"></i></button></div></div>
+                            <div style="background: #F8FAFF; border: 1.5px solid #E2E8F0; border-radius: 12px; padding: 16px; text-align: left; margin-bottom: 24px;"><label style="font-size: 0.75rem; font-weight: 700; color: #1E64FF;">🔒 Tu Panel</label><div class="d-flex gap-2 mt-1"><input type="text" id="urlAdmin" class="form-control" readonly value="${baseUrl}/admin-cliente?tienda=${data.slug}" style="font-size: 0.8rem;"><button class="btn btn-sm btn-outline-primary" onclick="copiarUrl('urlAdmin')"><i class="fas fa-copy"></i></button></div></div>
+                            <a href="/admin-cliente?tienda=${data.slug}" class="btn btn-primary w-100" style="padding: 14px; border-radius: 12px; font-weight: 700;">Ir a mi Panel</a>
+                        `;
+                    } else {
+                        htmlStep3 = `
+                            <div style="width: 80px; height: 80px; background: #FEF3C7; color: #D97706; border-radius: 50%; margin: 0 auto 24px; display: flex; align-items: center; justify-content: center; font-size: 2.5rem;"><i class="fas fa-clock"></i></div>
+                            <h2 style="font-weight: 800; color: #1A2B4C; margin-bottom: 8px;">¡Tienda en Revisión!</h2>
+                            <p style="color: #6B7A99; margin-bottom: 24px;">Tu pago está siendo verificado por el administrador. Mientras tanto, puedes acceder a tu panel y subir tus productos.</p>
+                            
+                            <div style="background: #F8FAFF; border: 1.5px solid #E2E8F0; border-radius: 12px; padding: 16px; text-align: left; margin-bottom: 24px;"><label style="font-size: 0.75rem; font-weight: 700; color: #1E64FF;">🔒 Tu Panel (Acceso anticipado)</label><div class="d-flex gap-2 mt-1"><input type="text" id="urlAdmin" class="form-control" readonly value="${baseUrl}/admin-cliente?tienda=${data.slug}" style="font-size: 0.8rem;"><button class="btn btn-sm btn-outline-primary" onclick="copiarUrl('urlAdmin')"><i class="fas fa-copy"></i></button></div></div>
+                            <a href="/admin-cliente?tienda=${data.slug}" class="btn btn-primary w-100" style="padding: 14px; border-radius: 12px; font-weight: 700;">Entrar a mi Panel</a>
+                        `;
+                    }
+                    document.getElementById('regStep3').innerHTML = htmlStep3;
+                } else {
+                    // FIX: Si el servidor detecta que el dispositivo o cuenta ya tiene tienda, bloquear
+                    if (data.codigo === 'DISPOSITIVO_BLOQUEADO' || data.codigo === 'TIENDA_EXISTENTE') {
+                        localStorage.setItem('fg_dispositivo_bloqueado', '1');
+                        // Cerrar el modal de registro y mostrar el modal de bloqueo
+                        var regModal = bootstrap.Modal.getInstance(document.getElementById('registroModal'));
+                        if (regModal) regModal.hide();
+                        mostrarModalBloqueo(data.error || 'No se permite crear más tiendas en este dispositivo.');
+                    } else {
+                        throw new Error(data.error);
+                    }
+                }
+            } catch (e) {
+                alert('Error: ' + e.message);
+                btn.innerHTML = 'Crear mi Tienda';
+                btn.disabled = false;
+            }
+        }
+
+        function copiarUrl(id) { const input = document.getElementById(id); input.select(); navigator.clipboard.writeText(input.value).then(() => alert('✅ URL copiada')); }
+
+        // ============================================================
+        // SOLICITUDES A ADMIN: multi-tienda y upgrade de plan
+        // ============================================================
+        async function solicitarPermisoMultiTienda() {
+            if (!currentUser) { alert('Inicia sesión primero.'); return; }
+            // Obtener tienda actual del usuario
+            let tiendaActual = null;
+            try {
+                const res = await fetch(`/api/mi-tienda?owner_id=${currentUser.id}`);
+                const data = await res.json();
+                if (data.success && data.store) tiendaActual = data.store.id;
+            } catch (e) {}
+            const motivo = prompt('¿Por qué necesitas otra tienda? (opcional)') || '';
+            try {
+                const res = await fetch('/api/solicitar-multi-tienda', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        user_id: currentUser.id,
+                        email: currentUser.email,
+                        tienda_actual: tiendaActual,
+                        motivo: motivo
+                    })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    alert('✅ Solicitud enviada. El administrador revisará tu petición.');
+                    bootstrap.Modal.getInstance(document.getElementById('limiteModal'))?.hide();
+                } else {
+                    alert('❌ ' + (data.error || 'Error'));
+                }
+            } catch (e) { alert('❌ Error de conexión'); }
+        }
+
+        function abrirUpgradePlanModal() {
+            if (!currentUser) { alert('Inicia sesión primero.'); return; }
+            // Verificar que tiene tienda
+            fetch(`/api/mi-tienda?owner_id=${currentUser.id}`).then(r => r.json()).then(data => {
+                if (!data.success || !data.store) {
+                    alert('Necesitas tener una tienda creada para solicitar upgrade.');
+                    return;
+                }
+                new bootstrap.Modal(document.getElementById('upgradePlanModal')).show();
+            });
+        }
+
+        async function enviarSolicitudUpgrade() {
+            if (!currentUser) { alert('Inicia sesión primero.'); return; }
+            const planDeseado = document.getElementById('upgradePlanSelect').value;
+            const meses = parseInt(document.getElementById('upgradeMesesSelect').value);
+            const codigoPago = document.getElementById('upgradeCodigoPago').value.trim();
+            if (!planDeseado) { alert('Selecciona un plan'); return; }
+            // Obtener tienda slug
+            let tiendaSlug = null, planActual = 'prueba';
+            try {
+                const res = await fetch(`/api/mi-tienda?owner_id=${currentUser.id}`);
+                const data = await res.json();
+                if (data.success && data.store) {
+                    tiendaSlug = data.store.id;
+                    planActual = data.store.plan || 'prueba';
+                }
+            } catch (e) {}
+            if (!tiendaSlug) { alert('No se encontró tu tienda.'); return; }
+            try {
+                const res = await fetch('/api/solicitar-upgrade-plan', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        user_id: currentUser.id,
+                        email: currentUser.email,
+                        tienda_slug: tiendaSlug,
+                        plan_actual: planActual,
+                        plan_deseado: planDeseado,
+                        meses,
+                        codigo_pago: codigoPago || null
+                    })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    alert('✅ Solicitud enviada. El administrador la procesará.');
+                    bootstrap.Modal.getInstance(document.getElementById('upgradePlanModal'))?.hide();
+                } else {
+                    alert('❌ ' + (data.error || 'Error'));
+                }
+            } catch (e) { alert('❌ Error de conexión'); }
+        }
+    </script>
+</body>
+</html>
