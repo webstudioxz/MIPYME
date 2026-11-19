@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Panel - Tienda-fg</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="/css/admin-cliente.css">
+
+
+
+
+
+
+</head>
+<body>
+
+<div id="loader"><div class="spinner"></div><p class="mt-3 text-muted">Verificando acceso...</p></div>
+<button class="mobile-menu-btn" id="mobileMenuBtn"><i class="fas fa-bars"></i></button>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<div class="sidebar" id="sidebar">
+    <a href="#" class="sidebar-brand">
+        <div class="brand-icon"><i class="fas fa-store"></i></div>
+        <span>Mi Tienda</span>
+    </a>
+    <div class="tienda-info-box">
+        <small>Mi Negocio</small>
+        <div class="nombre" id="nombreTiendaSidebar">Cargando...</div>
+        <div id="estadoTiendaSidebar"></div>
+    </div>
+    
+    <button class="nav-item" data-section="mensajes" onclick="showSection('mensajes')"><span class="icon"><i class="fas fa-comments"></i></span> Mensajes de Tiendas</button>
+    
+    
+    
+    <button class="nav-item active" data-section="products" onclick="showSection('products', this)">
+        <i class="fas fa-box" id="navIconProductos"></i> <span id="navTextProductos">Productos</span>
+    </button>
+    <button class="nav-item" id="navPedidos" data-section="orders" onclick="showSection('orders', this)">
+        <i class="fas fa-shopping-cart"></i> Pedidos
+    </button>
+    <button class="nav-item" id="navReservas" data-section="reservas" onclick="showSection('reservas', this)" style="display:none;">
+        <i class="fas fa-calendar-check"></i> Reservas
+    </button>
+    <button class="nav-item" data-section="settings" onclick="showSection('settings', this)">
+        <i class="fas fa-cog"></i> Configuración
+    </button>
+    <button class="nav-item" data-section="graficas" data-feature="graficas" onclick="showSection('graficas', this)" style="display:none;">
+        <i class="fas fa-chart-bar"></i> Gráficas
+    </button>
+    <button class="nav-item" data-section="promocion" data-feature="promocion_publicidad" onclick="showSection('promocion', this)" style="display:none;">
+        <i class="fas fa-bullhorn"></i> Promoción
+    </button>
+    <button class="nav-item" data-section="wa-clientes" data-feature="whatsapp_clientes_compradores" onclick="showSection('wa-clientes', this)" style="display:none;">
+        <i class="fas fa-users"></i> WhatsApp Clientes
+    </button>
+    <button class="nav-item" id="notifBtn" onclick="AdminNotifications.toggle()" style="color: #F59E0B;">
+        <i class="fas fa-bell-slash"></i> Notificaciones
+    </button>
+    <a href="#" id="btnVerTienda" class="nav-item" style="color: #10B981; margin-top: 15px;">
+        <i class="fas fa-external-link-alt"></i> Ver mi Tienda
+    </a>
+    <button class="nav-item logout" onclick="logout()">
+        <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+    </button>
+</div>
+
+<div class="main-content" id="app" style="display:none;">
+
+    <div id="bannerAdminPaused" style="display:none;"></div>
+
+    <div id="view-products">
+        <div class="page-header">
+            <div><h1><i class="fas fa-box"></i> <span id="titleProductos">Mis Productos</span></h1></div>
+            <button class="btn btn-primary" onclick="abrirModalProducto()">
+                <i class="fas fa-plus me-1"></i> <span id="btnNuevoProducto">Nuevo Producto</span>
+            </button>
+        </div>
+        <div class="card p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr><th>Img</th><th>Nombre</th><th>Precio</th><th>Categoría</th><th>Contacto</th><th>Stock</th><th style="text-align:right;">Acciones</th></tr>
+                    </thead>
+                    <tbody id="productsList"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="view-orders" style="display:none;">
+        <div class="page-header">
+            <div><h1><i class="fas fa-shopping-cart"></i> Pedidos Recibidos</h1></div>
+            <button class="btn btn-danger" onclick="eliminarTodosLosPedidos()"><i class="fas fa-trash-alt me-1"></i> Borrar Todos</button>
+        </div>
+        <div class="card mb-4">
+            <div class="card-body py-3">
+                <div class="input-group">
+                    <span class="input-group-text bg-white"><i class="fas fa-search text-muted"></i></span>
+                    <input type="text" id="searchOrderCode" class="form-control border-start-0" placeholder="Buscar por código..." oninput="filtrarPedidos()">
+                </div>
+            </div>
+        </div>
+        <div id="ordersList"></div>
+    </div>
+
+    <div id="view-reservas" style="display:none;">
+        <div class="page-header">
+            <div><h1><i class="fas fa-calendar-check"></i> Reservas de Servicios</h1></div>
+        </div>
+        <div class="card mb-4">
+            <div class="card-body py-3">
+                <div class="input-group">
+                    <span class="input-group-text bg-white"><i class="fas fa-search text-muted"></i></span>
+                    <input type="text" id="searchReserva" class="form-control border-start-0" placeholder="Buscar por cliente, fecha o servicio..." oninput="filtrarReservas()">
+                </div>
+            </div>
+        </div>
+        <div id="reservasList"></div>
+    </div>
+
+    <div id="view-graficas" style="display:none;">
+        <div class="page-header">
+            <div><h1><i class="fas fa-chart-bar"></i> Gráficas</h1></div>
+            <button class="btn btn-outline-primary" onclick="cargarGraficas()"><i class="fas fa-sync-alt"></i> Actualizar</button>
+        </div>
+        <div class="row g-3">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header"><i class="fas fa-eye"></i> Productos más visitados</div>
+                    <div class="card-body" id="graficaVisitados">
+                        <p class="text-muted text-center py-4">Cargando...</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header"><i class="fas fa-shopping-bag"></i> Productos más vendidos</div>
+                    <div class="card-body" id="graficaVendidos">
+                        <p class="text-muted text-center py-4">Cargando...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="view-promocion" style="display:none;">
+        <div class="page-header">
+            <div><h1><i class="fas fa-bullhorn"></i> Promoción y Publicidad</h1></div>
+        </div>
+        <div class="card">
+            <div class="card-header"><i class="fas fa-star"></i> Destaca tu tienda</div>
+            <div class="card-body">
+                <div class="alert alert-info border-0" style="background:var(--primary-light); color:var(--primary-dark); border-radius:12px; padding:14px 16px;">
+                    <i class="fas fa-info-circle me-1"></i> Las herramientas de promoción permiten que tu tienda aparezca destacada en el index público y llegue a más clientes.
+                </div>
+                <div class="info-row">
+                    <span class="label">Estado de promoción</span>
+                    <span class="value" id="estadoPromocion"><span class="badge bg-secondary">Inactiva</span></span>
+                </div>
+                <div class="info-row">
+                    <span class="label">Tienda destacada en el index</span>
+                    <span class="value" id="estadoDestacada"><span class="badge bg-secondary">No</span></span>
+                </div>
+                <div class="d-flex gap-2 flex-wrap mt-3">
+                    <button class="btn btn-primary" onclick="abrirChatAdmin()">
+                        <i class="fas fa-comments me-1"></i> Contactar administración
+                    </button>
+                    <button class="btn btn-outline-primary" onclick="solicitarPromocion()">
+                        <i class="fas fa-bullhorn me-1"></i> Solicitar promoción
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="view-wa-clientes" style="display:none;">
+        <div class="page-header">
+            <div><h1><i class="fas fa-users"></i> WhatsApp a Clientes</h1></div>
+            <button class="btn btn-primary" onclick="cargarClientesCompradores()"><i class="fas fa-sync-alt me-1"></i> Cargar clientes</button>
+        </div>
+        <div class="alert alert-info border-0 mb-3" style="background:#F3E8FF; color:#6B21A8; border-radius:12px; padding:14px 16px;">
+            <i class="fas fa-crown me-1"></i> <strong>Función exclusiva Premium.</strong> Envía mensajes masivos por WhatsApp a todos los clientes que han comprado en tu tienda.
+        </div>
+        <div class="card">
+            <div class="card-header"><i class="fas fa-edit"></i> Mensaje a enviar</div>
+            <div class="card-body">
+                <textarea id="waMensajeMasivo" class="form-control mb-3" rows="4" placeholder="Escribe aquí el mensaje que recibirán todos tus clientes..."></textarea>
+                <div id="listaClientesCompradores">
+                    <p class="text-muted text-center py-4">Pulsa "Cargar clientes" para ver la lista de compradores.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    
+    <div id="view-settings" style="display:none;">
+        <div class="page-header"><h1><i class="fas fa-cog"></i> Configuración</h1></div>
+
+        <div class="card">
+            <div class="card-header"><i class="fas fa-info-circle"></i> Información de la Tienda</div>
+            <div class="card-body">
+                <div class="info-row"><span class="label">Plan actual</span><span class="value"><span class="badge-plan" id="badgePlan">-</span></span></div>
+                <div class="info-row"><span class="label">Estado</span><span class="value" id="badgeEstado">-</span></div>
+                <div class="info-row"><span class="label">Vencimiento</span><span class="value" id="fechaVencimiento">-</span></div>
+                <div class="info-row"><span class="label">Límite</span><span class="value" id="maxProductos">-</span></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><i class="fas fa-bell"></i> Notificaciones</div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Modo de notificaciones</label>
+                        <select id="notifModo" class="form-select">
+                            <option value="admin">🔔 Solo Admin (requiere confirmar)</option>
+                            <option value="whatsapp">📱 Solo WhatsApp (sin confirmar)</option>
+                            <option value="ambos">🔔📱 Admin + WhatsApp (sin confirmar)</option>
+                        </select>
+                        <small class="text-muted">
+                            <strong>Admin:</strong> el pedido llega al panel y tú lo confirmas.<br>
+                            <strong>WhatsApp:</strong> el cliente abre WhatsApp directo.<br>
+                            <strong>Ambos:</strong> panel + WhatsApp automático.
+                        </small>
+                    </div>
+                </div>
+                <button class="btn btn-primary mt-3" onclick="guardarNotificaciones()"><i class="fas fa-save me-1"></i> Guardar</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><i class="fas fa-link"></i> Enlaces</div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label">🌐 URL Pública</label>
+                    <div class="d-flex gap-2 flex-wrap">
+                        <input type="text" id="miUrlTienda" class="form-control flex-grow-1" readonly>
+                        <button class="btn btn-outline-primary" onclick="copiarInput('miUrlTienda')"><i class="fas fa-copy"></i></button>
+                    </div>
+                </div>
+                <div class="mb-0">
+                    <label class="form-label">🔒 URL Admin</label>
+                    <div class="d-flex gap-2 flex-wrap">
+                        <input type="text" id="miUrlAdmin" class="form-control flex-grow-1" readonly>
+                        <button class="btn btn-outline-primary" onclick="copiarInput('miUrlAdmin')"><i class="fas fa-copy"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" id="cardHorario" style="display:none;">
+            <div class="card-header"><i class="fas fa-clock"></i> Horario Laboral</div>
+            <div class="card-body">
+                <label class="form-label d-block mb-3" style="font-size:0.9rem;">📅 Días que trabajas</label>
+                <div class="d-flex flex-wrap gap-2 mb-4" id="diasLaborables">
+                    <div class="day-pill active" data-day="1" onclick="toggleDia(this)">Lun</div>
+                    <div class="day-pill active" data-day="2" onclick="toggleDia(this)">Mar</div>
+                    <div class="day-pill active" data-day="3" onclick="toggleDia(this)">Mié</div>
+                    <div class="day-pill active" data-day="4" onclick="toggleDia(this)">Jue</div>
+                    <div class="day-pill active" data-day="5" onclick="toggleDia(this)">Vie</div>
+                    <div class="day-pill active" data-day="6" onclick="toggleDia(this)">Sáb</div>
+                    <div class="day-pill" data-day="0" onclick="toggleDia(this)">Dom</div>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label">🕐 Hora apertura</label>
+                        <input type="time" id="horaApertura" class="form-control" value="09:00">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">🕔 Hora cierre</label>
+                        <input type="time" id="horaCierre" class="form-control" value="18:00">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">⏱️ Duración de turno</label>
+                        <select id="intervaloTurnos" class="form-select">
+                            <option value="30">30 minutos</option>
+                            <option value="45">45 minutos</option>
+                            <option value="60" selected>1 hora</option>
+                            <option value="90">1 hora 30 min</option>
+                            <option value="120">2 horas</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary mt-4" onclick="guardarHorario()">
+                    <i class="fas fa-save me-1"></i> Guardar Horario
+                </button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><i class="fas fa-coins"></i> Tasas y Pagos</div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6"><label class="form-label">1 USD = CUP</label><input type="number" step="0.01" id="miRateUSD" class="form-control"></div>
+                    <div class="col-md-6"><label class="form-label">1 EUR = CUP</label><input type="number" step="0.01" id="miRateEUR" class="form-control"></div>
+                </div>
+                <hr class="my-4">
+                <label class="form-label d-block mb-3">Métodos de Pago</label>
+                <div class="d-flex flex-column gap-2 mb-3">
+                    <div class="form-check form-switch"><input class="form-check-input" type="checkbox" id="pagoEfectivo"><label class="form-check-label fw-bold" for="pagoEfectivo">💵 Efectivo</label></div>
+                    <div class="form-check form-switch"><input class="form-check-input" type="checkbox" id="pagoTransferencia"><label class="form-check-label fw-bold" for="pagoTransferencia">🏦 Transferencia</label></div>
+                    <div class="form-check form-switch"><input class="form-check-input" type="checkbox" id="pagoTarjeta"><label class="form-check-label fw-bold" for="pagoTarjeta">💳 Tarjeta</label></div>
+                </div>
+                <div class="row g-3 mt-2">
+                    <div class="col-12"><label class="form-label">Número de Tarjeta</label><input type="text" id="numTarjeta" class="form-control" placeholder="9200 XXXX XXXX XXXX"></div>
+                    <div class="col-12">
+                        <label class="form-label">Imagen QR</label>
+                        <input type="file" id="qrTarjetaFile" class="form-control" accept="image/jpeg,image/png,image/webp,image/gif" onchange="previewQrImage(event)">
+                        <input type="hidden" id="urlQrTarjeta">
+                        <div id="qrPreviewContainer" class="mt-2" style="display:none;">
+                            <img id="qrPreviewImg" src="" alt="QR" style="max-height: 120px; border-radius: 8px; border: 1px solid var(--border-soft);">
+                        </div>
+                    </div>
+                </div>
+                <button class="btn btn-primary mt-4" onclick="guardarConfiguracion()"><i class="fas fa-save me-1"></i> Guardar Configuración</button>
+            </div>
+        </div>
+
+        <div class="card" id="cardGestorVenta">
+            <div class="card-header"><i class="fas fa-user-tie"></i> Gestor de Ventas</div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6"><label class="form-label">Nombre</label><input type="text" id="gestorNombre" class="form-control"></div>
+                    <div class="col-md-6"><label class="form-label">Carnet</label><input type="text" id="gestorCarnet" class="form-control"></div>
+                    <div class="col-md-6"><label class="form-label">Teléfono</label><input type="text" id="gestorTelefono" class="form-control"></div>
+                    <div class="col-md-6"><label class="form-label">Dirección</label><input type="text" id="gestorDireccion" class="form-control"></div>
+                </div>
+                <button class="btn btn-primary mt-3" onclick="guardarGestorVenta()"><i class="fas fa-save me-1"></i> Guardar</button>
+            </div>
+        </div>
+
+        <div class="card danger-card">
+            <div class="card-header"><i class="fas fa-exclamation-triangle"></i> Zona de Peligro</div>
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                    <div><h6 class="fw-bold mb-1">Pausar Tienda</h6><small class="text-muted">Clientes no acceden temporalmente. Elige un mensaje público.</small></div>
+                    <div class="d-flex gap-2 flex-wrap">
+                        <button class="btn btn-warning" id="btnPausarConMensaje" onclick="abrirPausaModal()"><i class="fas fa-pause"></i> Pausar con mensaje</button>
+                        <button class="btn btn-success" id="btnReactivarTienda" onclick="reactivarTienda()" style="display:none;"><i class="fas fa-play"></i> Reactivar</button>
+                    </div>
+                </div>
+                <hr>
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <div><h6 class="fw-bold mb-1">Eliminar Tienda</h6><small class="text-muted">Irreversible.</small></div>
+                    <button class="btn btn-danger" onclick="eliminarMiTienda()">Eliminar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- MODAL PRODUCTO -->
+<div class="modal fade" id="productoModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="fw-bold m-0" id="modalProductoTitle"><i class="fas fa-box me-2" style="color:var(--primary);"></i> <span id="modalProductoTitleText">Nuevo Producto</span></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="prodId">
+                <div class="row g-3">
+                    <div class="col-md-8"><label class="form-label">Nombre *</label><input type="text" id="prodName" class="form-control" required></div>
+                    <div class="col-md-4"><label class="form-label">Precio *</label><input type="number" id="prodPrice" class="form-control" required min="0" step="0.01"></div>
+                    <div class="col-12"><label class="form-label">Descripción</label><textarea id="prodDesc" class="form-control" rows="2"></textarea></div>
+
+                    <div class="col-md-6" id="groupDescuento">
+                        <label class="form-label">Descuento (%)</label>
+                        <input type="number" id="prodDiscount" class="form-control" value="0" min="0" max="100">
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Categoría</label>
+                        <div class="d-flex gap-2">
+                            <select id="prodCategory" class="form-select flex-grow-1"></select>
+                            <button type="button" class="btn btn-outline-primary" onclick="agregarCategoria()"><i class="fas fa-plus"></i></button>
+                            <button type="button" class="btn btn-outline-danger" onclick="eliminarCategoria()"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label">Imagen Principal</label>
+                        <div class="d-flex gap-2 flex-wrap mb-2">
+                            <input type="text" id="prodImage" class="form-control flex-grow-1" placeholder="https://... o sube un archivo">
+                            <label class="btn btn-outline-primary mb-0" style="cursor:pointer;white-space:nowrap;">
+                                <i class="fas fa-upload me-1"></i> Subir archivo
+                                <input type="file" id="prodImageFile" accept="image/jpeg,image/png,image/webp,image/gif" style="display:none;" onchange="procesarImagenProducto(event)">
+                            </label>
+                        </div>
+                        <small class="text-muted">
+                            <i class="fas fa-shield-alt me-1"></i> JPG, PNG, WEBP o GIF · máx 5MB · la imagen se valida y re-codifica por seguridad.
+                        </small>
+                        <div id="prodImagePreview" class="mt-2" style="display:none;">
+                            <img id="prodImagePreviewImg" src="" style="max-height:150px;border-radius:8px;border:1px solid var(--border-soft);">
+                        </div>
+                    </div>
+
+                    <div class="col-12" id="divImagenesServicio" style="display:none;">
+                        <label class="form-label">🖼️ Imágenes del Servicio (3-6 URLs)</label>
+                        <textarea id="prodImagenesServicio" class="form-control" rows="4" placeholder="Una URL por línea"></textarea>
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label">👤 Nombre del contacto <span style="font-size:0.72rem;color:var(--text-muted);font-weight:400;">(opcional, se muestra al cliente)</span></label>
+                        <input type="text" id="prodContactoNombre" class="form-control" placeholder="Ej: Juan Pérez">
+                    </div>
+
+                    <div class="col-12" id="groupWhatsappProveedor">
+                        <label class="form-label">📞 WhatsApp del proveedor/contacto <span style="font-size:0.72rem;color:var(--text-muted);font-weight:400;">(opcional)</span></label>
+                        <input type="tel" id="prodWhatsAppProveedor" class="form-control" placeholder="+53 5XXXXXXX">
+                        <small class="text-muted">Si el plan lo incluye, este WhatsApp abrirá el chat directo. El pedido siempre llega a tu panel.</small>
+                    </div>
+
+                    <div class="col-12" id="groupImagenProveedor">
+                        <label class="form-label">🖼️ Imagen del proveedor <span style="font-size:0.72rem;color:var(--text-muted);font-weight:400;">(opcional)</span></label>
+                        <input type="text" id="prodImageProveedor" class="form-control" placeholder="https://...">
+                    </div>
+
+                    <div class="col-12" id="groupRequiereCarnet">
+                        <div class="form-check form-switch switch-box">
+                            <input class="form-check-input" type="checkbox" id="prodRequiereCarnet">
+                            <label class="form-check-label fw-bold" for="prodRequiereCarnet">🪪 Requerir carnet al cliente</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button class="btn btn-primary" onclick="guardarProducto()"><i class="fas fa-save me-1"></i> Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL PAUSAR CON MENSAJE -->
+<div class="modal fade" id="pausaModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="fw-bold m-0"><i class="fas fa-pause-circle me-2" style="color:var(--warning);"></i> Pausar Tienda</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-3">Tu tienda dejará de mostrarse públicamente hasta que la reactives. Los clientes verán el mensaje que elijas.</p>
+                <label class="form-label"><strong>Mensaje público</strong></label>
+                <select class="form-select mb-2" id="pausaMsgSelect" onchange="onChangePausaMsg(this)">
+                    <option value="Volvemos mañana">Volvemos mañana</option>
+                    <option value="Estamos en inventario">Estamos en inventario</option>
+                    <option value="En 1 hora abrimos">En 1 hora abrimos</option>
+                    <option value="Cerrado temporalmente por mantenimiento">Cerrado temporalmente por mantenimiento</option>
+                    <option value="__custom__">✏️ Escribir mensaje personalizado…</option>
+                </select>
+                <input type="text" class="form-control" id="pausaMsgCustom" placeholder="Escribe el mensaje que verá el público" style="display:none;" maxlength="200">
+                <div class="alert alert-info mt-3 mb-0" style="font-size:0.8rem;">
+                    <i class="fas fa-info-circle"></i> Puedes reactivar tu tienda cuando quieras desde esta misma sección.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button class="btn btn-warning" onclick="confirmarPausa()"><i class="fas fa-pause"></i> Pausar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: Mensajes con Administración -->
+<div class="modal fade" id="chatAdminModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="fw-bold m-0">
+                    <i class="fas fa-comments me-2" style="color:var(--primary);"></i>
+                    Mensajes con Administración
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert border-0 mb-3" style="background:var(--primary-light);color:var(--primary-dark);border-radius:12px;padding:12px 14px;font-size:0.82rem;">
+                    <i class="fas fa-info-circle me-1"></i>
+                    Todo mensaje incluye automáticamente el <strong>código de registro, email y nombre de la tienda</strong>.
+                    Las respuestas del administrador aparecerán aquí mismo.
+                </div>
+
+                <div id="chatAdminHeader" class="mb-3" style="background:#F8FAFF;padding:10px 14px;border-radius:10px;border:1px solid var(--border-soft);font-size:0.82rem;"></div>
+
+                <div id="chatAdminMensajes" style="max-height:380px;overflow-y:auto;padding:10px;background:#FAFBFF;border-radius:12px;border:1px solid var(--border-soft);">
+                    <p class="text-muted text-center py-4 small">Cargando conversación...</p>
+                </div>
+
+                <div class="mt-3">
+                    <label class="form-label">Escribe tu mensaje</label>
+                    <textarea id="chatAdminInput" class="form-control" rows="3" placeholder="Escribe aquí tu consulta o mensaje..."></textarea>
+                    <div class="text-end text-muted mt-1" style="font-size:0.72rem;">
+                        Encabezado automático: <strong>código · email · tienda</strong>.
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button class="btn btn-primary" onclick="enviarMensajeAdmin()">
+                    <i class="fas fa-paper-plane me-1"></i> Enviar mensaje
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/js/admin/notifications.js"></script>
+<script src="/js/admin-cliente.js"></script>
+</body>
+</html>
+
+
