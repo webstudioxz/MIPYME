@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Super Admin - Tienda-fg</title>
+    
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- CSS Personalizado (Ajusta la ruta si es necesario) -->
+    <link rel="stylesheet" href="/css/admin.css">
+    
+    <style>
+        /* Estilos rápidos para el chat si no los tienes en el CSS principal */
+        .chat-bubble {
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+        .chat-bubble-admin {
+            background-color: #4F46E5;
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+        .chat-bubble-tienda {
+            background-color: #ffffff;
+            color: #1f2937;
+            border: 1px solid #e5e7eb;
+            border-bottom-left-radius: 4px;
+        }
+        #chatAdminHistorial::-webkit-scrollbar { width: 6px; }
+        #chatAdminHistorial::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+    </style>
+</head>
+<body class="bg-light">
+
+    <!-- PANTALLA DE LOGIN -->
+    <div id="loginScreen" style="display: flex; align-items: center; justify-content: center; min-height: 100vh; background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);">
+        <div class="card shadow-lg border-0" style="width: 100%; max-width: 400px; border-radius: 16px;">
+            <div class="card-body p-5 text-center">
+                <div class="mb-4">
+                    <i class="fas fa-crown text-primary" style="font-size: 3rem;"></i>
+                </div>
+                <h4 class="mb-1 fw-bold">Super Admin</h4>
+                <p class="text-muted mb-4">Panel de Control</p>
+                
+                <div id="loginError" class="alert alert-danger d-none text-start small py-2"></div>
+                
+                <form id="loginForm">
+                    <div class="mb-3 text-start">
+                        <label class="form-label small fw-bold">Correo Electrónico</label>
+                        <input type="email" id="emailInput" class="form-control" placeholder="admin@ejemplo.com" required>
+                    </div>
+                    <div class="mb-4 text-start">
+                        <label class="form-label small fw-bold">Contraseña</label>
+                        <input type="password" id="passInput" class="form-control" placeholder="••••••••" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 py-2 fw-bold" id="btnLogin">
+                        Entrar al Panel
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- APP PRINCIPAL -->
+    <div id="app" style="display: none;">
+        
+        <!-- SIDEBAR -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-brand">
+                <i class="fas fa-crown"></i> Tienda-FG
+            </div>
+            
+            <div class="nav-item active" data-section="dashboard" onclick="showSection('dashboard')">
+                <i class="fas fa-chart-pie"></i> Dashboard
+            </div>
+            <div class="nav-item" data-section="tiendas" onclick="showSection('tiendas')">
+                <i class="fas fa-store"></i> Tiendas
+            </div>
+            <div class="nav-item" data-section="solicitudes" onclick="showSection('solicitudes')">
+                <i class="fas fa-inbox"></i> Solicitudes
+            </div>
+            <div class="nav-item" data-section="pedidos" onclick="showSection('pedidos')">
+                <i class="fas fa-shopping-bag"></i> Pedidos Globales
+            </div>
+            <div class="nav-item" data-section="mensajes" onclick="showSection('mensajes')">
+                <i class="fas fa-comments"></i> Mensajes / Chat
+            </div>
+            <div class="nav-item" data-section="pagos" onclick="showSection('pagos')">
+                <i class="fas fa-money-bill-wave"></i> Pagos
+            </div>
+            <div class="nav-item" data-section="planes" onclick="showSection('planes')">
+                <i class="fas fa-layer-group"></i> Planes
+            </div>
+            <div class="nav-item" data-section="configpagos" onclick="showSection('configpagos')">
+                <i class="fas fa-credit-card"></i> Config. Pagos
+            </div>
+            <div class="nav-item" data-section="privacidad" onclick="showSection('privacidad')">
+                <i class="fas fa-shield-alt"></i> Privacidad
+            </div>
+            <div class="nav-item" data-section="seguridad" onclick="showSection('seguridad')">
+                <i class="fas fa-lock"></i> Seguridad
+            </div>
+            
+            <div class="mt-auto pt-4">
+                <div class="nav-item text-danger" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                </div>
+            </div>
+        </div>
+
+        <!-- CONTENIDO PRINCIPAL -->
+        <div class="main-content">
+            <!-- HEADER MÓVIL -->
+            <div class="d-md-none bg-white p-3 shadow-sm d-flex justify-content-between align-items-center mb-3">
+                <h5 class="m-0 fw-bold">Admin Panel</h5>
+                <button class="btn btn-light" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+            </div>
+
+            <!-- VISTA: DASHBOARD -->
+            <div id="view-dashboard">
+                <div class="view-header mb-4">
+                    <h2 class="fw-bold m-0">Resumen General</h2>
+                    <p class="text-muted m-0">Estado actual de la plataforma</p>
+                </div>
+                
+                <div class="row g-3 mb-4">
+                    <div class="col-6 col-md-3">
+                        <div class="card border-0 shadow-sm p-3">
+                            <span class="text-muted small fw-bold">TOTAL TIENDAS</span>
+                            <h2 class="fw-bold m-0" id="dashTiendas">0</h2>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="card border-0 shadow-sm p-3 border-start border-success border-4">
+                            <span class="text-muted small fw-bold">ACTIVAS</span>
+                            <h2 class="fw-bold m-0" id="dashActivas">0</h2>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="card border-0 shadow-sm p-3 border-start border-warning border-4">
+                            <span class="text-muted small fw-bold">PENDIENTES</span>
+                            <h2 class="fw-bold m-0" id="dashPendientes">0</h2>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="card border-0 shadow-sm p-3 border-start border-danger border-4">
+                            <span class="text-muted small fw-bold">VENCIDAS</span>
+                            <h2 class="fw-bold m-0" id="dashVencidas">0</h2>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white border-0 pt-4 pb-0">
+                        <h5 class="fw-bold">Últimas Tiendas Registradas</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Tienda</th>
+                                        <th>Dueño</th>
+                                        <th>Plan</th>
+                                        <th>Vence</th>
+                                        <th>Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="dashRecentTiendas">
+                                    <tr><td colspan="5" class="text-center text-muted py-4">Cargando...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VISTA: TIENDAS -->
+            <div id="view-tiendas" style="display: none;">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h2 class="fw-bold m-0">Gestión de Tiendas</h2>
+                        <p class="text-muted m-0">Administra todos los negocios</p>
+                    </div>
+                    <button class="btn btn-primary fw-bold" onclick="abrirCrearTienda()">
+                        <i class="fas fa-plus"></i> Nueva Tienda
+                    </button>
+                </div>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-4 col-md-2"><div class="card text-center p-2"><small class="text-muted fw-bold">TOTAL</small><h4 class="m-0 fw-bold" id="kpiTotal">0</h4></div></div>
+                    <div class="col-4 col-md-2"><div class="card text-center p-2"><small class="text-success fw-bold">ACTIVAS</small><h4 class="m-0 fw-bold text-success" id="kpiActivas">0</h4></div></div>
+                    <div class="col-4 col-md-2"><div class="card text-center p-2"><small class="text-primary fw-bold">PENDIENTES</small><h4 class="m-0 fw-bold text-primary" id="kpiPendientes">0</h4></div></div>
+                    <div class="col-4 col-md-2"><div class="card text-center p-2"><small class="text-warning fw-bold">PAUSADAS</small><h4 class="m-0 fw-bold text-warning" id="kpiPausadas">0</h4></div></div>
+                    <div class="col-4 col-md-2"><div class="card text-center p-2"><small class="text-danger fw-bold">VENCIDAS</small><h4 class="m-0 fw-bold text-danger" id="kpiVencidas">0</h4></div></div>
+                </div>
+
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col-md-6 mb-2 mb-md-0">
+                                <input type="text" id="searchTiendas" class="form-control" placeholder="Buscar por nombre, ID o email..." onkeyup="renderTiendas()">
+                            </div>
+                            <div class="col-md-6">
+                                <select id="filterEstado" class="form-select" onchange="renderTiendas()">
+                                    <option value="todas">Todos los estados</option>
+                                    <option value="activas">Solo Activas</option>
+                                    <option value="pendientes">Pendientes de Liberación</option>
+                                    <option value="pausadas">Pausadas</option>
+                                    <option value="vencidas">Vencidas</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Tienda</th>
+                                        <th>Dueño / Cuenta</th>
+                                        <th>Plan</th>
+                                        <th>Vence</th>
+                                        <th class="text-center">Productos</th>
+                                        <th>Estado</th>
+                                        <th class="text-end">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tiendasList">
+                                    <tr><td colspan="7" class="text-center py-4"><i class="fas fa-spinner fa-spin"></i> Cargando tiendas...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VISTA: MENSAJES / CHAT -->
+            <div id="view-mensajes" style="display: none;">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h2 class="fw-bold m-0">Mensajes y Soporte</h2>
+                        <p class="text-muted m-0">Responde a las dudas de los dueños de tiendas</p>
+                    </div>
+                    <button class="btn btn-outline-primary" onclick="loadMensajesAdmin()">
+                        <i class="fas fa-sync-alt"></i> Actualizar
+                    </button>
+                </div>
+
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Última Actividad</th>
+                                        <th>Tienda</th>
+                                        <th>Email</th>
+                                        <th>Último Mensaje</th>
+                                        <th class="text-end">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="mensajesAdminList">
+                                    <tr><td colspan="5" class="text-center py-4"><i class="fas fa-spinner fa-spin"></i> Cargando mensajes...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- OTRAS VISTAS (Placeholders) -->
+            <div id="view-solicitudes" style="display: none;"><h2>Solicitudes</h2><p>En construcción...</p></div>
+            <div id="view-pedidos" style="display: none;"><h2>Pedidos Globales</h2><p>En construcción...</p></div>
+            <div id="view-pagos" style="display: none;"><h2>Pagos</h2><p>En construcción...</p></div>
+            <div id="view-planes" style="display: none;"><h2>Planes</h2><p>En construcción...</p></div>
+            <div id="view-configpagos" style="display: none;"><h2>Configuración de Pagos</h2><p>En construcción...</p></div>
+            <div id="view-privacidad" style="display: none;"><h2>Privacidad</h2><p>En construcción...</p></div>
+            <div id="view-seguridad" style="display: none;"><h2>Seguridad</h2><p>En construcción...</p></div>
+        </div>
+    </div>
+
+    <!-- MODAL DE CHAT CON TIENDA (NUEVO) -->
+    <div class="modal fade" id="chatAdminModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: 12px; overflow: hidden;">
+                <div class="modal-header bg-primary text-white border-0 py-3">
+                    <h5 class="modal-title fw-bold">
+                        <i class="fas fa-store me-2"></i> <span id="chatAdminTiendaNombre">Cargando...</span>
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body bg-light" id="chatAdminHistorial" style="height: 450px; overflow-y: auto; padding: 20px;">
+                    <!-- Aquí se inyectan los mensajes del chat vía JS -->
+                </div>
+                <div class="modal-footer bg-white border-top-0 py-3">
+                    <div class="input-group">
+                        <input type="text" id="chatAdminInput" class="form-control form-control-lg bg-light" placeholder="Escribe una respuesta..." onkeypress="if(event.key === 'Enter') enviarRespuestaAdmin()">
+                        <button class="btn btn-primary px-4" id="btnEnviarChatAdmin" onclick="enviarRespuestaAdmin()">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODALES ADICIONALES (Los que usas para crear/editar tiendas) -->
+    <!-- Si tienes modales como crearTiendaModal, editarTiendaModal, etc., asegúrate de que estén aquí debajo -->
+    <div class="modal fade" id="crearTiendaModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header"><h5 class="modal-title">Crear Tienda</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                <div class="modal-body">
+                    <p class="text-muted">Formulario de creación de tienda (Añade tus inputs aquí)</p>
+                    <input type="text" id="newNombre" class="form-control mb-2" placeholder="Nombre de la tienda">
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button class="btn btn-primary" onclick="crearTienda()">Crear</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST DE NOTIFICACIONES -->
+    <div id="adminToast" class="toast align-items-center text-white bg-dark border-0 position-fixed bottom-0 end-0 m-4" role="alert" aria-live="assertive" aria-atomic="true" style="z-index: 9999; display: none; border-left: 4px solid #10B981 !important;">
+        <div class="d-flex">
+            <div class="toast-body d-flex align-items-center gap-2">
+                <i class="fas fa-check-circle text-success"></i>
+                <span id="adminToastMsg">Operación exitosa</span>
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Tu archivo JS del Superadmin -->
+    <script src="/js/admin/app.js"></script>
+    
+    <script>
+        // Pequeño script de inicialización si usas el Login aquí mismo
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Si ya tienes la sesión guardada y verificada en tu app.js, esto la mostrará automáticamente
+            if (isSessionValid()) {
+                const isValid = await verifySession();
+                if (isValid) {
+                    showApp();
+                } else {
+                    logout();
+                }
+            }
+
+            // Formulario de login
+            document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const email = document.getElementById('emailInput').value;
+                const pass = document.getElementById('passInput').value;
+                const btn = document.getElementById('btnLogin');
+                const errDiv = document.getElementById('loginError');
+                
+                btn.disabled = true;
+                btn.innerHTML = 'Verificando...';
+                errDiv.classList.add('d-none');
+
+                try {
+                    const res = await fetch('/api/admin/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email, password: pass })
+                    });
+                    const data = await res.json();
+                    
+                    if (data.success && data.token) {
+                        // Guardar token y expiración (ej. 24 horas)
+                        saveSession(data.token, Date.now() + 24*60*60*1000);
+                        await showApp();
+                    } else {
+                        errDiv.textContent = data.error || 'Credenciales incorrectas';
+                        errDiv.classList.remove('d-none');
+                    }
+                } catch (err) {
+                    errDiv.textContent = 'Error de conexión';
+                    errDiv.classList.remove('d-none');
+                } finally {
+                    btn.disabled = false;
+                    btn.innerHTML = 'Entrar al Panel';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
